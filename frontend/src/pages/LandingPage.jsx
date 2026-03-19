@@ -79,6 +79,13 @@ const LandingPage = () => {
       subtitle: "Analytics",
       gradient: "bg-gradient-to-br from-blue-400 to-blue-500",
     },
+    {
+      path: "/influencer-settings",
+      icon: Settings,
+      title: "Settings",
+      subtitle: "Account & payments",
+      gradient: "bg-gradient-to-br from-gray-400 to-gray-500",
+    },
   ];
 
   const businessFlow = [
@@ -151,6 +158,13 @@ const LandingPage = () => {
       title: "Dashboard",
       subtitle: "Analytics",
       gradient: "bg-gradient-to-br from-cyan-400 to-cyan-500",
+    },
+    {
+      path: "/business-settings",
+      icon: Settings,
+      title: "Settings",
+      subtitle: "Account & billing",
+      gradient: "bg-gradient-to-br from-gray-400 to-gray-500",
     },
   ];
 

@@ -12,6 +12,7 @@ import InfluencerProfilePage from "./pages/InfluencerProfilePage";
 import CreateDigitalTwinPage from "./pages/CreateDigitalTwinPage";
 import DigitalTwinProgressPage from "./pages/DigitalTwinProgressPage";
 import DigitalTwinIntroPage from "./pages/DigitalTwinIntroPage";
+import InfluencerSettingsPage from "./pages/InfluencerSettingsPage";
 
 // Business Pages
 import BusinessProfilePage from "./pages/BusinessProfilePage";
@@ -23,6 +24,7 @@ import BusinessPlanPage from "./pages/BusinessPlanPage";
 import InfluencersPage from "./pages/InfluencersPage";
 import PaymentPage from "./pages/PaymentPage";
 import ContentPlanPage from "./pages/ContentPlanPage";
+import BusinessSettingsPage from "./pages/BusinessSettingsPage";
 
 // Shared Pages
 import DashboardPage from "./pages/DashboardPage";
@@ -41,6 +43,7 @@ function App() {
           <Route path="/create-digital-twin" element={<CreateDigitalTwinPage />} />
           <Route path="/digital-twin-progress" element={<DigitalTwinProgressPage />} />
           <Route path="/digital-twin-intro" element={<DigitalTwinIntroPage />} />
+          <Route path="/influencer-settings" element={<InfluencerSettingsPage />} />
 
           {/* Business Flow */}
           <Route path="/profile" element={<BusinessProfilePage />} />
@@ -52,6 +55,7 @@ function App() {
           <Route path="/influencers" element={<InfluencersPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/content-plan" element={<ContentPlanPage />} />
+          <Route path="/business-settings" element={<BusinessSettingsPage />} />
 
           {/* Shared */}
           <Route path="/dashboard" element={<DashboardPage />} />
