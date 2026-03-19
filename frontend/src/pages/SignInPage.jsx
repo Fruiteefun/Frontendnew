@@ -196,7 +196,7 @@ const SignInPage = () => {
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 relative z-50">
                   <Label htmlFor="user-type">I am a...</Label>
                   <Select
                     value={formData.userType}
@@ -205,7 +205,7 @@ const SignInPage = () => {
                     <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100" data-testid="signup-usertype-select">
                       <SelectValue placeholder="Select your role" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[100]">
                       <SelectItem value="influencer">Influencer</SelectItem>
                       <SelectItem value="business">Business</SelectItem>
                     </SelectContent>
