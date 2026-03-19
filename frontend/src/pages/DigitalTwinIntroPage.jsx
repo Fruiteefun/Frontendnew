@@ -184,7 +184,15 @@ const DigitalTwinIntroPage = () => {
         </div>
 
         {/* Continue Button */}
-        <div className="mt-8 flex justify-center">
+        <div className="mt-8 flex justify-between max-w-4xl mx-auto">
+          <Button
+            variant="outline"
+            onClick={() => navigate("/digital-twin-progress")}
+            className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
+            data-testid="back-btn"
+          >
+            Back
+          </Button>
           <Button
             onClick={() => navigate("/dashboard")}
             className="h-14 px-10 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold text-lg shadow-lg shadow-orange-500/20 transition-all duration-300"

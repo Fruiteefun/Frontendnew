@@ -222,7 +222,15 @@ const CreateDigitalTwinPage = () => {
         </div>
 
         {/* Submit Button */}
-        <div className="mt-8 flex justify-center">
+        <div className="mt-8 flex justify-between max-w-4xl mx-auto">
+          <Button
+            variant="outline"
+            onClick={() => navigate("/influencer-profile")}
+            className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
+            data-testid="back-btn"
+          >
+            Back
+          </Button>
           <Button
             onClick={handleSubmit}
             disabled={!uploadedImage || !hasRecorded}

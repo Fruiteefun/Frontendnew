@@ -161,19 +161,25 @@ const BrandsPage = () => {
           )}
         </div>
 
-        {/* Continue Button */}
-        {brands.length > 0 && (
-          <div className="mt-8 flex justify-end">
-            <Button
-              onClick={() => navigate("/brand-setup")}
-              className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
-              data-testid="continue-btn"
-            >
-              Continue to Brand Setup
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </div>
-        )}
+        {/* Navigation Buttons */}
+        <div className="mt-8 flex justify-between">
+          <Button
+            variant="outline"
+            onClick={() => navigate("/business-preferences")}
+            className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
+            data-testid="back-btn"
+          >
+            Back
+          </Button>
+          <Button
+            onClick={() => navigate("/brand-setup")}
+            className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
+            data-testid="continue-btn"
+          >
+            Continue
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
+        </div>
       </div>
     </Layout>
   );

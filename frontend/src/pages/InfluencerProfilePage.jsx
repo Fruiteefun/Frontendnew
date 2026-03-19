@@ -218,7 +218,16 @@ const InfluencerProfilePage = () => {
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end">
+          <div className="flex justify-between">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
+              onClick={() => navigate("/signin")}
+              data-testid="back-btn"
+            >
+              Back
+            </Button>
             <Button
               type="submit"
               className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"

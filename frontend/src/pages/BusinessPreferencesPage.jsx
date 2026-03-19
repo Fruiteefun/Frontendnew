@@ -285,7 +285,7 @@ const BusinessPreferencesPage = () => {
               className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
               data-testid="save-continue-btn"
             >
-              Save & Continue
+              Continue
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </div>
