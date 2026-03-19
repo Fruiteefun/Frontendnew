@@ -1,0 +1,169 @@
+{
+  "project_name": "Fruitee - Social Media Campaign Management",
+  "design_philosophy": {
+    "theme": "Juicy Minimalism",
+    "emotion": "Fresh, Energetic, Approachable, Professional",
+    "core_concept": "Data made delicious. A workspace that feels like a creative studio, not a spreadsheet.",
+    "mode": "light",
+    "note": "Forced Light Mode with Warm Neutrals. Dark mode is secondary/optional."
+  },
+  "typography": {
+    "font_family": {
+      "headings": "Outfit, sans-serif",
+      "body": "DM Sans, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "scale": {
+      "h1": "text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]",
+      "h2": "text-4xl md:text-5xl font-semibold tracking-tight",
+      "h3": "text-2xl md:text-3xl font-medium",
+      "body_lg": "text-lg md:text-xl leading-relaxed",
+      "body_base": "text-base leading-relaxed text-muted-foreground",
+      "caption": "text-sm font-medium tracking-wide uppercase text-muted-foreground"
+    },
+    "imports": [
+      "@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Outfit:wght@300;500;700;900&display=swap');"
+    ]
+  },
+  "colors": {
+    "palette": {
+      "background": "#FFF8F0",
+      "foreground": "#2D2A26",
+      "card": "#FFFFFF",
+      "card_foreground": "#2D2A26",
+      "primary": "#FF6B6B",
+      "primary_foreground": "#FFFFFF",
+      "secondary": "#FFE66D",
+      "secondary_foreground": "#2D2A26",
+      "accent": "#4ECDC4",
+      "accent_foreground": "#FFFFFF",
+      "muted": "#F7F2EB",
+      "muted_foreground": "#888278",
+      "border": "#E6DDD0",
+      "input": "#FFFBF5",
+      "ring": "#FF6B6B"
+    },
+    "gradients": {
+      "brand_primary": "bg-gradient-to-r from-orange-400 to-pink-500",
+      "brand_text": "bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-pink-600",
+      "surface_shine": "bg-gradient-to-br from-white/80 to-white/40"
+    },
+    "usage": {
+      "primary_action": "bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 transition-opacity",
+      "secondary_action": "bg-white border-2 border-orange-100 text-orange-600 hover:bg-orange-50",
+      "success": "text-teal-600 bg-teal-50 border-teal-100",
+      "warning": "text-yellow-600 bg-yellow-50 border-yellow-100",
+      "error": "text-red-600 bg-red-50 border-red-100"
+    }
+  },
+  "visual_enhancers": {
+    "radius": {
+      "default": "rounded-2xl",
+      "card": "rounded-3xl",
+      "button": "rounded-full"
+    },
+    "shadows": {
+      "soft": "shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
+      "floating": "shadow-[0_20px_50px_rgb(0,0,0,0.1)]",
+      "inner": "shadow-inner"
+    },
+    "glassmorphism": {
+      "default": "bg-white/70 backdrop-blur-xl border border-white/50 shadow-sm",
+      "heavy": "bg-white/40 backdrop-blur-2xl border border-white/30"
+    },
+    "borders": {
+      "subtle": "border border-orange-100/50",
+      "focus": "ring-2 ring-orange-200 ring-offset-2"
+    }
+  },
+  "component_styling": {
+    "buttons": {
+      "primary": "rounded-full px-8 py-6 font-semibold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 hover:-translate-y-0.5 transition-all duration-300",
+      "ghost": "hover:bg-orange-50 text-orange-700 font-medium"
+    },
+    "cards": {
+      "default": "bg-white rounded-3xl border border-orange-50/50 shadow-sm hover:shadow-md transition-shadow duration-300 p-8",
+      "interactive": "group hover:border-orange-200 transition-colors cursor-pointer"
+    },
+    "inputs": {
+      "default": "rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 transition-all duration-200 h-12 px-4"
+    }
+  },
+  "layout_strategy": {
+    "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "grid_system": {
+      "dashboard": "grid grid-cols-1 md:grid-cols-12 gap-6",
+      "cards": "grid grid-cols-1 md:grid-cols-3 gap-8",
+      "feature_split": "grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+    },
+    "spacing": {
+      "section_padding": "py-24 md:py-32",
+      "element_gap": "gap-4 md:gap-8"
+    }
+  },
+  "motion": {
+    "transitions": {
+      "default": "transition-all duration-300 ease-out",
+      "slow": "transition-all duration-700 ease-in-out"
+    },
+    "animations": {
+      "fade_in_up": "animate-in fade-in slide-in-from-bottom-8 duration-700",
+      "scale_in": "animate-in zoom-in-95 duration-300",
+      "float": "animate-bounce duration-[3s]"
+    }
+  },
+  "image_urls": {
+    "branding": [
+      {
+        "url": "https://images.unsplash.com/photo-1555328425-c29bc27e91c6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTJ8MHwxfHNlYXJjaHwzfHwzZCUyMG1pbmltYWwlMjBmcnVpdCUyMHJlbmRlciUyMHBhc3RlbCUyMHBpbmslMjBvcmFuZ2V8ZW58MHx8fHwxNzczOTU5MjE1fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Three round orange fruits - minimal 3D",
+        "category": "hero_decoration"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1586826983328-fa96ac552bd7?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTJ8MHwxfHNlYXJjaHwxfHwzZCUyMG1pbmltYWwlMjBmcnVpdCUyMHJlbmRlciUyMHBhc3RlbCUyMHBpbmslMjBvcmFuZ2V8ZW58MHx8fHwxNzczOTU5MjE1fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Yellow round fruit on pink surface - high contrast",
+        "category": "card_accent"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1712273119941-724231753648?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTJ8MHwxfHNlYXJjaHwyfHwzZCUyMG1pbmltYWwlMjBmcnVpdCUyMHJlbmRlciUyMHBhc3RlbCUyMHBpbmslMjBvcmFuZ2V8ZW58MHx8fHwxNzczOTU5MjE1fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Orange falling into air - dynamic motion",
+        "category": "hero_action"
+      }
+    ],
+    "people": [
+      {
+        "url": "https://images.unsplash.com/photo-1676252651721-6a06e6df805d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwbW9kZWwlMjBwb3J0cmFpdCUyMGNvbG9yZnVsJTIwYmFja2dyb3VuZCUyMHNtaWxlfGVufDB8fHx8MTc3Mzk1OTIxNHww&ixlib=rb-4.1.0&q=85",
+        "description": "Man in orange jacket leaning on wall",
+        "category": "influencer_avatar"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1638409867784-4ed76ed742a1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwyfHxmYXNoaW9uJTIwbW9kZWwlMjBwb3J0cmFpdCUyMGNvbG9yZnVsJTIwYmFja2dyb3VuZCUyMHNtaWxlfGVufDB8fHx8MTc3Mzk1OTIxNHww&ixlib=rb-4.1.0&q=85",
+        "description": "Woman standing in front of colorful wall",
+        "category": "influencer_avatar"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1524158572048-994dc70d2b58?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwzfHxmYXNoaW9uJTIwbW9kZWwlMjBwb3J0cmFpdCUyMGNvbG9yZnVsJTIwYmFja2dyb3VuZCUyMHNtaWxlfGVufDB8fHx8MTc3Mzk1OTIxNHww&ixlib=rb-4.1.0&q=85",
+        "description": "Smiling woman close up",
+        "category": "testimonial_avatar"
+      }
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Install 'lucide-react' for icons: `yarn add lucide-react`.",
+    "Install 'framer-motion' for animations: `yarn add framer-motion`.",
+    "Install 'recharts' for charts: `yarn add recharts`.",
+    "Install 'react-dropzone' for file uploads: `yarn add react-dropzone`.",
+    "Configure Tailwind themes by extending `theme.colors` with the palette provided above in `tailwind.config.js`.",
+    "For the Logo: Use a text logo 'Fruitee' with the 'i' replaced by an SVG of a fruit (orange/peach) or a colored dot.",
+    "Implement the 'Digital Twin' recording UI with a clear visualizer component.",
+    "Use Bento Grid layouts for the Dashboard.",
+    "Ensure all interactive elements have `data-testid` attributes."
+  ],
+  "universal_guidelines": [
+    "Do not use generic gray backgrounds; always tint with warm cream (#FFF8F0).",
+    "Avoid sharp edges; use `rounded-2xl` or `rounded-3xl`.",
+    "Use gradients sparingly (buttons, text highlights), not full backgrounds.",
+    "Ensure all text meets APCA contrast standards against the cream background.",
+    "Micro-interactions: Buttons should scale down slightly on click (`active:scale-95`)."
+  ]
+}
