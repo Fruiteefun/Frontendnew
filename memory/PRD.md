@@ -35,7 +35,7 @@ Build a web app called Fruitee - a social media campaign management platform wit
 
 ### Business Flow
 1. Business Profile - Company details, logo, social handles
-2. Preferences - Campaign goals, platforms, budget, content types
+2. Preferences - Campaign goals, target audiences (multiselect chips), content types
 3. Brand Management - Create/manage multiple brands
 4. Brand Setup - Assets, colors, voice/tone
 5. Campaign Type - Select objective (awareness, launch, event, promotion)
@@ -45,9 +45,9 @@ Build a web app called Fruitee - a social media campaign management platform wit
 9. Content Plan - Calendar with posts/reels scheduling
 10. Dashboard - Analytics and performance tracking
 
-## What's Been Implemented (March 19, 2026)
+## What's Been Implemented
 
-### Pages Built (15+)
+### Pages Built (15+) - Completed March 19-20, 2026
 - Landing page with navigation cards
 - Sign In / Sign Up with email authentication
 - Influencer Profile setup
@@ -55,7 +55,7 @@ Build a web app called Fruitee - a social media campaign management platform wit
 - Digital Twin Progress (animated loading)
 - Digital Twin Intro (video player placeholder)
 - Business Profile (logo upload, forms)
-- Business Preferences (checkboxes, sliders, multi-select)
+- Business Preferences (multiselect chips for target audiences, campaign goals, content types)
 - Brands management (add/delete brands)
 - Brand Setup (asset upload, color picker)
 - Campaign Type selection
@@ -81,10 +81,14 @@ Build a web app called Fruitee - a social media campaign management platform wit
 - File Upload: react-dropzone
 - Animations: Framer Motion (available)
 
+### Verified (March 20, 2026)
+- BusinessPreferencesPage multiselect chips for Target Audiences working correctly
+- Removed Preferred Platforms, Monthly Budget, Campaign Frequency frames as requested
+
 ## Prioritized Backlog
 
 ### P0 - Critical (Backend Integration)
-- Connect all pages to backend API endpoints
+- Connect all pages to backend API endpoints (Swagger: http://18.135.75.87:8000/docs)
 - User authentication with JWT tokens
 - Database integration for user data
 
@@ -92,9 +96,10 @@ Build a web app called Fruitee - a social media campaign management platform wit
 - Real file upload functionality
 - Voice recording implementation
 - AI digital twin generation integration
-- Payment gateway integration (Stripe)
+- Form validations across all onboarding steps
 
 ### P2 - Medium Priority
+- Payment gateway integration (Stripe)
 - Real-time content generation
 - Social media posting automation
 - Campaign analytics from real data
