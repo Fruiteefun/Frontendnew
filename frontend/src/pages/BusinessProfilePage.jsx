@@ -32,9 +32,8 @@ const BusinessProfilePage = () => {
     phone: initialPhone,
     description: "",
     instagram: "",
-    twitter: "",
     tiktok: "",
-    linkedin: "",
+    youtube: "",
   });
 
   const handleLogoUpload = (e) => {
@@ -272,11 +271,16 @@ const BusinessProfilePage = () => {
 
           {/* Social Media Handles */}
           <div className="bg-white rounded-3xl p-8 shadow-soft space-y-6">
-            <h2 className="font-outfit text-xl font-semibold">
-              Social Media Handles
-            </h2>
+            <div>
+              <h2 className="font-outfit text-xl font-semibold">
+                Social Media Handles
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                At least one platform is required
+              </p>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="instagram">Instagram</Label>
                 <Input
@@ -292,22 +296,6 @@ const BusinessProfilePage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="twitter">Twitter / X</Label>
-                <Input
-                  id="twitter"
-                  placeholder="@yourhandle"
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                  value={formData.twitter}
-                  onChange={(e) =>
-                    setFormData({ ...formData, twitter: e.target.value })
-                  }
-                  data-testid="twitter-input"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
                 <Label htmlFor="tiktok">TikTok</Label>
                 <Input
                   id="tiktok"
@@ -322,16 +310,16 @@ const BusinessProfilePage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="linkedin">LinkedIn</Label>
+                <Label htmlFor="youtube">YouTube</Label>
                 <Input
-                  id="linkedin"
-                  placeholder="company/yourcompany"
+                  id="youtube"
+                  placeholder="@yourchannel"
                   className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                  value={formData.linkedin}
+                  value={formData.youtube}
                   onChange={(e) =>
-                    setFormData({ ...formData, linkedin: e.target.value })
+                    setFormData({ ...formData, youtube: e.target.value })
                   }
-                  data-testid="linkedin-input"
+                  data-testid="youtube-input"
                 />
               </div>
             </div>
