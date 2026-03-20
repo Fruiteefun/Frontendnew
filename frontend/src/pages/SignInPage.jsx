@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, User } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, User, Phone } from "lucide-react";
 import { Instagram, Twitter, Facebook, Youtube, Linkedin } from "lucide-react";
 
 const SignInPage = () => {
@@ -23,6 +23,7 @@ const SignInPage = () => {
     email: "",
     password: "",
     name: "",
+    phone: "",
     userType: "",
   });
 
@@ -34,9 +35,9 @@ const SignInPage = () => {
     setTimeout(() => {
       setIsLoading(false);
       if (formData.userType === "influencer" || type === "signin") {
-        navigate("/influencer-profile", { state: { fullName: formData.name } });
+        navigate("/influencer-profile", { state: { fullName: formData.name, phone: formData.phone } });
       } else {
-        navigate("/profile", { state: { fullName: formData.name } });
+        navigate("/profile", { state: { fullName: formData.name, phone: formData.phone } });
       }
     }, 1000);
   };
@@ -193,6 +194,22 @@ const SignInPage = () => {
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="signup-phone">Phone Number</Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Input
+                      id="signup-phone"
+                      type="tel"
+                      placeholder="+1 (555) 000-0000"
+                      className="pl-10 h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      data-testid="signup-phone-input"
+                    />
                   </div>
                 </div>
 

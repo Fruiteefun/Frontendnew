@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -16,14 +16,20 @@ import { Camera, ArrowRight, X } from "lucide-react";
 
 const BusinessProfilePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [logo, setLogo] = useState(null);
+  
+  // Get phone from signup
+  const initialPhone = location.state?.phone || "";
+  
   const [formData, setFormData] = useState({
     businessName: "",
     category: "",
     website: "",
     teamSize: "",
-    location: "",
-    phone: "",
+    country: "",
+    city: "",
+    phone: initialPhone,
     description: "",
     instagram: "",
     twitter: "",
@@ -195,32 +201,58 @@ const BusinessProfilePage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  placeholder="New York, USA"
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                  value={formData.location}
-                  onChange={(e) =>
-                    setFormData({ ...formData, location: e.target.value })
+                <Label htmlFor="country">Country</Label>
+                <Select
+                  value={formData.country}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, country: value })
                   }
-                  data-testid="location-input"
-                />
+                >
+                  <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white/50" data-testid="country-select">
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="us">United States</SelectItem>
+                    <SelectItem value="uk">United Kingdom</SelectItem>
+                    <SelectItem value="ca">Canada</SelectItem>
+                    <SelectItem value="au">Australia</SelectItem>
+                    <SelectItem value="de">Germany</SelectItem>
+                    <SelectItem value="fr">France</SelectItem>
+                    <SelectItem value="in">India</SelectItem>
+                    <SelectItem value="jp">Japan</SelectItem>
+                    <SelectItem value="br">Brazil</SelectItem>
+                    <SelectItem value="mx">Mexico</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
+                <Label htmlFor="city">City/Town</Label>
                 <Input
-                  id="phone"
-                  placeholder="+1 (555) 000-0000"
+                  id="city"
+                  placeholder="New York"
                   className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                  value={formData.phone}
+                  value={formData.city}
                   onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
+                    setFormData({ ...formData, city: e.target.value })
                   }
-                  data-testid="phone-input"
+                  data-testid="city-input"
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                placeholder="+1 (555) 000-0000"
+                className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
+                data-testid="phone-input"
+              />
             </div>
 
             <div className="space-y-2">
