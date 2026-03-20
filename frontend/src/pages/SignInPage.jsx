@@ -196,18 +196,22 @@ const SignInPage = () => {
                   </div>
                 </div>
 
-                <div className="space-y-2 relative z-50">
+                <div className="space-y-2">
                   <Label htmlFor="user-type">I am a...</Label>
                   <Select
                     value={formData.userType}
                     onValueChange={(value) => setFormData({ ...formData, userType: value })}
                   >
-                    <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100" data-testid="signup-usertype-select">
+                    <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100" data-testid="signup-usertype-select">
                       <SelectValue placeholder="Select your role" />
                     </SelectTrigger>
-                    <SelectContent className="z-[100]">
-                      <SelectItem value="influencer">Influencer</SelectItem>
-                      <SelectItem value="business">Business</SelectItem>
+                    <SelectContent 
+                      position="popper" 
+                      sideOffset={4}
+                      className="bg-white border border-gray-200 shadow-lg rounded-xl"
+                    >
+                      <SelectItem value="influencer" className="py-3 px-4 cursor-pointer hover:bg-orange-50 rounded-lg">Influencer</SelectItem>
+                      <SelectItem value="business" className="py-3 px-4 cursor-pointer hover:bg-orange-50 rounded-lg">Business</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -215,7 +219,7 @@ const SignInPage = () => {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-12 rounded-xl bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
+                  className="w-full h-12 rounded-xl bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300 relative z-0"
                   data-testid="signup-submit-btn"
                 >
                   {isLoading ? "Creating account..." : "Sign Up"}
