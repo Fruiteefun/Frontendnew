@@ -17,7 +17,7 @@ import {
   CreditCard,
   Calendar,
   LogOut,
-  Settings2,
+  Cog,
 } from "lucide-react";
 
 const influencerNavItems = [
@@ -93,7 +93,7 @@ export const Layout = ({ children, userType = "business" }) => {
       <main className="flex-1 overflow-auto">
         <div className="relative min-h-full">
           {/* Top Right Settings Icon */}
-          <div className="absolute top-6 right-8 z-50">
+          <div className="fixed top-6 right-8 z-[100]">
             <Link
               to={settingsPath}
               data-testid="settings-icon"
@@ -103,7 +103,7 @@ export const Layout = ({ children, userType = "business" }) => {
                   : "bg-white shadow-soft hover:shadow-md text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Settings2 className="w-5 h-5" />
+              <Cog className="w-5 h-5" />
             </Link>
           </div>
 
