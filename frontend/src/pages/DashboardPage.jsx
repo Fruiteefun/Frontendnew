@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Layout } from "../components/Layout";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
 import {
   Select,
   SelectContent,
@@ -8,13 +11,18 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../components/ui/popover";
+import {
   Eye,
   Users,
   Heart,
   Share2,
   TrendingUp,
   TrendingDown,
-  Filter,
+  Calendar,
 } from "lucide-react";
 import {
   LineChart,
@@ -34,7 +42,29 @@ import {
 } from "recharts";
 
 const DashboardPage = () => {
-  const [timeFilter, setTimeFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("last-month");
+  const [campaignFilter, setCampaignFilter] = useState("all");
+  const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
+  const [showCustomDates, setShowCustomDates] = useState(false);
+
+  // Mock campaigns list
+  const campaigns = [
+    { id: "all", name: "All Campaigns" },
+    { id: "spring-launch", name: "Spring Product Launch" },
+    { id: "brand-awareness", name: "Brand Awareness Q1" },
+    { id: "holiday-promo", name: "Holiday Promotion" },
+    { id: "influencer-collab", name: "Influencer Collaboration" },
+  ];
+
+  const handlePeriodChange = (value) => {
+    setPeriodFilter(value);
+    if (value === "custom") {
+      setShowCustomDates(true);
+    } else {
+      setShowCustomDates(false);
+    }
+  };
 
   const stats = [
     {
@@ -106,7 +136,7 @@ const DashboardPage = () => {
 
   return (
     <Layout userType="business">
-      <div className="p-8" data-testid="dashboard-page">
+      <div className="p-8 pr-24" data-testid="dashboard-page">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -118,18 +148,76 @@ const DashboardPage = () => {
             </p>
           </div>
 
+          {/* Filters */}
           <div className="flex items-center gap-4">
+            {/* Period Filter */}
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-muted-foreground" />
-              <Select value={timeFilter} onValueChange={setTimeFilter}>
-                <SelectTrigger className="w-32 h-10 rounded-xl border-gray-200" data-testid="time-filter">
+              <Label className="text-sm text-muted-foreground whitespace-nowrap">Period:</Label>
+              <Select value={periodFilter} onValueChange={handlePeriodChange}>
+                <SelectTrigger className="w-40 h-10 rounded-xl border-gray-200 bg-white" data-testid="period-filter">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Time</SelectItem>
-                  <SelectItem value="week">This Week</SelectItem>
-                  <SelectItem value="month">This Month</SelectItem>
-                  <SelectItem value="quarter">This Quarter</SelectItem>
+                  <SelectItem value="last-week">Last Week</SelectItem>
+                  <SelectItem value="last-month">Last Month</SelectItem>
+                  <SelectItem value="ytd">Year to Date</SelectItem>
+                  <SelectItem value="custom">Custom Dates</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Custom Date Range (shows when custom is selected) */}
+            {showCustomDates && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="h-10 rounded-xl border-gray-200 gap-2">
+                    <Calendar className="w-4 h-4" />
+                    {customStartDate && customEndDate 
+                      ? `${customStartDate} - ${customEndDate}`
+                      : "Select dates"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 bg-white p-4" align="end">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Start Date</Label>
+                      <Input
+                        type="date"
+                        value={customStartDate}
+                        onChange={(e) => setCustomStartDate(e.target.value)}
+                        className="h-10 rounded-xl"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>End Date</Label>
+                      <Input
+                        type="date"
+                        value={customEndDate}
+                        onChange={(e) => setCustomEndDate(e.target.value)}
+                        className="h-10 rounded-xl"
+                      />
+                    </div>
+                    <Button className="w-full h-10 rounded-xl bg-gradient-to-r from-orange-400 to-pink-500 text-white">
+                      Apply
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
+
+            {/* Campaign Filter */}
+            <div className="flex items-center gap-2">
+              <Label className="text-sm text-muted-foreground whitespace-nowrap">Campaign:</Label>
+              <Select value={campaignFilter} onValueChange={setCampaignFilter}>
+                <SelectTrigger className="w-48 h-10 rounded-xl border-gray-200 bg-white" data-testid="campaign-filter">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {campaigns.map((campaign) => (
+                    <SelectItem key={campaign.id} value={campaign.id}>
+                      {campaign.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
