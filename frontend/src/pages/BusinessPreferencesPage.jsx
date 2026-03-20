@@ -2,25 +2,13 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
-import { Label } from "../components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../components/ui/select";
-import { Slider } from "../components/ui/slider";
-import { ArrowRight, ArrowLeft, Check } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check, X } from "lucide-react";
 
 const BusinessPreferencesPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     campaignGoals: [],
-    targetAudience: "",
-    preferredPlatforms: [],
-    budgetRange: [5000],
-    campaignFrequency: "",
+    targetAudiences: [],
     contentTypes: [],
   });
 
@@ -33,13 +21,13 @@ const BusinessPreferencesPage = () => {
     { id: "event-promotion", label: "Event Promotion" },
   ];
 
-  const platformOptions = [
-    { id: "instagram", label: "Instagram" },
-    { id: "tiktok", label: "TikTok" },
-    { id: "youtube", label: "YouTube" },
-    { id: "twitter", label: "Twitter/X" },
-    { id: "linkedin", label: "LinkedIn" },
-    { id: "facebook", label: "Facebook" },
+  const targetAudienceOptions = [
+    { id: "13-17", label: "Gen Z (13-17)" },
+    { id: "18-24", label: "Gen Z (18-24)" },
+    { id: "25-34", label: "Millennials (25-34)" },
+    { id: "35-44", label: "Millennials (35-44)" },
+    { id: "45-54", label: "Gen X (45-54)" },
+    { id: "55+", label: "Baby Boomers (55+)" },
   ];
 
   const contentTypeOptions = [
@@ -60,6 +48,10 @@ const BusinessPreferencesPage = () => {
     }
   };
 
+  const removeSelection = (field, value) => {
+    setFormData({ ...formData, [field]: formData[field].filter((item) => item !== value) });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     navigate("/brands");
@@ -78,6 +70,12 @@ const BusinessPreferencesPage = () => {
         {checked && <Check className="w-3 h-3 text-white" />}
       </div>
     );
+  };
+
+  // Get label for an option by id
+  const getLabel = (options, id) => {
+    const option = options.find(opt => opt.id === id);
+    return option ? option.label : id;
   };
 
   return (
@@ -122,43 +120,37 @@ const BusinessPreferencesPage = () => {
             </div>
           </div>
 
-          {/* Target Audience */}
+          {/* Target Audiences - Multi-select with chips */}
           <div className="bg-white rounded-3xl p-8 shadow-soft space-y-6">
-            <h2 className="font-outfit text-xl font-semibold">Target Audience</h2>
-
-            <div className="space-y-2">
-              <Label htmlFor="targetAudience">Primary Age Group</Label>
-              <Select
-                value={formData.targetAudience}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, targetAudience: value })
-                }
-              >
-                <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white" data-testid="target-audience-select">
-                  <SelectValue placeholder="Select age group" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="13-17">Gen Z (13-17)</SelectItem>
-                  <SelectItem value="18-24">Gen Z (18-24)</SelectItem>
-                  <SelectItem value="25-34">Millennials (25-34)</SelectItem>
-                  <SelectItem value="35-44">Millennials (35-44)</SelectItem>
-                  <SelectItem value="45-54">Gen X (45-54)</SelectItem>
-                  <SelectItem value="55+">Baby Boomers (55+)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Preferred Platforms */}
-          <div className="bg-white rounded-3xl p-8 shadow-soft space-y-6">
-            <h2 className="font-outfit text-xl font-semibold">Preferred Platforms</h2>
+            <h2 className="font-outfit text-xl font-semibold">Target Audiences</h2>
             <p className="text-sm text-muted-foreground">
-              Select the platforms where you want to run campaigns
+              Select all age groups you want to target
             </p>
 
+            {/* Selected Chips */}
+            {formData.targetAudiences.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {formData.targetAudiences.map((audienceId) => (
+                  <div
+                    key={audienceId}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-pink-100 text-pink-700 rounded-full text-sm font-medium"
+                  >
+                    {getLabel(targetAudienceOptions, audienceId)}
+                    <button
+                      type="button"
+                      onClick={() => removeSelection("targetAudiences", audienceId)}
+                      className="w-4 h-4 rounded-full bg-pink-200 hover:bg-pink-300 flex items-center justify-center transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {platformOptions.map((option) => {
-                const isSelected = formData.preferredPlatforms.includes(option.id);
+              {targetAudienceOptions.map((option) => {
+                const isSelected = formData.targetAudiences.includes(option.id);
                 return (
                   <div
                     key={option.id}
@@ -167,45 +159,14 @@ const BusinessPreferencesPage = () => {
                         ? "border-pink-400 bg-pink-50"
                         : "border-gray-100 hover:border-pink-200"
                     }`}
-                    onClick={() => toggleSelection("preferredPlatforms", option.id)}
-                    data-testid={`platform-${option.id}`}
+                    onClick={() => toggleSelection("targetAudiences", option.id)}
+                    data-testid={`target-audience-${option.id}`}
                   >
                     <CheckboxIndicator checked={isSelected} color="pink" />
                     <span className="text-sm font-medium">{option.label}</span>
                   </div>
                 );
               })}
-            </div>
-          </div>
-
-          {/* Budget Range */}
-          <div className="bg-white rounded-3xl p-8 shadow-soft space-y-6">
-            <h2 className="font-outfit text-xl font-semibold">Monthly Budget</h2>
-
-            <div className="space-y-6">
-              <div className="text-center">
-                <span className="text-4xl font-outfit font-bold bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent">
-                  ${formData.budgetRange[0].toLocaleString()}
-                </span>
-                <span className="text-muted-foreground ml-2">/ month</span>
-              </div>
-
-              <Slider
-                value={formData.budgetRange}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, budgetRange: value })
-                }
-                max={50000}
-                min={500}
-                step={500}
-                className="py-4"
-                data-testid="budget-slider"
-              />
-
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>$500</span>
-                <span>$50,000+</span>
-              </div>
             </div>
           </div>
 
@@ -235,32 +196,6 @@ const BusinessPreferencesPage = () => {
                   </div>
                 );
               })}
-            </div>
-          </div>
-
-          {/* Campaign Frequency */}
-          <div className="bg-white rounded-3xl p-8 shadow-soft space-y-6">
-            <h2 className="font-outfit text-xl font-semibold">Campaign Frequency</h2>
-
-            <div className="space-y-2">
-              <Label htmlFor="frequency">How often do you plan to run campaigns?</Label>
-              <Select
-                value={formData.campaignFrequency}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, campaignFrequency: value })
-                }
-              >
-                <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white" data-testid="frequency-select">
-                  <SelectValue placeholder="Select frequency" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="biweekly">Bi-weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                  <SelectItem value="quarterly">Quarterly</SelectItem>
-                  <SelectItem value="adhoc">Ad-hoc / One-time</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
 
