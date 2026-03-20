@@ -2,31 +2,10 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FruiteeLogo } from "../components/FruiteeLogo";
 import { Button } from "../components/ui/button";
-import { ArrowRight, Sparkles, Users, BarChart3 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
-
-  const features = [
-    {
-      icon: Sparkles,
-      title: "Digital Twins",
-      description: "Create AI-powered digital versions of influencers",
-      gradient: "from-pink-400 to-pink-500",
-    },
-    {
-      icon: Users,
-      title: "Perfect Matches",
-      description: "Connect brands with the right influencers",
-      gradient: "from-orange-400 to-orange-500",
-    },
-    {
-      icon: BarChart3,
-      title: "Track Results",
-      description: "Monitor campaign performance in real-time",
-      gradient: "from-teal-400 to-teal-500",
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-background flex flex-col" data-testid="landing-page">
@@ -77,31 +56,6 @@ const LandingPage = () => {
             Get Started
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
-
-          {/* Features */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20">
-            {features.map((feature) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={feature.title}
-                  className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-soft border border-white/50"
-                >
-                  <div
-                    className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 mx-auto`}
-                  >
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="font-outfit font-semibold text-foreground mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {feature.description}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
         </div>
       </main>
 
