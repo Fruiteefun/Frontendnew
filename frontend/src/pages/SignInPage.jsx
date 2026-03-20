@@ -34,9 +34,9 @@ const SignInPage = () => {
     setTimeout(() => {
       setIsLoading(false);
       if (formData.userType === "influencer" || type === "signin") {
-        navigate("/influencer-profile");
+        navigate("/influencer-profile", { state: { fullName: formData.name } });
       } else {
-        navigate("/profile");
+        navigate("/profile", { state: { fullName: formData.name } });
       }
     }, 1000);
   };

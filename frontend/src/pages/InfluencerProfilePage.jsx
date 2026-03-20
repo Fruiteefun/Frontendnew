@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -15,10 +15,15 @@ import { Camera, ArrowRight } from "lucide-react";
 
 const InfluencerProfilePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [profileImage, setProfileImage] = useState(null);
+  
+  // Get the full name passed from signup
+  const initialFullName = location.state?.fullName || "";
+  
   const [formData, setFormData] = useState({
     displayName: "",
-    fullName: "",
+    fullName: initialFullName,
     dateOfBirth: "",
     gender: "",
     language: "",
