@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Checkbox } from "../components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -13,7 +11,7 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { Slider } from "../components/ui/slider";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check } from "lucide-react";
 
 const BusinessPreferencesPage = () => {
   const navigate = useNavigate();
@@ -53,20 +51,33 @@ const BusinessPreferencesPage = () => {
     { id: "tutorials", label: "Tutorials" },
   ];
 
-  const handleCheckboxChange = (field, value, checked) => {
-    if (checked) {
-      setFormData({ ...formData, [field]: [...formData[field], value] });
+  const toggleSelection = (field, value) => {
+    const currentValues = formData[field];
+    if (currentValues.includes(value)) {
+      setFormData({ ...formData, [field]: currentValues.filter((item) => item !== value) });
     } else {
-      setFormData({
-        ...formData,
-        [field]: formData[field].filter((item) => item !== value),
-      });
+      setFormData({ ...formData, [field]: [...currentValues, value] });
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     navigate("/brands");
+  };
+
+  // Custom checkbox indicator component
+  const CheckboxIndicator = ({ checked, color = "orange" }) => {
+    const colorClasses = {
+      orange: checked ? "bg-orange-500 border-orange-500" : "border-gray-300",
+      pink: checked ? "bg-pink-500 border-pink-500" : "border-gray-300",
+      teal: checked ? "bg-teal-500 border-teal-500" : "border-gray-300",
+    };
+    
+    return (
+      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${colorClasses[color]}`}>
+        {checked && <Check className="w-3 h-3 text-white" />}
+      </div>
+    );
   };
 
   return (
@@ -90,29 +101,24 @@ const BusinessPreferencesPage = () => {
             </p>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {campaignGoalOptions.map((option) => (
-                <div
-                  key={option.id}
-                  className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                    formData.campaignGoals.includes(option.id)
-                      ? "border-orange-400 bg-orange-50"
-                      : "border-gray-100 hover:border-orange-200"
-                  }`}
-                  onClick={() =>
-                    handleCheckboxChange(
-                      "campaignGoals",
-                      option.id,
-                      !formData.campaignGoals.includes(option.id)
-                    )
-                  }
-                >
-                  <Checkbox
-                    checked={formData.campaignGoals.includes(option.id)}
-                    className="data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
-                  />
-                  <span className="text-sm font-medium">{option.label}</span>
-                </div>
-              ))}
+              {campaignGoalOptions.map((option) => {
+                const isSelected = formData.campaignGoals.includes(option.id);
+                return (
+                  <div
+                    key={option.id}
+                    className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      isSelected
+                        ? "border-orange-400 bg-orange-50"
+                        : "border-gray-100 hover:border-orange-200"
+                    }`}
+                    onClick={() => toggleSelection("campaignGoals", option.id)}
+                    data-testid={`campaign-goal-${option.id}`}
+                  >
+                    <CheckboxIndicator checked={isSelected} color="orange" />
+                    <span className="text-sm font-medium">{option.label}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -128,7 +134,7 @@ const BusinessPreferencesPage = () => {
                   setFormData({ ...formData, targetAudience: value })
                 }
               >
-                <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white/50" data-testid="target-audience-select">
+                <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white" data-testid="target-audience-select">
                   <SelectValue placeholder="Select age group" />
                 </SelectTrigger>
                 <SelectContent>
@@ -151,29 +157,24 @@ const BusinessPreferencesPage = () => {
             </p>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {platformOptions.map((option) => (
-                <div
-                  key={option.id}
-                  className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                    formData.preferredPlatforms.includes(option.id)
-                      ? "border-pink-400 bg-pink-50"
-                      : "border-gray-100 hover:border-pink-200"
-                  }`}
-                  onClick={() =>
-                    handleCheckboxChange(
-                      "preferredPlatforms",
-                      option.id,
-                      !formData.preferredPlatforms.includes(option.id)
-                    )
-                  }
-                >
-                  <Checkbox
-                    checked={formData.preferredPlatforms.includes(option.id)}
-                    className="data-[state=checked]:bg-pink-500 data-[state=checked]:border-pink-500"
-                  />
-                  <span className="text-sm font-medium">{option.label}</span>
-                </div>
-              ))}
+              {platformOptions.map((option) => {
+                const isSelected = formData.preferredPlatforms.includes(option.id);
+                return (
+                  <div
+                    key={option.id}
+                    className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      isSelected
+                        ? "border-pink-400 bg-pink-50"
+                        : "border-gray-100 hover:border-pink-200"
+                    }`}
+                    onClick={() => toggleSelection("preferredPlatforms", option.id)}
+                    data-testid={`platform-${option.id}`}
+                  >
+                    <CheckboxIndicator checked={isSelected} color="pink" />
+                    <span className="text-sm font-medium">{option.label}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -216,29 +217,24 @@ const BusinessPreferencesPage = () => {
             </p>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {contentTypeOptions.map((option) => (
-                <div
-                  key={option.id}
-                  className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                    formData.contentTypes.includes(option.id)
-                      ? "border-teal-400 bg-teal-50"
-                      : "border-gray-100 hover:border-teal-200"
-                  }`}
-                  onClick={() =>
-                    handleCheckboxChange(
-                      "contentTypes",
-                      option.id,
-                      !formData.contentTypes.includes(option.id)
-                    )
-                  }
-                >
-                  <Checkbox
-                    checked={formData.contentTypes.includes(option.id)}
-                    className="data-[state=checked]:bg-teal-500 data-[state=checked]:border-teal-500"
-                  />
-                  <span className="text-sm font-medium">{option.label}</span>
-                </div>
-              ))}
+              {contentTypeOptions.map((option) => {
+                const isSelected = formData.contentTypes.includes(option.id);
+                return (
+                  <div
+                    key={option.id}
+                    className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      isSelected
+                        ? "border-teal-400 bg-teal-50"
+                        : "border-gray-100 hover:border-teal-200"
+                    }`}
+                    onClick={() => toggleSelection("contentTypes", option.id)}
+                    data-testid={`content-type-${option.id}`}
+                  >
+                    <CheckboxIndicator checked={isSelected} color="teal" />
+                    <span className="text-sm font-medium">{option.label}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -254,7 +250,7 @@ const BusinessPreferencesPage = () => {
                   setFormData({ ...formData, campaignFrequency: value })
                 }
               >
-                <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white/50" data-testid="frequency-select">
+                <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white" data-testid="frequency-select">
                   <SelectValue placeholder="Select frequency" />
                 </SelectTrigger>
                 <SelectContent>
