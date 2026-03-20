@@ -19,7 +19,7 @@ const BusinessProfilePage = () => {
   const [logo, setLogo] = useState(null);
   const [formData, setFormData] = useState({
     businessName: "",
-    industry: "",
+    category: "",
     website: "",
     teamSize: "",
     location: "",
@@ -132,25 +132,25 @@ const BusinessProfilePage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="industry">Industry</Label>
+                <Label htmlFor="category">Category</Label>
                 <Select
-                  value={formData.industry}
+                  value={formData.category}
                   onValueChange={(value) =>
-                    setFormData({ ...formData, industry: value })
+                    setFormData({ ...formData, category: value })
                   }
                 >
-                  <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white/50" data-testid="industry-select">
-                    <SelectValue placeholder="Select industry" />
+                  <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white/50" data-testid="category-select">
+                    <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="technology">Technology</SelectItem>
-                    <SelectItem value="fashion">Fashion</SelectItem>
-                    <SelectItem value="food">Food & Beverage</SelectItem>
-                    <SelectItem value="health">Health & Wellness</SelectItem>
-                    <SelectItem value="finance">Finance</SelectItem>
-                    <SelectItem value="entertainment">Entertainment</SelectItem>
-                    <SelectItem value="retail">Retail</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    <SelectItem value="fashion-apparel">Fashion & Apparel</SelectItem>
+                    <SelectItem value="beauty-personal-care">Beauty & Personal Care</SelectItem>
+                    <SelectItem value="health-fitness-wellness">Health, Fitness & Wellness</SelectItem>
+                    <SelectItem value="food-beverage">Food & Beverage</SelectItem>
+                    <SelectItem value="travel-experiences">Travel & Experiences</SelectItem>
+                    <SelectItem value="lifestyle-home">Lifestyle & Home</SelectItem>
+                    <SelectItem value="services-domestic">Services – Domestic</SelectItem>
+                    <SelectItem value="services-business">Services – Business</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
