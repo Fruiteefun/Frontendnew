@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Layout } from "../components/Layout";
-import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import {
@@ -11,18 +10,12 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../components/ui/popover";
-import {
   Eye,
   Users,
   Heart,
   Share2,
   TrendingUp,
   TrendingDown,
-  Calendar,
 } from "lucide-react";
 import {
   LineChart,
@@ -46,7 +39,6 @@ const DashboardPage = () => {
   const [campaignFilter, setCampaignFilter] = useState("all");
   const [customStartDate, setCustomStartDate] = useState("");
   const [customEndDate, setCustomEndDate] = useState("");
-  const [showCustomDates, setShowCustomDates] = useState(false);
 
   // Mock campaigns list
   const campaigns = [
@@ -59,11 +51,6 @@ const DashboardPage = () => {
 
   const handlePeriodChange = (value) => {
     setPeriodFilter(value);
-    if (value === "custom") {
-      setShowCustomDates(true);
-    } else {
-      setShowCustomDates(false);
-    }
   };
 
   const stats = [
@@ -167,42 +154,24 @@ const DashboardPage = () => {
             </div>
 
             {/* Custom Date Range (shows when custom is selected) */}
-            {showCustomDates && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="h-10 rounded-xl border-gray-200 gap-2">
-                    <Calendar className="w-4 h-4" />
-                    {customStartDate && customEndDate 
-                      ? `${customStartDate} - ${customEndDate}`
-                      : "Select dates"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80 bg-white p-4" align="end">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Start Date</Label>
-                      <Input
-                        type="date"
-                        value={customStartDate}
-                        onChange={(e) => setCustomStartDate(e.target.value)}
-                        className="h-10 rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>End Date</Label>
-                      <Input
-                        type="date"
-                        value={customEndDate}
-                        onChange={(e) => setCustomEndDate(e.target.value)}
-                        className="h-10 rounded-xl"
-                      />
-                    </div>
-                    <Button className="w-full h-10 rounded-xl bg-gradient-to-r from-orange-400 to-pink-500 text-white">
-                      Apply
-                    </Button>
-                  </div>
-                </PopoverContent>
-              </Popover>
+            {periodFilter === "custom" && (
+              <div className="flex items-center gap-2">
+                <Input
+                  type="date"
+                  value={customStartDate}
+                  onChange={(e) => setCustomStartDate(e.target.value)}
+                  className="h-10 w-36 rounded-xl border-gray-200 bg-white"
+                  placeholder="Start"
+                />
+                <span className="text-muted-foreground">-</span>
+                <Input
+                  type="date"
+                  value={customEndDate}
+                  onChange={(e) => setCustomEndDate(e.target.value)}
+                  className="h-10 w-36 rounded-xl border-gray-200 bg-white"
+                  placeholder="End"
+                />
+              </div>
             )}
 
             {/* Campaign Filter */}
