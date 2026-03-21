@@ -129,21 +129,21 @@ const DigitalTwinIntroPage = () => {
               <div className="flex gap-3">
                 <Button
                   variant="outline"
-                  className="flex-1 h-12 rounded-xl border-[#1DA1F2] text-[#1DA1F2] hover:bg-[#1DA1F2]/10"
-                >
-                  Twitter
-                </Button>
-                <Button
-                  variant="outline"
                   className="flex-1 h-12 rounded-xl border-[#E4405F] text-[#E4405F] hover:bg-[#E4405F]/10"
                 >
                   Instagram
                 </Button>
                 <Button
                   variant="outline"
-                  className="flex-1 h-12 rounded-xl border-[#0A66C2] text-[#0A66C2] hover:bg-[#0A66C2]/10"
+                  className="flex-1 h-12 rounded-xl border-[#000000] text-[#000000] hover:bg-[#000000]/10"
                 >
-                  LinkedIn
+                  TikTok
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1 h-12 rounded-xl border-[#FF0000] text-[#FF0000] hover:bg-[#FF0000]/10"
+                >
+                  YouTube
                 </Button>
               </div>
             </div>
@@ -155,27 +155,27 @@ const DigitalTwinIntroPage = () => {
               </h3>
               <ul className="space-y-3 text-sm">
                 <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-orange-400 text-white flex items-center justify-center text-xs font-bold">
+                  <div className="w-6 h-6 rounded-full bg-orange-400 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
                     1
                   </div>
                   <span>
-                    Share your intro video on your social platforms
+                    The video will be posted to your accounts, introducing your Twin to your followers
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-pink-400 text-white flex items-center justify-center text-xs font-bold">
+                  <div className="w-6 h-6 rounded-full bg-pink-400 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
                     2
                   </div>
                   <span>
-                    Brands will discover and reach out to you
+                    Fruitee will market your profile to businesses
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-teal-400 text-white flex items-center justify-center text-xs font-bold">
+                  <div className="w-6 h-6 rounded-full bg-teal-400 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
                     3
                   </div>
                   <span>
-                    Track your performance in the dashboard
+                    Track your performance on the dashboard
                   </span>
                 </li>
               </ul>
