@@ -5,7 +5,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import { ArrowRight, ArrowLeft, Plus, X } from "lucide-react";
+import { ArrowRight, Plus, X, Target, Users, Swords, TrendingUp, Save } from "lucide-react";
 
 const BusinessPlanPage = () => {
   const navigate = useNavigate();
@@ -84,28 +84,31 @@ const BusinessPlanPage = () => {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Target Market */}
           <div className="bg-white rounded-3xl p-8 shadow-soft space-y-6">
-            <h2 className="font-outfit text-xl font-semibold">Target Market</h2>
+            <h2 className="font-outfit text-xl font-semibold flex items-center gap-2">
+              <Target className="w-5 h-5 text-orange-500" />
+              Target Market
+            </h2>
 
-            <div className="space-y-2">
-              <Label htmlFor="territory">Territory</Label>
-              <Input
-                id="territory"
-                placeholder="e.g., United States, Europe, Global..."
-                className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                value={formData.territory}
-                onChange={(e) =>
-                  setFormData({ ...formData, territory: e.target.value })
-                }
-                data-testid="territory-input"
-              />
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="territory">Territory</Label>
+                <Input
+                  id="territory"
+                  placeholder="e.g. Global, Online, EU, North America"
+                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  value={formData.territory}
+                  onChange={(e) =>
+                    setFormData({ ...formData, territory: e.target.value })
+                  }
+                  data-testid="territory-input"
+                />
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="marketSizeValue">Market Size (Value)</Label>
                 <Input
                   id="marketSizeValue"
-                  placeholder="e.g., $500M"
+                  placeholder="e.g. $2.5B"
                   className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
                   value={formData.marketSizeValue}
                   onChange={(e) =>
@@ -116,12 +119,10 @@ const BusinessPlanPage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="marketSizeCustomers">
-                  Market Size (Customers)
-                </Label>
+                <Label htmlFor="marketSizeCustomers">Market Size (Customers)</Label>
                 <Input
                   id="marketSizeCustomers"
-                  placeholder="e.g., 2M potential customers"
+                  placeholder="e.g. 12M potential customers"
                   className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
                   value={formData.marketSizeCustomers}
                   onChange={(e) =>
@@ -138,7 +139,8 @@ const BusinessPlanPage = () => {
 
           {/* Target Customer Profile */}
           <div className="bg-white rounded-3xl p-8 shadow-soft space-y-6">
-            <h2 className="font-outfit text-xl font-semibold">
+            <h2 className="font-outfit text-xl font-semibold flex items-center gap-2">
+              <Users className="w-5 h-5 text-orange-500" />
               Target Customer Profile
             </h2>
 
@@ -191,7 +193,7 @@ const BusinessPlanPage = () => {
                 <Label htmlFor="targetIncome">Income Level</Label>
                 <Input
                   id="targetIncome"
-                  placeholder="e.g., $50K-$100K"
+                  placeholder="e.g. $50K-$100K"
                   className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
                   value={formData.targetIncome}
                   onChange={(e) =>
@@ -200,20 +202,20 @@ const BusinessPlanPage = () => {
                   data-testid="target-income-input"
                 />
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="targetLifestyle">Lifestyle Traits</Label>
-                <Input
-                  id="targetLifestyle"
-                  placeholder="e.g., Health-conscious, Tech-savvy..."
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                  value={formData.targetLifestyle}
-                  onChange={(e) =>
-                    setFormData({ ...formData, targetLifestyle: e.target.value })
-                  }
-                  data-testid="target-lifestyle-input"
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="targetLifestyle">Lifestyle Traits</Label>
+              <Textarea
+                id="targetLifestyle"
+                placeholder="Describe target customer lifestyle — health-conscious, urban, eco-friendly..."
+                className="min-h-[80px] rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                value={formData.targetLifestyle}
+                onChange={(e) =>
+                  setFormData({ ...formData, targetLifestyle: e.target.value })
+                }
+                data-testid="target-lifestyle-input"
+              />
             </div>
           </div>
 
@@ -221,7 +223,8 @@ const BusinessPlanPage = () => {
           <div className="bg-white rounded-3xl p-8 shadow-soft space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="font-outfit text-xl font-semibold">
+                <h2 className="font-outfit text-xl font-semibold flex items-center gap-2">
+                  <Swords className="w-5 h-5 text-orange-500" />
                   Competitors Profile
                 </h2>
                 <p className="text-sm text-muted-foreground">
@@ -360,7 +363,8 @@ const BusinessPlanPage = () => {
 
           {/* Growth Target */}
           <div className="bg-white rounded-3xl p-8 shadow-soft space-y-6">
-            <h2 className="font-outfit text-xl font-semibold">
+            <h2 className="font-outfit text-xl font-semibold flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-orange-500" />
               Growth Target (Social Media Campaign)
             </h2>
 
@@ -420,24 +424,23 @@ const BusinessPlanPage = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-between">
+          <div className="flex justify-end gap-4">
             <Button
               type="button"
               variant="outline"
               className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
               onClick={() => navigate("/campaign-type")}
-              data-testid="back-btn"
+              data-testid="cancel-btn"
             >
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Back
+              Cancel
             </Button>
             <Button
               type="submit"
-              className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
+              className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-purple-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
               data-testid="save-continue-btn"
             >
-              Continue
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <Save className="w-4 h-4 mr-2" />
+              Save & Continue
             </Button>
           </div>
         </form>

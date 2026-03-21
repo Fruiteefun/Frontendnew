@@ -12,28 +12,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Camera, ArrowRight, X } from "lucide-react";
+import { Upload, ArrowRight, X, Globe, Users, MapPin, Phone, Building2, Save } from "lucide-react";
 
 const BusinessProfilePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [logo, setLogo] = useState(null);
-  
-  // Get phone from signup
+
   const initialPhone = location.state?.phone || "";
-  
+
   const [formData, setFormData] = useState({
     businessName: "",
-    category: "",
+    industry: "",
     website: "",
     teamSize: "",
-    country: "",
-    city: "",
+    location: "",
     phone: initialPhone,
     description: "",
     instagram: "",
+    twitter: "",
     tiktok: "",
-    youtube: "",
+    linkedin: "",
   });
 
   const handleLogoUpload = (e) => {
@@ -69,7 +68,7 @@ const BusinessProfilePage = () => {
                   className={`w-24 h-24 rounded-2xl border-2 border-dashed flex items-center justify-center overflow-hidden ${
                     logo
                       ? "border-orange-400 bg-orange-50"
-                      : "border-gray-200 bg-muted"
+                      : "border-gray-200 bg-gradient-to-br from-orange-100 to-pink-100"
                   }`}
                 >
                   {logo ? (
@@ -88,19 +87,14 @@ const BusinessProfilePage = () => {
                       </button>
                     </>
                   ) : (
-                    <span className="text-2xl font-bold text-muted-foreground">
-                      F
-                    </span>
+                    <span className="text-2xl font-bold text-orange-400">F</span>
                   )}
                 </div>
-              </div>
-              <div>
                 <label
                   htmlFor="logo-upload"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-400 to-pink-500 text-white rounded-xl cursor-pointer hover:opacity-90 transition-opacity"
+                  className="absolute -bottom-1 -right-1 w-7 h-7 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full flex items-center justify-center cursor-pointer shadow-md"
                 >
-                  <Camera className="w-4 h-4" />
-                  Upload Business Logo
+                  <Upload className="w-3.5 h-3.5 text-white" />
                   <input
                     id="logo-upload"
                     type="file"
@@ -110,23 +104,27 @@ const BusinessProfilePage = () => {
                     data-testid="logo-upload-input"
                   />
                 </label>
-                <p className="text-sm text-muted-foreground mt-2">
-                  PNG, JPG up to 5MB
-                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">Upload Business Logo</h3>
+                <p className="text-sm text-muted-foreground">PNG, JPG up to 5MB</p>
               </div>
             </div>
           </div>
 
           {/* Business Details */}
           <div className="bg-white rounded-3xl p-8 shadow-soft space-y-6">
-            <h2 className="font-outfit text-xl font-semibold">Business Details</h2>
+            <h2 className="font-outfit text-xl font-semibold flex items-center gap-2">
+              <Building2 className="w-5 h-5 text-orange-500" />
+              Business Details
+            </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="businessName">Business Name</Label>
                 <Input
                   id="businessName"
-                  placeholder="Acme Inc."
+                  placeholder="Fruitee Inc."
                   className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
                   value={formData.businessName}
                   onChange={(e) =>
@@ -137,128 +135,104 @@ const BusinessProfilePage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <Select
-                  value={formData.category}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, category: value })
+                <Label htmlFor="industry">Industry</Label>
+                <Input
+                  id="industry"
+                  placeholder="Social Media Marketing"
+                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  value={formData.industry}
+                  onChange={(e) =>
+                    setFormData({ ...formData, industry: e.target.value })
                   }
-                >
-                  <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white/50" data-testid="category-select">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="fashion-apparel">Fashion & Apparel</SelectItem>
-                    <SelectItem value="beauty-personal-care">Beauty & Personal Care</SelectItem>
-                    <SelectItem value="health-fitness-wellness">Health, Fitness & Wellness</SelectItem>
-                    <SelectItem value="food-beverage">Food & Beverage</SelectItem>
-                    <SelectItem value="travel-experiences">Travel & Experiences</SelectItem>
-                    <SelectItem value="lifestyle-home">Lifestyle & Home</SelectItem>
-                    <SelectItem value="services-domestic">Services – Domestic</SelectItem>
-                    <SelectItem value="services-business">Services – Business</SelectItem>
-                  </SelectContent>
-                </Select>
+                  data-testid="industry-input"
+                />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="website">Website</Label>
-                <Input
-                  id="website"
-                  placeholder="https://example.com"
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                  value={formData.website}
-                  onChange={(e) =>
-                    setFormData({ ...formData, website: e.target.value })
-                  }
-                  data-testid="website-input"
-                />
+                <div className="relative">
+                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="website"
+                    placeholder="https://fruitee.fun"
+                    className="h-12 pl-10 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                    value={formData.website}
+                    onChange={(e) =>
+                      setFormData({ ...formData, website: e.target.value })
+                    }
+                    data-testid="website-input"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="teamSize">Team Size</Label>
-                <Select
-                  value={formData.teamSize}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, teamSize: value })
-                  }
-                >
-                  <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white/50" data-testid="team-size-select">
-                    <SelectValue placeholder="Select size" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1-10">1-10</SelectItem>
-                    <SelectItem value="11-50">11-50</SelectItem>
-                    <SelectItem value="51-200">51-200</SelectItem>
-                    <SelectItem value="201-500">201-500</SelectItem>
-                    <SelectItem value="500+">500+</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="relative">
+                  <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
+                  <Select
+                    value={formData.teamSize}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, teamSize: value })
+                    }
+                  >
+                    <SelectTrigger className="h-12 pl-10 rounded-xl border-gray-200 bg-white/50" data-testid="team-size-select">
+                      <SelectValue placeholder="10-50" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1-10">1-10</SelectItem>
+                      <SelectItem value="10-50">10-50</SelectItem>
+                      <SelectItem value="51-200">51-200</SelectItem>
+                      <SelectItem value="201-500">201-500</SelectItem>
+                      <SelectItem value="500+">500+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="country">Country</Label>
-                <Select
-                  value={formData.country}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, country: value })
-                  }
-                >
-                  <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white/50" data-testid="country-select">
-                    <SelectValue placeholder="Select country" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="us">United States</SelectItem>
-                    <SelectItem value="uk">United Kingdom</SelectItem>
-                    <SelectItem value="ca">Canada</SelectItem>
-                    <SelectItem value="au">Australia</SelectItem>
-                    <SelectItem value="de">Germany</SelectItem>
-                    <SelectItem value="fr">France</SelectItem>
-                    <SelectItem value="in">India</SelectItem>
-                    <SelectItem value="jp">Japan</SelectItem>
-                    <SelectItem value="br">Brazil</SelectItem>
-                    <SelectItem value="mx">Mexico</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="location">Location</Label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="location"
+                    placeholder="New York, US"
+                    className="h-12 pl-10 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                    value={formData.location}
+                    onChange={(e) =>
+                      setFormData({ ...formData, location: e.target.value })
+                    }
+                    data-testid="location-input"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="city">City/Town</Label>
-                <Input
-                  id="city"
-                  placeholder="New York"
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                  value={formData.city}
-                  onChange={(e) =>
-                    setFormData({ ...formData, city: e.target.value })
-                  }
-                  data-testid="city-input"
-                />
+                <Label htmlFor="phone">Phone</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="phone"
+                    placeholder="+1 (555) 000-0000"
+                    className="h-12 pl-10 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                    value={formData.phone}
+                    onChange={(e) =>
+                      setFormData({ ...formData, phone: e.target.value })
+                    }
+                    data-testid="phone-input"
+                  />
+                </div>
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                placeholder="+1 (555) 000-0000"
-                className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
-                data-testid="phone-input"
-              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="description">Business Description</Label>
               <Textarea
                 id="description"
-                placeholder="Tell us about your business..."
+                placeholder="Tell us what your business does..."
                 className="min-h-[100px] rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
                 value={formData.description}
                 onChange={(e) =>
@@ -271,16 +245,16 @@ const BusinessProfilePage = () => {
 
           {/* Social Media Handles */}
           <div className="bg-white rounded-3xl p-8 shadow-soft space-y-6">
-            <div>
-              <h2 className="font-outfit text-xl font-semibold">
-                Social Media Handles
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                At least one platform is required
-              </p>
-            </div>
+            <h2 className="font-outfit text-xl font-semibold flex items-center gap-2">
+              <svg className="w-5 h-5 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+              </svg>
+              Social Media Handles
+            </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="instagram">Instagram</Label>
                 <Input
@@ -292,6 +266,20 @@ const BusinessProfilePage = () => {
                     setFormData({ ...formData, instagram: e.target.value })
                   }
                   data-testid="instagram-input"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="twitter">Twitter / X</Label>
+                <Input
+                  id="twitter"
+                  placeholder="@yourhandle"
+                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  value={formData.twitter}
+                  onChange={(e) =>
+                    setFormData({ ...formData, twitter: e.target.value })
+                  }
+                  data-testid="twitter-input"
                 />
               </div>
 
@@ -310,39 +298,39 @@ const BusinessProfilePage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="youtube">YouTube</Label>
+                <Label htmlFor="linkedin">LinkedIn</Label>
                 <Input
-                  id="youtube"
-                  placeholder="@yourchannel"
+                  id="linkedin"
+                  placeholder="@yourhandle"
                   className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                  value={formData.youtube}
+                  value={formData.linkedin}
                   onChange={(e) =>
-                    setFormData({ ...formData, youtube: e.target.value })
+                    setFormData({ ...formData, linkedin: e.target.value })
                   }
-                  data-testid="youtube-input"
+                  data-testid="linkedin-input"
                 />
               </div>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-between">
+          <div className="flex justify-end gap-4">
             <Button
               type="button"
               variant="outline"
               className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
               onClick={() => navigate("/signin")}
-              data-testid="back-btn"
+              data-testid="cancel-btn"
             >
-              Back
+              Cancel
             </Button>
             <Button
               type="submit"
-              className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
+              className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-purple-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
               data-testid="save-continue-btn"
             >
-              Continue
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <Save className="w-4 h-4 mr-2" />
+              Save & Continue
             </Button>
           </div>
         </form>

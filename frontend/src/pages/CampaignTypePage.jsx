@@ -2,46 +2,64 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
-import { Megaphone, Rocket, CalendarDays, Tag, ArrowRight, ArrowLeft, Check } from "lucide-react";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
+import { Megaphone, Rocket, CalendarDays, Tag, ArrowRight, Globe, Plus, X, Image } from "lucide-react";
 
 const CampaignTypePage = () => {
   const navigate = useNavigate();
   const [selectedType, setSelectedType] = useState(null);
+  const [campaignData, setCampaignData] = useState({
+    website: "",
+    details: "",
+  });
+  const [campaignImages, setCampaignImages] = useState([]);
 
   const campaignTypes = [
     {
       id: "brand-awareness",
       icon: Megaphone,
       title: "Raising Brand Awareness",
-      description:
-        "Increase visibility, reach new audiences, and build recognition for your brand",
-      color: "from-orange-400 to-orange-500",
+      description: "Increase visibility, reach new audiences, and build recognition for your brand",
+      gradient: "from-orange-400 to-orange-500",
     },
     {
       id: "product-launch",
       icon: Rocket,
       title: "Launching New Product(s) or Service(s)",
-      description:
-        "Generate buzz and drive interest around a new product or service launch",
-      color: "from-pink-400 to-pink-500",
+      description: "Generate buzz and drive interest around a new product or service launch",
+      gradient: "from-pink-400 to-pink-500",
     },
     {
       id: "event-promo",
       icon: CalendarDays,
       title: "Advertising an Event",
-      description:
-        "Promote an upcoming event to maximise attendance and engagement",
-      color: "from-teal-400 to-teal-500",
+      description: "Promote an upcoming event to maximise attendance and engagement",
+      gradient: "from-teal-400 to-teal-500",
     },
     {
       id: "promotion",
       icon: Tag,
       title: "Launching a Promotion",
-      description:
-        "Drive sales and conversions with a limited-time offer or discount campaign",
-      color: "from-purple-400 to-purple-500",
+      description: "Drive sales and conversions with a limited-time offer or discount campaign",
+      gradient: "from-purple-400 to-purple-500",
     },
   ];
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && campaignImages.length < 5) {
+      setCampaignImages([
+        ...campaignImages,
+        { id: Date.now(), file, preview: URL.createObjectURL(file) },
+      ]);
+    }
+  };
+
+  const removeImage = (id) => {
+    setCampaignImages(campaignImages.filter((img) => img.id !== id));
+  };
 
   const handleContinue = () => {
     if (selectedType) {
@@ -69,43 +87,115 @@ const CampaignTypePage = () => {
             return (
               <div
                 key={type.id}
-                onClick={() => setSelectedType(type.id)}
-                className={`bg-white rounded-3xl p-6 shadow-soft cursor-pointer transition-all duration-300 border-2 ${
+                className={`bg-white rounded-3xl shadow-soft transition-all duration-300 border-2 overflow-hidden ${
                   isSelected
                     ? "border-orange-400 shadow-floating"
                     : "border-transparent hover:border-orange-200 hover:shadow-md"
                 }`}
                 data-testid={`campaign-type-${type.id}`}
               >
-                <div className="flex items-start gap-4">
-                  <div
-                    className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${type.color} flex items-center justify-center flex-shrink-0`}
-                  >
+                {/* Header - always visible */}
+                <div
+                  className="flex items-center gap-4 p-6 cursor-pointer"
+                  onClick={() => setSelectedType(isSelected ? null : type.id)}
+                >
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${type.gradient} flex items-center justify-center flex-shrink-0`}>
                     <Icon className="w-7 h-7 text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-outfit text-lg font-semibold text-foreground">
-                        {type.title}
-                      </h3>
-                      {isSelected && (
-                        <div className="w-6 h-6 rounded-full bg-teal-500 flex items-center justify-center">
-                          <Check className="w-4 h-4 text-white" />
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-muted-foreground mt-1">
+                    <h3 className="font-outfit text-lg font-semibold text-foreground">
+                      {type.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mt-0.5">
                       {type.description}
                     </p>
                   </div>
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+                    isSelected ? "border-orange-400" : "border-gray-300"
+                  }`}>
+                    {isSelected && <div className="w-3 h-3 rounded-full bg-orange-400" />}
+                  </div>
                 </div>
+
+                {/* Expandable fields */}
+                {isSelected && (
+                  <div className="px-6 pb-6 space-y-5 border-t border-gray-100 pt-5">
+                    {/* Campaign Website */}
+                    <div className="space-y-2">
+                      <Label>Campaign Website</Label>
+                      <div className="relative">
+                        <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          placeholder="https://example.com"
+                          className="h-12 pl-10 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                          value={campaignData.website}
+                          onChange={(e) => setCampaignData({ ...campaignData, website: e.target.value })}
+                          data-testid="campaign-website-input"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Campaign Images */}
+                    <div className="space-y-2">
+                      <Label>Campaign Image(s)</Label>
+                      <div className="flex gap-3 flex-wrap">
+                        {campaignImages.map((img) => (
+                          <div key={img.id} className="relative">
+                            <img
+                              src={img.preview}
+                              alt="Campaign"
+                              className="w-20 h-20 rounded-xl object-cover border border-gray-200"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeImage(img.id)}
+                              className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center"
+                            >
+                              <X className="w-3 h-3 text-white" />
+                            </button>
+                          </div>
+                        ))}
+
+                        {campaignImages.length < 5 && (
+                          <label
+                            htmlFor={`campaign-image-upload-${type.id}`}
+                            className="w-20 h-20 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-orange-300 transition-colors"
+                          >
+                            <Plus className="w-5 h-5 text-muted-foreground mb-0.5" />
+                            <span className="text-[10px] text-muted-foreground">Add</span>
+                            <input
+                              id={`campaign-image-upload-${type.id}`}
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={handleImageUpload}
+                              data-testid="campaign-image-upload"
+                            />
+                          </label>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Campaign Details */}
+                    <div className="space-y-2">
+                      <Label>Campaign Details</Label>
+                      <Textarea
+                        placeholder="Describe your campaign..."
+                        className="min-h-[100px] rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                        value={campaignData.details}
+                        onChange={(e) => setCampaignData({ ...campaignData, details: e.target.value })}
+                        data-testid="campaign-details-textarea"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-between">
+        <div className="flex justify-end gap-4">
           <Button
             type="button"
             variant="outline"
@@ -113,13 +203,12 @@ const CampaignTypePage = () => {
             onClick={() => navigate("/brand-setup")}
             data-testid="back-btn"
           >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back
+            Cancel
           </Button>
           <Button
             onClick={handleContinue}
             disabled={!selectedType}
-            className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300 disabled:opacity-50"
+            className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-purple-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300 disabled:opacity-50"
             data-testid="continue-btn"
           >
             Continue

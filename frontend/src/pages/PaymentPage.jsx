@@ -4,7 +4,7 @@ import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Check, ArrowRight, CreditCard, Lock, Sparkles } from "lucide-react";
+import { Check, ArrowRight, CreditCard, Lock, Sparkles, CreditCard as CardIcon } from "lucide-react";
 
 const PaymentPage = () => {
   const navigate = useNavigate();
@@ -20,6 +20,7 @@ const PaymentPage = () => {
       id: "starter",
       name: "Starter",
       price: 29,
+      color: "from-orange-400 to-orange-500",
       features: [
         "5 Campaigns",
         "Basic Analytics",
@@ -32,6 +33,7 @@ const PaymentPage = () => {
       id: "pro",
       name: "Pro",
       price: 79,
+      color: "from-orange-400 to-pink-500",
       features: [
         "Unlimited Campaigns",
         "Advanced Analytics",
@@ -45,6 +47,7 @@ const PaymentPage = () => {
       id: "enterprise",
       name: "Enterprise",
       price: 199,
+      color: "from-teal-400 to-teal-500",
       features: [
         "Everything in Pro",
         "Custom Integrations",
@@ -96,11 +99,14 @@ const PaymentPage = () => {
                   </div>
                 )}
 
-                <div className="text-center mb-6">
-                  <h3 className="font-outfit text-xl font-semibold mb-2">
+                <div className="mb-6">
+                  <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${plan.color} flex items-center justify-center mb-4`}>
+                    <CardIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="font-outfit text-xl font-semibold mb-1">
                     {plan.name}
                   </h3>
-                  <div className="flex items-baseline justify-center gap-1">
+                  <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-outfit font-bold">
                       ${plan.price}
                     </span>
@@ -111,16 +117,8 @@ const PaymentPage = () => {
                 <ul className="space-y-3 mb-6">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-center gap-3">
-                      <div
-                        className={`w-5 h-5 rounded-full flex items-center justify-center ${
-                          isSelected ? "bg-teal-500" : "bg-muted"
-                        }`}
-                      >
-                        <Check
-                          className={`w-3 h-3 ${
-                            isSelected ? "text-white" : "text-muted-foreground"
-                          }`}
-                        />
+                      <div className="w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-3 h-3 text-teal-600" />
                       </div>
                       <span className="text-sm">{feature}</span>
                     </li>
@@ -130,12 +128,12 @@ const PaymentPage = () => {
                 <Button
                   type="button"
                   className={`w-full h-12 rounded-xl font-semibold transition-all ${
-                    isSelected
-                      ? "bg-gradient-to-r from-orange-400 to-pink-500 text-white"
+                    plan.popular
+                      ? "bg-gradient-to-r from-orange-400 to-purple-500 text-white"
                       : "bg-muted text-foreground hover:bg-muted/80"
                   }`}
                 >
-                  {isSelected ? "Selected" : "Get Started"}
+                  Get Started
                 </Button>
               </div>
             );
