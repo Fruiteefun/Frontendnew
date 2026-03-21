@@ -26,6 +26,19 @@ Build a web app called Fruitee - a social media campaign management platform wit
 - Email-based sign up/sign in
 - Role selection: Influencer or Business
 
+### Business Flow (Complete - matches reference design)
+1. **Business Profile** - Logo upload, Business Name, Industry, Website, Team Size, Location, Phone, Description, Social Media (Instagram, Twitter/X, TikTok, LinkedIn)
+2. **Business Preferences** - 8 numbered sections: AI Consent, Categories, Restricted Categories, Content Tone, Content Pillars, Audience Type, Participation Control, Campaign Matching
+3. **Brands** - Add/remove brands, brand list
+4. **Brand Setup** - Website URL, Brand Logo upload, Product Images (0/3), Brand Colours (picker + hex)
+5. **Campaign Type** - 4 types with expandable fields (Campaign Website, Images, Details)
+6. **Campaign Plan** - Target Market (3 cols), Customer Profile, Competitors (up to 5), Growth Targets
+7. **Influencer Selection** - Horizontal filter bar + 3 influencer cards with heart/stats
+8. **Payment** - 3 pricing plans (Starter/Pro/Enterprise) + secure payment form
+9. **Content Plan** - Calendar with posts/reels scheduling
+10. **Dashboard** - 4 stat cards + 4 charts (Area, Line, Pie, Bar)
+11. **Settings** - Email, password, quick links, payments, account actions
+
 ### Influencer Flow
 1. Profile Setup - Personal details, location, language
 2. Digital Twin Creation - Photo upload, voice recording
@@ -33,57 +46,30 @@ Build a web app called Fruitee - a social media campaign management platform wit
 4. Intro Video - Share generated video
 5. Dashboard - Analytics and performance tracking
 
-### Business Flow
-1. Business Profile - Company details, logo, social handles
-2. Preferences - Campaign goals, target audiences (multiselect chips), content types
-3. Brand Management - Create/manage multiple brands
-4. Brand Setup - Assets, colors, voice/tone
-5. Campaign Type - Select objective (awareness, launch, event, promotion)
-6. Campaign Plan - Target market, customer profile, competitors, growth targets
-7. Influencer Selection - Filter and select creators
-8. Payment - Choose plan (Starter/Pro/Enterprise)
-9. Content Plan - Calendar with posts/reels scheduling
-10. Dashboard - Analytics and performance tracking
-
 ## What's Been Implemented
 
-### Pages Built (15+) - Completed March 19-20, 2026
+### Pages Built (15+) - Completed March 19-21, 2026
 - Landing page with navigation cards
 - Sign In / Sign Up with email authentication
-- Influencer Profile setup
-- Create Digital Twin (photo upload + voice recording UI)
-- Digital Twin Progress (animated loading)
-- Digital Twin Intro (video player placeholder)
-- Business Profile (logo upload, forms)
-- Business Preferences (multiselect chips for target audiences, campaign goals, content types)
-- Brands management (add/delete brands)
-- Brand Setup (asset upload, color picker)
-- Campaign Type selection
-- Campaign Plan (multi-competitor forms, growth targets)
-- Influencer Selection (filters, search, card selection)
-- Payment (pricing plans, card form)
-- Content Plan (calendar with posts/reels, status indicators)
-- Dashboard (4 analytics charts: Area, Line, Pie, Bar)
+- All 11 Business flow pages (updated to match reference design March 21)
+- All Influencer flow pages (5 pages)
+- Settings pages for both personas
 
 ### Design Implementation
 - Warm cream background (#FFF8F0)
-- Orange-pink gradient buttons
+- Orange-to-purple gradient buttons (Save & Continue)
 - Outfit font for headings, DM Sans for body
-- Shadcn/UI components
+- Shadcn/UI components with Lucide React icons
 - Recharts for analytics
-- react-dropzone for file uploads
-- Framer Motion installed for animations
+- Numbered section headers with orange icons
+- Cancel + Save & Continue button pattern
+- Sidebar navigation with active states
 
 ### Tech Stack
 - Frontend: React, Tailwind CSS, Shadcn/UI
 - Charts: Recharts
 - Icons: Lucide React
-- File Upload: react-dropzone
 - Animations: Framer Motion (available)
-
-### Verified (March 20, 2026)
-- BusinessPreferencesPage multiselect chips for Target Audiences working correctly
-- Removed Preferred Platforms, Monthly Budget, Campaign Frequency frames as requested
 
 ## Prioritized Backlog
 
