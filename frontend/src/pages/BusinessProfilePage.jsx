@@ -13,11 +13,16 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { Upload, ArrowRight, X, Globe, Users, MapPin, Phone, Building2, Save } from "lucide-react";
+import { isNotEmpty, isValidUrl, isValidPhone, isValidHandle } from "../lib/validation";
+
+const FieldError = ({ message }) =>
+  message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
 
 const BusinessProfilePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [logo, setLogo] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const initialPhone = location.state?.phone || "";
 
@@ -42,8 +47,22 @@ const BusinessProfilePage = () => {
     }
   };
 
+  const validate = () => {
+    const e = {};
+    if (!isNotEmpty(formData.businessName)) e.businessName = "Business name is required";
+    if (formData.website && !isValidUrl(formData.website)) e.website = "Please enter a valid URL (https://...)";
+    if (formData.phone && !isValidPhone(formData.phone)) e.phone = "Please enter a valid phone number";
+    if (formData.instagram && !isValidHandle(formData.instagram)) e.instagram = "Invalid handle format";
+    if (formData.twitter && !isValidHandle(formData.twitter)) e.twitter = "Invalid handle format";
+    if (formData.tiktok && !isValidHandle(formData.tiktok)) e.tiktok = "Invalid handle format";
+    if (formData.linkedin && !isValidHandle(formData.linkedin)) e.linkedin = "Invalid handle format";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validate()) return;
     navigate("/business-preferences");
   };
 
@@ -125,13 +144,14 @@ const BusinessProfilePage = () => {
                 <Input
                   id="businessName"
                   placeholder="Fruitee Inc."
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.businessName ? "border-red-400" : ""}`}
                   value={formData.businessName}
                   onChange={(e) =>
                     setFormData({ ...formData, businessName: e.target.value })
                   }
                   data-testid="business-name-input"
                 />
+                <FieldError message={errors.businessName} />
               </div>
 
               <div className="space-y-2">
@@ -141,7 +161,7 @@ const BusinessProfilePage = () => {
                   <Input
                     id="website"
                     placeholder="https://fruitee.fun"
-                    className="h-12 pl-10 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                    className={`h-12 pl-10 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.website ? "border-red-400" : ""}`}
                     value={formData.website}
                     onChange={(e) =>
                       setFormData({ ...formData, website: e.target.value })
@@ -149,6 +169,7 @@ const BusinessProfilePage = () => {
                     data-testid="website-input"
                   />
                 </div>
+                <FieldError message={errors.website} />
               </div>
             </div>
 
@@ -240,14 +261,18 @@ const BusinessProfilePage = () => {
                 <Input
                   id="phone"
                   placeholder="+1 (555) 000-0000"
-                  className="h-12 pl-10 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  className={`h-12 pl-10 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.phone ? "border-red-400" : ""}`}
                   value={formData.phone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (/^[+\d\s()\-]*$/.test(val)) {
+                      setFormData({ ...formData, phone: val });
+                    }
+                  }}
                   data-testid="phone-input"
                 />
               </div>
+              <FieldError message={errors.phone} />
             </div>
 
             <div className="space-y-2">
@@ -282,13 +307,14 @@ const BusinessProfilePage = () => {
                 <Input
                   id="instagram"
                   placeholder="@yourhandle"
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.instagram ? "border-red-400" : ""}`}
                   value={formData.instagram}
                   onChange={(e) =>
                     setFormData({ ...formData, instagram: e.target.value })
                   }
                   data-testid="instagram-input"
                 />
+                <FieldError message={errors.instagram} />
               </div>
 
               <div className="space-y-2">
@@ -296,13 +322,14 @@ const BusinessProfilePage = () => {
                 <Input
                   id="twitter"
                   placeholder="@yourhandle"
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.twitter ? "border-red-400" : ""}`}
                   value={formData.twitter}
                   onChange={(e) =>
                     setFormData({ ...formData, twitter: e.target.value })
                   }
                   data-testid="twitter-input"
                 />
+                <FieldError message={errors.twitter} />
               </div>
 
               <div className="space-y-2">
@@ -310,13 +337,14 @@ const BusinessProfilePage = () => {
                 <Input
                   id="tiktok"
                   placeholder="@yourhandle"
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.tiktok ? "border-red-400" : ""}`}
                   value={formData.tiktok}
                   onChange={(e) =>
                     setFormData({ ...formData, tiktok: e.target.value })
                   }
                   data-testid="tiktok-input"
                 />
+                <FieldError message={errors.tiktok} />
               </div>
 
               <div className="space-y-2">
@@ -324,13 +352,14 @@ const BusinessProfilePage = () => {
                 <Input
                   id="linkedin"
                   placeholder="@yourhandle"
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.linkedin ? "border-red-400" : ""}`}
                   value={formData.linkedin}
                   onChange={(e) =>
                     setFormData({ ...formData, linkedin: e.target.value })
                   }
                   data-testid="linkedin-input"
                 />
+                <FieldError message={errors.linkedin} />
               </div>
             </div>
           </div>

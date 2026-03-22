@@ -12,15 +12,19 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { Camera, ArrowRight } from "lucide-react";
+import { isNotEmpty, isMinAge } from "../lib/validation";
+
+const FieldError = ({ message }) =>
+  message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
 
 const InfluencerProfilePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [profileImage, setProfileImage] = useState(null);
-  
-  // Get the full name passed from signup
+  const [errors, setErrors] = useState({});
+
   const initialFullName = location.state?.fullName || "";
-  
+
   const [formData, setFormData] = useState({
     displayName: "",
     fullName: initialFullName,
@@ -38,10 +42,33 @@ const InfluencerProfilePage = () => {
     }
   };
 
+  const validate = () => {
+    const e = {};
+    if (!isNotEmpty(formData.displayName)) e.displayName = "Display name is required";
+    if (!isNotEmpty(formData.fullName)) e.fullName = "Full name is required";
+    if (!isNotEmpty(formData.dateOfBirth)) {
+      e.dateOfBirth = "Date of birth is required";
+    } else if (!isMinAge(formData.dateOfBirth, 16)) {
+      e.dateOfBirth = "You must be at least 16 years old to use Fruitee";
+    }
+    if (!isNotEmpty(formData.gender)) e.gender = "Please select your gender";
+    if (!isNotEmpty(formData.language)) e.language = "Please select a language";
+    if (!isNotEmpty(formData.country)) e.country = "Please select a country";
+    if (!isNotEmpty(formData.city)) e.city = "City is required";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validate()) return;
     navigate("/influencer-preferences");
   };
+
+  // Max date = 16 years ago from today
+  const maxDate = new Date();
+  maxDate.setFullYear(maxDate.getFullYear() - 16);
+  const maxDateStr = maxDate.toISOString().split("T")[0];
 
   return (
     <Layout userType="influencer">
@@ -100,13 +127,14 @@ const InfluencerProfilePage = () => {
                 <Input
                   id="displayName"
                   placeholder="@yourhandle"
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.displayName ? "border-red-400" : ""}`}
                   value={formData.displayName}
                   onChange={(e) =>
                     setFormData({ ...formData, displayName: e.target.value })
                   }
                   data-testid="display-name-input"
                 />
+                <FieldError message={errors.displayName} />
               </div>
 
               <div className="space-y-2">
@@ -114,13 +142,14 @@ const InfluencerProfilePage = () => {
                 <Input
                   id="fullName"
                   placeholder="John Doe"
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.fullName ? "border-red-400" : ""}`}
                   value={formData.fullName}
                   onChange={(e) =>
                     setFormData({ ...formData, fullName: e.target.value })
                   }
                   data-testid="full-name-input"
                 />
+                <FieldError message={errors.fullName} />
               </div>
             </div>
 
@@ -130,13 +159,15 @@ const InfluencerProfilePage = () => {
                 <Input
                   id="dateOfBirth"
                   type="date"
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  max={maxDateStr}
+                  className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.dateOfBirth ? "border-red-400" : ""}`}
                   value={formData.dateOfBirth}
                   onChange={(e) =>
                     setFormData({ ...formData, dateOfBirth: e.target.value })
                   }
                   data-testid="dob-input"
                 />
+                <FieldError message={errors.dateOfBirth} />
               </div>
 
               <div className="space-y-2">
@@ -147,7 +178,7 @@ const InfluencerProfilePage = () => {
                     setFormData({ ...formData, gender: value })
                   }
                 >
-                  <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white/50" data-testid="gender-select">
+                  <SelectTrigger className={`h-12 rounded-xl border-gray-200 bg-white/50 ${errors.gender ? "border-red-400" : ""}`} data-testid="gender-select">
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
@@ -157,6 +188,7 @@ const InfluencerProfilePage = () => {
                     <SelectItem value="prefer-not">Prefer not to say</SelectItem>
                   </SelectContent>
                 </Select>
+                <FieldError message={errors.gender} />
               </div>
             </div>
 
@@ -169,7 +201,7 @@ const InfluencerProfilePage = () => {
                     setFormData({ ...formData, language: value })
                   }
                 >
-                  <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white/50" data-testid="language-select">
+                  <SelectTrigger className={`h-12 rounded-xl border-gray-200 bg-white/50 ${errors.language ? "border-red-400" : ""}`} data-testid="language-select">
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
@@ -181,6 +213,7 @@ const InfluencerProfilePage = () => {
                     <SelectItem value="hindi">Hindi</SelectItem>
                   </SelectContent>
                 </Select>
+                <FieldError message={errors.language} />
               </div>
 
               <div className="space-y-2">
@@ -191,7 +224,7 @@ const InfluencerProfilePage = () => {
                     setFormData({ ...formData, country: value })
                   }
                 >
-                  <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white/50" data-testid="country-select">
+                  <SelectTrigger className={`h-12 rounded-xl border-gray-200 bg-white/50 ${errors.country ? "border-red-400" : ""}`} data-testid="country-select">
                     <SelectValue placeholder="Select country" />
                   </SelectTrigger>
                   <SelectContent>
@@ -204,6 +237,7 @@ const InfluencerProfilePage = () => {
                     <SelectItem value="in">India</SelectItem>
                   </SelectContent>
                 </Select>
+                <FieldError message={errors.country} />
               </div>
             </div>
 
@@ -212,13 +246,14 @@ const InfluencerProfilePage = () => {
               <Input
                 id="city"
                 placeholder="New York"
-                className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.city ? "border-red-400" : ""}`}
                 value={formData.city}
                 onChange={(e) =>
                   setFormData({ ...formData, city: e.target.value })
                 }
                 data-testid="city-input"
               />
+              <FieldError message={errors.city} />
             </div>
           </div>
 

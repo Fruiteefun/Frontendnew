@@ -6,6 +6,10 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { Megaphone, Rocket, CalendarDays, Tag, ArrowRight, Globe, Plus, X, Image } from "lucide-react";
+import { isValidUrl } from "../lib/validation";
+
+const FieldError = ({ message }) =>
+  message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
 
 const CampaignTypePage = () => {
   const navigate = useNavigate();
@@ -15,6 +19,7 @@ const CampaignTypePage = () => {
     details: "",
   });
   const [campaignImages, setCampaignImages] = useState([]);
+  const [errors, setErrors] = useState({});
 
   const campaignTypes = [
     {
@@ -62,9 +67,12 @@ const CampaignTypePage = () => {
   };
 
   const handleContinue = () => {
-    if (selectedType) {
-      navigate("/business-plan");
-    }
+    if (!selectedType) return;
+    const e = {};
+    if (campaignData.website && !isValidUrl(campaignData.website)) e.website = "Please enter a valid URL (https://...)";
+    setErrors(e);
+    if (Object.keys(e).length > 0) return;
+    navigate("/business-plan");
   };
 
   return (
@@ -127,12 +135,13 @@ const CampaignTypePage = () => {
                         <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                           placeholder="https://example.com"
-                          className="h-12 pl-10 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                          className={`h-12 pl-10 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.website ? "border-red-400" : ""}`}
                           value={campaignData.website}
                           onChange={(e) => setCampaignData({ ...campaignData, website: e.target.value })}
                           data-testid="campaign-website-input"
                         />
                       </div>
+                      <FieldError message={errors.website} />
                     </div>
 
                     {/* Campaign Images */}

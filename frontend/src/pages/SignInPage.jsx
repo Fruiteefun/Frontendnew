@@ -14,11 +14,16 @@ import {
 } from "../components/ui/select";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, User, Phone } from "lucide-react";
 import { Instagram, Twitter, Facebook, Youtube, Linkedin } from "lucide-react";
+import { isValidEmail, isValidPhone, isValidPassword, isNotEmpty } from "../lib/validation";
+
+const FieldError = ({ message }) =>
+  message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
 
 const SignInPage = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -27,11 +32,33 @@ const SignInPage = () => {
     userType: "",
   });
 
+  const validateSignIn = () => {
+    const e = {};
+    if (!isValidEmail(formData.email)) e.email = "Please enter a valid email address";
+    if (!isNotEmpty(formData.password)) e.password = "Password is required";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const validateSignUp = () => {
+    const e = {};
+    if (!isNotEmpty(formData.name)) e.name = "Full name is required";
+    if (!isValidEmail(formData.email)) e.email = "Please enter a valid email address";
+    if (!isValidPassword(formData.password)) e.password = "Password must be at least 8 characters";
+    if (!isValidPhone(formData.phone)) e.phone = "Please enter a valid phone number (digits only)";
+    if (!isNotEmpty(formData.userType)) e.userType = "Please select your role";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
   const handleSubmit = async (e, type) => {
     e.preventDefault();
+    setErrors({});
+
+    if (type === "signin" && !validateSignIn()) return;
+    if (type === "signup" && !validateSignUp()) return;
+
     setIsLoading(true);
-    
-    // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
       if (formData.userType === "influencer" || type === "signin") {
@@ -42,7 +69,6 @@ const SignInPage = () => {
     }, 1000);
   };
 
-  // Social media icons positioned in background
   const SocialIcons = () => (
     <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-10">
       <Instagram className="absolute top-[20%] left-[10%] w-24 h-24 text-pink-500" />
@@ -59,15 +85,13 @@ const SignInPage = () => {
       <SocialIcons />
       
       <div className="w-full max-w-md relative z-10">
-        {/* Logo */}
         <div className="text-center mb-8">
           <FruiteeLogo size="large" />
           <p className="text-muted-foreground mt-2">Welcome back! Sign in to continue</p>
         </div>
 
-        {/* Auth Card */}
         <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-floating border border-white/50 p-8">
-          <Tabs defaultValue="signin" className="w-full">
+          <Tabs defaultValue="signin" className="w-full" onValueChange={() => setErrors({})}>
             <TabsList className="grid w-full grid-cols-2 mb-6 bg-muted/50 rounded-xl p-1">
               <TabsTrigger
                 value="signin"
@@ -96,12 +120,13 @@ const SignInPage = () => {
                       id="signin-email"
                       type="email"
                       placeholder="you@company.com"
-                      className="pl-10 h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                      className={`pl-10 h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.email ? "border-red-400" : ""}`}
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       data-testid="signin-email-input"
                     />
                   </div>
+                  <FieldError message={errors.email} />
                 </div>
 
                 <div className="space-y-2">
@@ -112,7 +137,7 @@ const SignInPage = () => {
                       id="signin-password"
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="pl-10 pr-10 h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                      className={`pl-10 pr-10 h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.password ? "border-red-400" : ""}`}
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       data-testid="signin-password-input"
@@ -125,6 +150,7 @@ const SignInPage = () => {
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
+                  <FieldError message={errors.password} />
                 </div>
 
                 <Button
@@ -150,12 +176,13 @@ const SignInPage = () => {
                       id="signup-name"
                       type="text"
                       placeholder="John Doe"
-                      className="pl-10 h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                      className={`pl-10 h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.name ? "border-red-400" : ""}`}
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       data-testid="signup-name-input"
                     />
                   </div>
+                  <FieldError message={errors.name} />
                 </div>
 
                 <div className="space-y-2">
@@ -166,12 +193,13 @@ const SignInPage = () => {
                       id="signup-email"
                       type="email"
                       placeholder="you@company.com"
-                      className="pl-10 h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                      className={`pl-10 h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.email ? "border-red-400" : ""}`}
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       data-testid="signup-email-input"
                     />
                   </div>
+                  <FieldError message={errors.email} />
                 </div>
 
                 <div className="space-y-2">
@@ -182,7 +210,7 @@ const SignInPage = () => {
                       id="signup-password"
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="pl-10 pr-10 h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                      className={`pl-10 pr-10 h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.password ? "border-red-400" : ""}`}
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       data-testid="signup-password-input"
@@ -195,6 +223,7 @@ const SignInPage = () => {
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
+                  <FieldError message={errors.password} />
                 </div>
 
                 <div className="space-y-2">
@@ -205,12 +234,18 @@ const SignInPage = () => {
                       id="signup-phone"
                       type="tel"
                       placeholder="+1 (555) 000-0000"
-                      className="pl-10 h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                      className={`pl-10 h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.phone ? "border-red-400" : ""}`}
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (/^[+\d\s()\-]*$/.test(val)) {
+                          setFormData({ ...formData, phone: val });
+                        }
+                      }}
                       data-testid="signup-phone-input"
                     />
                   </div>
+                  <FieldError message={errors.phone} />
                 </div>
 
                 <div className="space-y-2">
@@ -219,7 +254,7 @@ const SignInPage = () => {
                     value={formData.userType}
                     onValueChange={(value) => setFormData({ ...formData, userType: value })}
                   >
-                    <SelectTrigger className="h-12 rounded-xl border-gray-200 bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100" data-testid="signup-usertype-select">
+                    <SelectTrigger className={`h-12 rounded-xl border-gray-200 bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.userType ? "border-red-400" : ""}`} data-testid="signup-usertype-select">
                       <SelectValue placeholder="Select your role" />
                     </SelectTrigger>
                     <SelectContent 
@@ -231,6 +266,7 @@ const SignInPage = () => {
                       <SelectItem value="business" className="py-3 px-4 cursor-pointer hover:bg-orange-50 rounded-lg">Business</SelectItem>
                     </SelectContent>
                   </Select>
+                  <FieldError message={errors.userType} />
                 </div>
 
                 <Button

@@ -5,6 +5,10 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Globe, Upload, Plus, X, Image, Palette, Save } from "lucide-react";
+import { isValidUrl } from "../lib/validation";
+
+const FieldError = ({ message }) =>
+  message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
 
 const BrandSetupPage = () => {
   const navigate = useNavigate();
@@ -13,6 +17,7 @@ const BrandSetupPage = () => {
   const [productImages, setProductImages] = useState([]);
   const [brandColors, setBrandColors] = useState([]);
   const [newColor, setNewColor] = useState("#F97316");
+  const [errors, setErrors] = useState({});
 
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
@@ -47,6 +52,10 @@ const BrandSetupPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const e2 = {};
+    if (websiteUrl && !isValidUrl(websiteUrl)) e2.website = "Please enter a valid URL (https://...)";
+    setErrors(e2);
+    if (Object.keys(e2).length > 0) return;
     navigate("/campaign-type");
   };
 
@@ -76,12 +85,13 @@ const BrandSetupPage = () => {
                 <Input
                   id="websiteUrl"
                   placeholder="https://yourbrand.com"
-                  className="h-12 pl-10 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  className={`h-12 pl-10 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.website ? "border-red-400" : ""}`}
                   value={websiteUrl}
                   onChange={(e) => setWebsiteUrl(e.target.value)}
                   data-testid="website-url-input"
                 />
               </div>
+              <FieldError message={errors.website} />
             </div>
           </div>
 
