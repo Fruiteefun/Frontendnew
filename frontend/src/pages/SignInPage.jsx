@@ -62,10 +62,16 @@ const SignInPage = () => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      if (formData.userType === "influencer") {
-        navigate("/influencer-profile", { state: { fullName: formData.name, phone: formData.phone } });
+      if (type === "signin") {
+        // Returning user → straight to dashboard
+        navigate("/dashboard");
       } else {
-        navigate("/profile", { state: { fullName: formData.name, phone: formData.phone } });
+        // New user → registration flow
+        if (formData.userType === "influencer") {
+          navigate("/influencer-profile", { state: { fullName: formData.name, phone: formData.phone } });
+        } else {
+          navigate("/profile", { state: { fullName: formData.name, phone: formData.phone } });
+        }
       }
     }, 1000);
   };
