@@ -56,7 +56,7 @@ const BrandSetupPage = () => {
     if (websiteUrl && !isValidUrl(websiteUrl)) e2.website = "Please enter a valid URL (https://...)";
     setErrors(e2);
     if (Object.keys(e2).length > 0) return;
-    navigate("/campaign-type");
+    navigate("/campaign");
   };
 
   return (
