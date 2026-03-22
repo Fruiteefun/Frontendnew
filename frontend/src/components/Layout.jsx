@@ -30,35 +30,71 @@ const influencerNavItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
 ];
 
-const businessNavItems = [
+// Business hub-level nav
+const businessHubNav = [
   { path: "/profile", label: "Profile", icon: Building2 },
   { path: "/brands", label: "Brands", icon: Tag },
+  { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+];
+
+// Brand setup nav (when inside a brand)
+const brandSetupNav = [
   { path: "/brand-setup", label: "Brand Profile", icon: Palette },
   { path: "/business-preferences", label: "Brand Preferences", icon: Settings },
+];
+
+// Campaign flow nav (when inside a campaign)
+const campaignFlowNav = [
   { path: "/campaign", label: "Campaign", icon: Megaphone },
   { path: "/campaign-type", label: "Campaign Type", icon: Target },
   { path: "/business-plan", label: "Campaign Plan", icon: FileText },
   { path: "/influencers", label: "Influencers", icon: Users },
   { path: "/payment", label: "Payment", icon: CreditCard },
-  { path: "/content-plan", label: "Content Plan", icon: Calendar },
-  { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/content-plan", label: "Content", icon: Calendar },
 ];
+
+function getBusinessNav(pathname) {
+  // Inside campaign flow
+  const campaignPaths = ["/campaign", "/campaign-type", "/business-plan", "/influencers", "/payment", "/content-plan"];
+  if (campaignPaths.some((p) => pathname.startsWith(p))) {
+    return campaignFlowNav;
+  }
+  // Inside brand setup
+  const brandPaths = ["/brand-setup", "/business-preferences"];
+  if (brandPaths.some((p) => pathname.startsWith(p))) {
+    return brandSetupNav;
+  }
+  // Brand campaigns page
+  if (pathname === "/brand-campaigns") {
+    return businessHubNav;
+  }
+  // Hub level (profile, brands, dashboard, settings)
+  return businessHubNav;
+}
 
 export const Layout = ({ children, userType = "business" }) => {
   const location = useLocation();
-  const navItems = userType === "influencer" ? influencerNavItems : businessNavItems;
-  const settingsPath = userType === "influencer" ? "/influencer-settings" : "/business-settings";
+
+  const navItems =
+    userType === "influencer"
+      ? influencerNavItems
+      : getBusinessNav(location.pathname);
+
+  const settingsPath =
+    userType === "influencer" ? "/influencer-settings" : "/business-settings";
   const isSettingsActive = location.pathname === settingsPath;
 
   return (
-    <div className="min-h-screen bg-background flex" data-testid="app-layout">
+    <div className="flex min-h-screen bg-background" data-testid="layout">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-border p-6 flex flex-col" data-testid="sidebar">
-        <Link to="/" className="mb-8">
-          <FruiteeLogo />
-        </Link>
+      <aside className="w-[200px] bg-white/60 backdrop-blur-lg border-r border-orange-100/50 flex flex-col fixed h-full z-50">
+        <div className="p-4">
+          <Link to="/" data-testid="logo-link">
+            <FruiteeLogo size="small" />
+          </Link>
+        </div>
 
-        <nav className="flex-1 space-y-1">
+        <nav className="flex-1 px-3 py-4 space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -66,56 +102,48 @@ export const Layout = ({ children, userType = "business" }) => {
               <Link
                 key={item.path}
                 to={item.path}
-                data-testid={`nav-${item.path.replace("/", "")}`}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? "bg-gradient-to-r from-orange-400 to-pink-500 text-white shadow-lg shadow-orange-500/20"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-gradient-to-r from-orange-400 to-pink-500 text-white shadow-md shadow-orange-500/20"
+                    : "text-muted-foreground hover:bg-orange-50 hover:text-foreground"
                 }`}
+                data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
               >
-                <Icon className="w-5 h-5" />
-                <span className="font-medium">{item.label}</span>
+                <Icon className="w-4 h-4" />
+                {item.label}
               </Link>
             );
           })}
         </nav>
 
-        <div className="pt-4 border-t border-border">
+        <div className="p-3 border-t border-orange-100/50">
           <Link
             to="/signin"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:bg-red-50 hover:text-red-600 transition-all duration-200"
-            data-testid="nav-logout"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-red-50 hover:text-red-500 transition-all"
+            data-testid="logout-btn"
           >
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium">Log out</span>
+            <LogOut className="w-4 h-4" />
+            Log out
           </Link>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        <div className="relative min-h-full">
-          {/* Top Right Settings Icon */}
-          <div className="fixed top-6 right-8 z-[100]">
-            <Link
-              to={settingsPath}
-              data-testid="settings-icon"
-              className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200 ${
-                isSettingsActive
-                  ? "bg-gradient-to-r from-orange-400 to-pink-500 text-white shadow-lg shadow-orange-500/20"
-                  : "bg-white shadow-soft hover:shadow-md text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Cog className="w-5 h-5" />
-            </Link>
-          </div>
+      <main className="flex-1 ml-[200px] min-h-screen relative">
+        {/* Settings Icon */}
+        <Link
+          to={settingsPath}
+          className={`fixed top-4 right-6 z-[100] w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+            isSettingsActive
+              ? "bg-gradient-to-r from-orange-400 to-pink-500 text-white shadow-md"
+              : "bg-white/80 text-muted-foreground hover:bg-white hover:text-foreground shadow-soft"
+          }`}
+          data-testid="settings-icon"
+        >
+          <Cog className="w-5 h-5" />
+        </Link>
 
-          {/* Decorative watermark */}
-          <div className="fixed top-0 right-0 w-96 h-96 opacity-5 pointer-events-none">
-            <div className="w-full h-full rounded-full bg-gradient-to-br from-orange-400 to-pink-500 blur-3xl transform translate-x-1/2 -translate-y-1/2" />
-          </div>
-          {children}
-        </div>
+        {children}
       </main>
     </div>
   );

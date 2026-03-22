@@ -74,7 +74,7 @@ const BusinessPreferencesPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate("/campaign");
+    navigate("/brands");
   };
 
   const RadioOption = ({ label, selected, onClick, testId }) => (

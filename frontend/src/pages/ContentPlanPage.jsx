@@ -316,7 +316,7 @@ const ContentPlanPage = () => {
               Generate All Content
             </Button>
             <Button
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/brand-campaigns")}
               className="h-12 px-6 rounded-xl bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20"
               data-testid="continue-dashboard-btn"
             >

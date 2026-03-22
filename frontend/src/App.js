@@ -27,6 +27,7 @@ import InfluencerSettingsPage from "./pages/InfluencerSettingsPage";
 import BusinessProfilePage from "./pages/BusinessProfilePage";
 import BusinessPreferencesPage from "./pages/BusinessPreferencesPage";
 import BrandsPage from "./pages/BrandsPage";
+import BrandCampaignsPage from "./pages/BrandCampaignsPage";
 import BrandSetupPage from "./pages/BrandSetupPage";
 import CampaignPage from "./pages/CampaignPage";
 import CampaignTypePage from "./pages/CampaignTypePage";
@@ -61,6 +62,7 @@ function App() {
           <Route path="/profile" element={<BusinessProfilePage />} />
           <Route path="/business-preferences" element={<BusinessPreferencesPage />} />
           <Route path="/brands" element={<BrandsPage />} />
+          <Route path="/brand-campaigns" element={<BrandCampaignsPage />} />
           <Route path="/brand-setup" element={<BrandSetupPage />} />
           <Route path="/campaign" element={<CampaignPage />} />
           <Route path="/campaign-type" element={<CampaignTypePage />} />
