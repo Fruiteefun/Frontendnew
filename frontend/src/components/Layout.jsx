@@ -7,16 +7,8 @@ import {
   Loader,
   Video,
   LayoutDashboard,
-  Building2,
   Settings,
   Tag,
-  Palette,
-  Megaphone,
-  Target,
-  FileText,
-  Users,
-  CreditCard,
-  Calendar,
   LogOut,
   Cog,
   CheckCircle2,
@@ -44,43 +36,11 @@ const influencerSignedInNav = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
 ];
 
-// Business hub-level nav
-const businessHubNav = [
-  { path: "/profile", label: "Profile", icon: Building2 },
+// Business nav — always the same two top-level items
+const businessNav = [
+  { path: "/profile", label: "Edit Business Profile", icon: Pencil },
   { path: "/brands", label: "Brands", icon: Tag },
-  { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
 ];
-
-// Brand setup nav (when inside a brand)
-const brandSetupNav = [
-  { path: "/brand-setup", label: "Brand Profile", icon: Palette },
-  { path: "/business-preferences", label: "Brand Preferences", icon: Settings },
-];
-
-// Campaign flow nav (when inside a campaign)
-const campaignFlowNav = [
-  { path: "/campaign", label: "Campaign", icon: Megaphone },
-  { path: "/campaign-type", label: "Campaign Type", icon: Target },
-  { path: "/business-plan", label: "Campaign Plan", icon: FileText },
-  { path: "/influencers", label: "Influencers", icon: Users },
-  { path: "/payment", label: "Payment", icon: CreditCard },
-  { path: "/content-plan", label: "Content", icon: Calendar },
-];
-
-function getBusinessNav(pathname) {
-  const campaignPaths = ["/campaign", "/campaign-type", "/business-plan", "/influencers", "/payment", "/content-plan"];
-  if (campaignPaths.some((p) => pathname.startsWith(p))) {
-    return campaignFlowNav;
-  }
-  const brandPaths = ["/brand-setup", "/business-preferences"];
-  if (brandPaths.some((p) => pathname.startsWith(p))) {
-    return brandSetupNav;
-  }
-  if (pathname === "/brand-campaigns") {
-    return businessHubNav;
-  }
-  return businessHubNav;
-}
 
 function getInfluencerProgress() {
   try {
@@ -181,8 +141,7 @@ export const Layout = ({ children, userType = "business" }) => {
   };
 
   const renderBusinessNav = () => {
-    const navItems = getBusinessNav(location.pathname);
-    return navItems.map((item) => {
+    return businessNav.map((item) => {
       const Icon = item.icon;
       const isActive = location.pathname === item.path;
       return (
