@@ -36,6 +36,7 @@ const SignInPage = () => {
     const e = {};
     if (!isValidEmail(formData.email)) e.email = "Please enter a valid email address";
     if (!isNotEmpty(formData.password)) e.password = "Password is required";
+    if (!isNotEmpty(formData.userType)) e.userType = "Please select your role";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -61,7 +62,7 @@ const SignInPage = () => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      if (formData.userType === "influencer" || type === "signin") {
+      if (formData.userType === "influencer") {
         navigate("/influencer-profile", { state: { fullName: formData.name, phone: formData.phone } });
       } else {
         navigate("/profile", { state: { fullName: formData.name, phone: formData.phone } });
@@ -151,6 +152,27 @@ const SignInPage = () => {
                     </button>
                   </div>
                   <FieldError message={errors.password} />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="signin-role">Role</Label>
+                  <Select
+                    value={formData.userType}
+                    onValueChange={(value) => setFormData({ ...formData, userType: value })}
+                  >
+                    <SelectTrigger className={`h-12 rounded-xl border-gray-200 bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.userType ? "border-red-400" : ""}`} data-testid="signin-role-select">
+                      <SelectValue placeholder="Select your role" />
+                    </SelectTrigger>
+                    <SelectContent
+                      position="popper"
+                      sideOffset={4}
+                      className="bg-white border border-gray-200 shadow-lg rounded-xl"
+                    >
+                      <SelectItem value="influencer" className="py-3 px-4 cursor-pointer hover:bg-orange-50 rounded-lg">Influencer</SelectItem>
+                      <SelectItem value="business" className="py-3 px-4 cursor-pointer hover:bg-orange-50 rounded-lg">Business</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FieldError message={errors.userType} />
                 </div>
 
                 <Button
