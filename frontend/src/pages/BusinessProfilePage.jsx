@@ -25,7 +25,8 @@ const BusinessProfilePage = () => {
     businessName: "",
     website: "",
     teamSize: "",
-    location: "",
+    country: "",
+    city: "",
     phone: initialPhone,
     description: "",
     instagram: "",
@@ -179,21 +180,58 @@ const BusinessProfilePage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
+                <Label htmlFor="country">Country</Label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id="location"
-                    placeholder="New York, US"
-                    className="h-12 pl-10 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                    value={formData.location}
-                    onChange={(e) =>
-                      setFormData({ ...formData, location: e.target.value })
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
+                  <Select
+                    value={formData.country}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, country: value })
                     }
-                    data-testid="location-input"
-                  />
+                  >
+                    <SelectTrigger className="h-12 pl-10 rounded-xl border-gray-200 bg-white/50" data-testid="country-select">
+                      <SelectValue placeholder="Select country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="us">United States</SelectItem>
+                      <SelectItem value="uk">United Kingdom</SelectItem>
+                      <SelectItem value="ca">Canada</SelectItem>
+                      <SelectItem value="au">Australia</SelectItem>
+                      <SelectItem value="de">Germany</SelectItem>
+                      <SelectItem value="fr">France</SelectItem>
+                      <SelectItem value="in">India</SelectItem>
+                      <SelectItem value="jp">Japan</SelectItem>
+                      <SelectItem value="br">Brazil</SelectItem>
+                      <SelectItem value="mx">Mexico</SelectItem>
+                      <SelectItem value="es">Spain</SelectItem>
+                      <SelectItem value="it">Italy</SelectItem>
+                      <SelectItem value="nl">Netherlands</SelectItem>
+                      <SelectItem value="se">Sweden</SelectItem>
+                      <SelectItem value="sg">Singapore</SelectItem>
+                      <SelectItem value="ae">United Arab Emirates</SelectItem>
+                      <SelectItem value="za">South Africa</SelectItem>
+                      <SelectItem value="ng">Nigeria</SelectItem>
+                      <SelectItem value="ke">Kenya</SelectItem>
+                      <SelectItem value="ie">Ireland</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="city">City / Town</Label>
+                <Input
+                  id="city"
+                  placeholder="e.g. London"
+                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  value={formData.city}
+                  onChange={(e) =>
+                    setFormData({ ...formData, city: e.target.value })
+                  }
+                  data-testid="city-input"
+                />
+              </div>
+            </div>
 
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone</Label>
