@@ -74,7 +74,7 @@ const BusinessPreferencesPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate("/brands");
+    navigate("/campaign");
   };
 
   const RadioOption = ({ label, selected, onClick, testId }) => (
@@ -116,7 +116,7 @@ const BusinessPreferencesPage = () => {
       <div className="p-8 max-w-3xl mx-auto" data-testid="business-preferences-page">
         <div className="mb-8">
           <h1 className="font-outfit text-4xl font-bold text-foreground mb-2">
-            Business Preferences
+            Brand Preferences
           </h1>
           <p className="text-muted-foreground">
             Customise how your brand participates in campaigns
@@ -313,7 +313,7 @@ const BusinessPreferencesPage = () => {
               type="button"
               variant="outline"
               className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
-              onClick={() => navigate("/profile")}
+              onClick={() => navigate("/brand-setup")}
               data-testid="cancel-btn"
             >
               Cancel

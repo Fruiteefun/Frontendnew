@@ -83,7 +83,7 @@ const CampaignPage = () => {
               type="button"
               variant="outline"
               className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
-              onClick={() => navigate("/brand-setup")}
+              onClick={() => navigate("/business-preferences")}
               data-testid="back-btn"
             >
               Back

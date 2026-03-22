@@ -63,7 +63,7 @@ const BusinessProfilePage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
-    navigate("/business-preferences");
+    navigate("/brands");
   };
 
   return (
