@@ -64,7 +64,7 @@ const BrandSetupPage = () => {
       <div className="p-8 max-w-3xl mx-auto" data-testid="brand-setup-page">
         <div className="mb-8">
           <h1 className="font-outfit text-4xl font-bold text-foreground mb-2">
-            Brand Setup
+            Brand Profile
           </h1>
           <p className="text-muted-foreground">
             Add your brand assets and visual identity

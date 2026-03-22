@@ -34,7 +34,7 @@ const businessNavItems = [
   { path: "/profile", label: "Profile", icon: Building2 },
   { path: "/business-preferences", label: "Preferences", icon: Settings },
   { path: "/brands", label: "Brands", icon: Tag },
-  { path: "/brand-setup", label: "Brand Setup", icon: Palette },
+  { path: "/brand-setup", label: "Brand Profile", icon: Palette },
   { path: "/campaign", label: "Campaign", icon: Megaphone },
   { path: "/campaign-type", label: "Campaign Type", icon: Target },
   { path: "/business-plan", label: "Campaign Plan", icon: FileText },
