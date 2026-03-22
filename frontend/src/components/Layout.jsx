@@ -22,6 +22,7 @@ import {
 
 const influencerNavItems = [
   { path: "/influencer-profile", label: "Profile", icon: User },
+  { path: "/influencer-preferences", label: "Preferences", icon: Settings },
   { path: "/create-digital-twin", label: "Create Twin", icon: Sparkles },
   { path: "/digital-twin-progress", label: "Generation", icon: Loader },
   { path: "/digital-twin-intro", label: "Intro Video", icon: Video },

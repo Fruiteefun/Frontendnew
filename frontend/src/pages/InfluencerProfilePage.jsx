@@ -40,7 +40,7 @@ const InfluencerProfilePage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate("/create-digital-twin");
+    navigate("/influencer-preferences");
   };
 
   return (

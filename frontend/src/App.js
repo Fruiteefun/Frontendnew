@@ -9,6 +9,7 @@ import SignInPage from "./pages/SignInPage";
 
 // Influencer Pages
 import InfluencerProfilePage from "./pages/InfluencerProfilePage";
+import InfluencerPreferencesPage from "./pages/InfluencerPreferencesPage";
 import CreateDigitalTwinPage from "./pages/CreateDigitalTwinPage";
 import DigitalTwinProgressPage from "./pages/DigitalTwinProgressPage";
 import DigitalTwinIntroPage from "./pages/DigitalTwinIntroPage";
@@ -40,6 +41,7 @@ function App() {
 
           {/* Influencer Flow */}
           <Route path="/influencer-profile" element={<InfluencerProfilePage />} />
+          <Route path="/influencer-preferences" element={<InfluencerPreferencesPage />} />
           <Route path="/create-digital-twin" element={<CreateDigitalTwinPage />} />
           <Route path="/digital-twin-progress" element={<DigitalTwinProgressPage />} />
           <Route path="/digital-twin-intro" element={<DigitalTwinIntroPage />} />
