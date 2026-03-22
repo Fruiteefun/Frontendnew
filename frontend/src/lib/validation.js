@@ -10,7 +10,7 @@ export const isValidPhone = (phone) => {
 };
 
 export const isValidUrl = (url) => {
-  if (!url) return true;
+  if (!url || url === "https://") return true;
   return /^https?:\/\/.+\..+/.test(url);
 };
 

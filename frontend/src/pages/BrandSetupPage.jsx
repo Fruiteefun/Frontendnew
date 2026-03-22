@@ -12,7 +12,7 @@ const FieldError = ({ message }) =>
 
 const BrandSetupPage = () => {
   const navigate = useNavigate();
-  const [websiteUrl, setWebsiteUrl] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("https://");
   const [brandLogo, setBrandLogo] = useState(null);
   const [productImages, setProductImages] = useState([]);
   const [brandColors, setBrandColors] = useState([]);

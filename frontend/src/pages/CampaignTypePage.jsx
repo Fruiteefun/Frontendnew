@@ -15,7 +15,7 @@ const CampaignTypePage = () => {
   const navigate = useNavigate();
   const [selectedType, setSelectedType] = useState(null);
   const [campaignData, setCampaignData] = useState({
-    website: "",
+    website: "https://",
     details: "",
   });
   const [campaignImages, setCampaignImages] = useState([]);

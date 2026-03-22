@@ -28,7 +28,7 @@ const BusinessProfilePage = () => {
 
   const [formData, setFormData] = useState({
     businessName: "",
-    website: "",
+    website: "https://",
     teamSize: "",
     country: "",
     city: "",
