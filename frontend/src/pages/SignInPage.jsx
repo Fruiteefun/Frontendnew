@@ -62,6 +62,8 @@ const SignInPage = () => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
+      // Store user type for sidebar/settings routing
+      localStorage.setItem("fruitee_userType", formData.userType);
       if (type === "signin") {
         // Returning user → straight to dashboard
         navigate("/dashboard");

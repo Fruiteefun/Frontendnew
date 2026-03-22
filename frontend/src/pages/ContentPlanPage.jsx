@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 const ContentPlanPage = () => {
+  const userType = localStorage.getItem("fruitee_userType") || "business";
   const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date(2026, 2, 1)); // March 2026
 
@@ -156,7 +157,7 @@ const ContentPlanPage = () => {
   const emptyDays = Array.from({ length: firstDay }, (_, i) => i);
 
   return (
-    <Layout userType="business">
+    <Layout userType={userType}>
       <div className="p-8" data-testid="content-plan-page">
         <div className="flex items-center justify-between mb-8">
           <div>

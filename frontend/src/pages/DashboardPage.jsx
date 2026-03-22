@@ -35,6 +35,7 @@ import {
 } from "recharts";
 
 const DashboardPage = () => {
+  const userType = localStorage.getItem("fruitee_userType") || "business";
   const [periodFilter, setPeriodFilter] = useState("last-month");
   const [campaignFilter, setCampaignFilter] = useState("all");
   const [customStartDate, setCustomStartDate] = useState("");
@@ -122,7 +123,7 @@ const DashboardPage = () => {
   ];
 
   return (
-    <Layout userType="business">
+    <Layout userType={userType}>
       <div className="p-8 pr-24" data-testid="dashboard-page">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
