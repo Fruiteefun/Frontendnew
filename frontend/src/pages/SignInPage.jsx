@@ -65,8 +65,12 @@ const SignInPage = () => {
       // Store user type for sidebar/settings routing
       localStorage.setItem("fruitee_userType", formData.userType);
       if (type === "signin") {
-        // Returning user → straight to dashboard
-        navigate("/dashboard");
+        // Returning user → straight to their hub
+        if (formData.userType === "influencer") {
+          navigate("/dashboard");
+        } else {
+          navigate("/brands");
+        }
       } else {
         // New user → registration flow
         if (formData.userType === "influencer") {
