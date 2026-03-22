@@ -43,6 +43,9 @@ const DigitalTwinProgressPage = () => {
       if (elapsed >= totalDuration) {
         clearInterval(interval);
         setTimeout(() => {
+          const progress = JSON.parse(localStorage.getItem("fruitee_influencer_progress") || "{}");
+          progress.generation = true;
+          localStorage.setItem("fruitee_influencer_progress", JSON.stringify(progress));
           navigate("/digital-twin-intro");
         }, 500);
       }

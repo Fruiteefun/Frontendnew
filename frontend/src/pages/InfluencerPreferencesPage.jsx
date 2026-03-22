@@ -88,6 +88,9 @@ const InfluencerPreferencesPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const progress = JSON.parse(localStorage.getItem("fruitee_influencer_progress") || "{}");
+    progress.preferences = true;
+    localStorage.setItem("fruitee_influencer_progress", JSON.stringify(progress));
     navigate("/create-digital-twin");
   };
 

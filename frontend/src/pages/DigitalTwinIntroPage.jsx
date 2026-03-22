@@ -194,7 +194,14 @@ const DigitalTwinIntroPage = () => {
             Back
           </Button>
           <Button
-            onClick={() => navigate("/dashboard")}
+            onClick={() => {
+              const progress = JSON.parse(localStorage.getItem("fruitee_influencer_progress") || "{}");
+              progress["intro-video"] = true;
+              progress.dashboard = true;
+              localStorage.setItem("fruitee_influencer_progress", JSON.stringify(progress));
+              localStorage.setItem("fruitee_influencer_registered", "true");
+              navigate("/dashboard");
+            }}
             className="h-14 px-10 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold text-lg shadow-lg shadow-orange-500/20 transition-all duration-300"
             data-testid="go-to-dashboard-btn"
           >

@@ -53,6 +53,9 @@ const CreateDigitalTwinPage = () => {
   };
 
   const handleSubmit = () => {
+    const progress = JSON.parse(localStorage.getItem("fruitee_influencer_progress") || "{}");
+    progress["create-twin"] = true;
+    localStorage.setItem("fruitee_influencer_progress", JSON.stringify(progress));
     navigate("/digital-twin-progress");
   };
 

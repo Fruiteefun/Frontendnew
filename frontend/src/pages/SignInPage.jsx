@@ -67,6 +67,7 @@ const SignInPage = () => {
       if (type === "signin") {
         // Returning user → straight to their hub
         if (formData.userType === "influencer") {
+          localStorage.setItem("fruitee_influencer_registered", "true");
           navigate("/dashboard");
         } else {
           navigate("/brands");
@@ -74,6 +75,8 @@ const SignInPage = () => {
       } else {
         // New user → registration flow
         if (formData.userType === "influencer") {
+          localStorage.removeItem("fruitee_influencer_registered");
+          localStorage.removeItem("fruitee_influencer_progress");
           navigate("/influencer-profile", { state: { fullName: formData.name, phone: formData.phone } });
         } else {
           navigate("/profile", { state: { fullName: formData.name, phone: formData.phone } });
