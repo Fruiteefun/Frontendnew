@@ -56,6 +56,10 @@ const CreateDigitalTwinPage = () => {
     const progress = JSON.parse(localStorage.getItem("fruitee_influencer_progress") || "{}");
     progress["create-twin"] = true;
     localStorage.setItem("fruitee_influencer_progress", JSON.stringify(progress));
+    // If registered, this is an edit → trigger regeneration
+    if (localStorage.getItem("fruitee_influencer_registered") === "true") {
+      localStorage.setItem("fruitee_twin_regenerating", "true");
+    }
     navigate("/digital-twin-progress");
   };
 

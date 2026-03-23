@@ -8,6 +8,16 @@ const DigitalTwinIntroPage = () => {
   const navigate = useNavigate();
   const [isPlaying, setIsPlaying] = useState(false);
   const [copied, setCopied] = useState(false);
+  const isRegistered = localStorage.getItem("fruitee_influencer_registered") === "true";
+
+  // Track which platforms have been posted to
+  const [postedPlatforms, setPostedPlatforms] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("fruitee_posted_platforms") || "{}");
+    } catch {
+      return {};
+    }
+  });
 
   const shareUrl = "https://fruitee.app/twin/yourhandle";
 
@@ -16,6 +26,54 @@ const DigitalTwinIntroPage = () => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const handlePostTo = (platform) => {
+    const updated = { ...postedPlatforms, [platform]: true };
+    setPostedPlatforms(updated);
+    localStorage.setItem("fruitee_posted_platforms", JSON.stringify(updated));
+  };
+
+  const handleGoToDashboard = () => {
+    const progress = JSON.parse(localStorage.getItem("fruitee_influencer_progress") || "{}");
+    progress["intro-video"] = true;
+    progress.dashboard = true;
+    localStorage.setItem("fruitee_influencer_progress", JSON.stringify(progress));
+    localStorage.setItem("fruitee_influencer_registered", "true");
+    navigate("/dashboard");
+  };
+
+  const platforms = [
+    {
+      key: "instagram",
+      label: "Instagram",
+      color: "#E4405F",
+      icon: (
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+        </svg>
+      ),
+    },
+    {
+      key: "tiktok",
+      label: "TikTok",
+      color: "#000000",
+      icon: (
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.4a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.44a8.16 8.16 0 0 0 3.76.92V6.69z"/>
+        </svg>
+      ),
+    },
+    {
+      key: "youtube",
+      label: "YouTube",
+      color: "#FF0000",
+      icon: (
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.13C5.12 19.56 12 19.56 12 19.56s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="white"/>
+        </svg>
+      ),
+    },
+  ];
 
   return (
     <Layout userType="influencer">
@@ -41,16 +99,12 @@ const DigitalTwinIntroPage = () => {
               Intro Video Preview
             </h2>
 
-            {/* Video Player Placeholder */}
             <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl overflow-hidden mb-4">
-              {/* Placeholder image */}
               <img
                 src="https://images.unsplash.com/photo-1524158572048-994dc70d2b58?w=800&h=450&fit=crop"
                 alt="Digital Twin Preview"
                 className="w-full h-full object-cover opacity-80"
               />
-
-              {/* Play Button Overlay */}
               <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                 <button
                   onClick={() => setIsPlaying(!isPlaying)}
@@ -64,8 +118,6 @@ const DigitalTwinIntroPage = () => {
                   )}
                 </button>
               </div>
-
-              {/* Video Progress Bar */}
               <div className="absolute bottom-0 left-0 right-0 p-4">
                 <div className="h-1 bg-white/30 rounded-full overflow-hidden">
                   <div
@@ -76,7 +128,6 @@ const DigitalTwinIntroPage = () => {
               </div>
             </div>
 
-            {/* Video Controls */}
             <div className="flex gap-3">
               <Button
                 variant="outline"
@@ -103,7 +154,7 @@ const DigitalTwinIntroPage = () => {
                 Share Your Twin
               </h2>
               <p className="text-muted-foreground mb-4">
-                Copy your unique link to share your digital twin with your audience
+                Post your intro video to your social media accounts
               </p>
 
               {/* Share Link */}
@@ -125,30 +176,45 @@ const DigitalTwinIntroPage = () => {
                 </Button>
               </div>
 
-              {/* Social Share Buttons */}
+              {/* Social Platform Buttons */}
               <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  className="flex-1 h-12 rounded-xl border-[#E4405F] text-[#E4405F] hover:bg-[#E4405F]/10"
-                >
-                  Instagram
-                </Button>
-                <Button
-                  variant="outline"
-                  className="flex-1 h-12 rounded-xl border-[#000000] text-[#000000] hover:bg-[#000000]/10"
-                >
-                  TikTok
-                </Button>
-                <Button
-                  variant="outline"
-                  className="flex-1 h-12 rounded-xl border-[#FF0000] text-[#FF0000] hover:bg-[#FF0000]/10"
-                >
-                  YouTube
-                </Button>
+                {platforms.map((p) => {
+                  const isPosted = !!postedPlatforms[p.key];
+                  return (
+                    <Button
+                      key={p.key}
+                      variant="outline"
+                      onClick={() => !isPosted && handlePostTo(p.key)}
+                      className={`flex-1 h-12 rounded-xl transition-all duration-300 ${
+                        isPosted
+                          ? "bg-teal-500 border-teal-500 text-white hover:bg-teal-600"
+                          : `border-[${p.color}] text-[${p.color}] hover:bg-[${p.color}]/10`
+                      }`}
+                      style={
+                        isPosted
+                          ? {}
+                          : { borderColor: p.color, color: p.color }
+                      }
+                      data-testid={`post-${p.key}-btn`}
+                    >
+                      {isPosted ? (
+                        <>
+                          <Check className="w-4 h-4 mr-2" />
+                          Posted
+                        </>
+                      ) : (
+                        <>
+                          <span className="mr-2">{p.icon}</span>
+                          {p.label}
+                        </>
+                      )}
+                    </Button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Stats Preview */}
+            {/* What's Next */}
             <div className="bg-gradient-to-br from-orange-50 to-pink-50 rounded-3xl p-6">
               <h3 className="font-outfit font-semibold mb-4">
                 What's Next?
@@ -194,14 +260,7 @@ const DigitalTwinIntroPage = () => {
             Back
           </Button>
           <Button
-            onClick={() => {
-              const progress = JSON.parse(localStorage.getItem("fruitee_influencer_progress") || "{}");
-              progress["intro-video"] = true;
-              progress.dashboard = true;
-              localStorage.setItem("fruitee_influencer_progress", JSON.stringify(progress));
-              localStorage.setItem("fruitee_influencer_registered", "true");
-              navigate("/dashboard");
-            }}
+            onClick={handleGoToDashboard}
             className="h-14 px-10 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold text-lg shadow-lg shadow-orange-500/20 transition-all duration-300"
             data-testid="go-to-dashboard-btn"
           >
