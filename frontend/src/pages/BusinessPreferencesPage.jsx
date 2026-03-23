@@ -74,7 +74,7 @@ const BusinessPreferencesPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate("/brands");
+    navigate("/brand-bio");
   };
 
   const RadioOption = ({ label, selected, onClick, testId }) => (

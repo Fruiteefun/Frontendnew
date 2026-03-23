@@ -29,6 +29,7 @@ import BusinessPreferencesPage from "./pages/BusinessPreferencesPage";
 import BrandsPage from "./pages/BrandsPage";
 import BrandCampaignsPage from "./pages/BrandCampaignsPage";
 import BrandSetupPage from "./pages/BrandSetupPage";
+import BrandBioPage from "./pages/BrandBioPage";
 import CampaignPage from "./pages/CampaignPage";
 import CampaignTypePage from "./pages/CampaignTypePage";
 import BusinessPlanPage from "./pages/BusinessPlanPage";
@@ -64,6 +65,7 @@ function App() {
           <Route path="/brands" element={<BrandsPage />} />
           <Route path="/brand-campaigns" element={<BrandCampaignsPage />} />
           <Route path="/brand-setup" element={<BrandSetupPage />} />
+          <Route path="/brand-bio" element={<BrandBioPage />} />
           <Route path="/campaign" element={<CampaignPage />} />
           <Route path="/campaign-type" element={<CampaignTypePage />} />
           <Route path="/business-plan" element={<BusinessPlanPage />} />
