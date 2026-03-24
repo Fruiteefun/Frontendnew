@@ -1,105 +1,77 @@
-# Fruitee - Social Media Campaign Management Platform
-
-## Overview
-Fruitee is a social media campaign management platform connecting influencers with businesses for marketing campaigns.
+# Fruitee - Product Requirements Document
 
 ## Original Problem Statement
-Build a web app called Fruitee - a social media campaign management platform with:
-1. Influencers register, update details, create digital twins, generate intro videos
-2. Businesses register, create brands, enter brand details, create campaigns, get matched with influencers, pay for campaigns, view content calendar and progress dashboard
+A social media campaign management platform called "Fruitee" where:
+1. **Influencers** register, onboard with preferences, subscribe/pay, create digital twins, and generate intro videos.
+2. **Businesses** register, onboard, create brands, setup campaigns, select influencers, pay, and view a content calendar/dashboard.
 
-## User Personas
-
-### Influencers
-- Content creators looking to monetize through brand partnerships
-- Need to create digital twin avatars for AI-powered content
-- Track their campaign performance and earnings
-
-### Businesses
-- Small to medium businesses wanting influencer marketing campaigns
-- Need to create/manage brands and campaigns
-- Match with relevant influencers and track ROI
-
-## Core Requirements (Static)
-
-### Authentication
-- Email-based sign up/sign in
-- Role selection: Influencer or Business
-
-### Business Flow (Complete - matches reference design)
-1. **Business Profile** - Logo upload, Business Name, Website, Location, Phone, About, Social Media (Instagram, TikTok Shop, TikTok, LinkedIn)
-2. **Business Preferences** - 8 numbered sections: AI Consent, Categories, Restricted Categories, Content Tone, Content Pillars, Audience Type, Participation Control, Campaign Matching
-3. **Brands** - Add/remove brands, brand list
-4. **Brand Setup** - Website URL, Brand Logo upload, Product Images (0/3), Brand Colours (picker + hex)
-5. **Campaign Type** - 4 types with expandable fields (Campaign Website, Images, Details)
-6. **Campaign Plan** - Target Market (3 cols), Customer Profile, Competitors (up to 5), Growth Targets
-7. **Influencer Selection** - Horizontal filter bar + 3 influencer cards with heart/stats
-8. **Payment** - 3 pricing plans (Starter/Pro/Enterprise) + secure payment form
-9. **Content Plan** - Calendar with posts/reels scheduling
-10. **Dashboard** - 4 stat cards + 4 charts (Area, Line, Pie, Bar)
-11. **Settings** - Email, password, quick links, payments, account actions
-
-### Influencer Flow
-1. Profile Setup - Personal details, location, language
-2. Digital Twin Creation - Photo upload, voice recording
-3. Twin Generation - Progress indicator
-4. Intro Video - Share generated video
-5. Dashboard - Analytics and performance tracking
+## Architecture
+- **Frontend**: React + Tailwind CSS + Shadcn UI + React Router
+- **Backend**: FastAPI + MongoDB (not yet connected to frontend)
+- **State**: localStorage mocking (to be replaced with real API)
 
 ## What's Been Implemented
 
-### Pages Built (15+) - Completed March 19-21, 2026
-- Landing page with navigation cards
-- Sign In / Sign Up with email authentication
-- All 11 Business flow pages (updated to match reference design March 21)
-- All Influencer flow pages (5 pages)
-- Settings pages for both personas
+### Authentication
+- Sign in / Sign up with role selection (Business / Influencer)
+- Forgot / Reset Password flow (modal with email → token → new password → success)
 
-### Design Implementation
-- Warm cream background (#FFF8F0)
-- Orange-to-purple gradient buttons (Save & Continue)
-- Outfit font for headings, DM Sans for body
-- Shadcn/UI components with Lucide React icons
-- Recharts for analytics
-- Numbered section headers with orange icons
-- Cancel + Save & Continue button pattern
-- Sidebar navigation with active states
+### Business Flow (Hub-and-Spoke)
+1. **Business Profile** - Logo upload, Your Name (pre-populated from sign-up), Business Name, Website, Country, City, Phone, Social Media (Instagram, TikTok Shop, TikTok, YouTube)
+2. **Business Preferences** - Consent checkboxes, Category (multi-select checkboxes), Preferred Content Tone (multi-select), Primary Content Pillars (multi-select), Target Audience Type (multi-select), Participation consent, Regions (UK, US, EU, India, Global - multi-select), Campaign Matching
+3. **Brands Hub** - List/create/delete brands
+4. **Brand Setup** - Website, Colors, Fonts, Tone of Voice
+5. **Brand Bio** - Description, Visual Identity, Customer Experience
+6. **Campaign Creation** - Name, Start Date
+7. **Campaign Type** - Product Launch, Event Promo, Brand Awareness, Promotion
+8. **Business Plan** - Market analysis, competitors, growth targets
+9. **Influencer Selection** - Browse and select influencers
+10. **Payment** - Campaign payment (Stripe placeholder)
+11. **Content Plan** - Pre-content plan, content calendar, Generate All Content, Start Campaign
+12. **Dashboard** - Metrics charts, campaign overview
 
-### Tech Stack
-- Frontend: React, Tailwind CSS, Shadcn/UI
-- Charts: Recharts
-- Icons: Lucide React
-- Animations: Framer Motion (available)
+### Influencer Flow (Linear, Locked Steps)
+1. **Influencer Profile** - Photo upload, Display Name, Full Name, DOB (age 16+), Gender, Language, Country, City, Social handles
+2. **Influencer Preferences** - Consent checkboxes, Category (multi-select), Tone, Pillars, Audience, Region
+3. **Payment/Subscription** - 3 plans (Basic $9/mo, Creator $29/mo, Pro $79/mo), Stripe-style payment form, Success popup
+4. **Create Digital Twin** - Photo upload, voice recording
+5. **Twin Generation** - Animated progress (static for returning users)
+6. **Intro Video** - Preview and publish
+
+### Global
+- Dynamic sidebar (role-aware, state-aware)
+- Back buttons on all applicable screens
+- Field validations (email, phone, URL, handles, dates, numeric fields)
+- Settings pages (Business & Influencer)
 
 ## Prioritized Backlog
 
-### P0 - Critical (Backend Integration)
-- Connect all pages to backend API endpoints (Swagger: http://18.135.75.87:8000/docs)
-- User authentication with JWT tokens
-- Database integration for user data
+### P0 - Critical
+- Connect frontend to backend REST API (replace all localStorage mocking)
+- Implement real JWT authentication flow
 
-### P1 - High Priority
-- Real file upload functionality
-- Voice recording implementation
-- AI digital twin generation integration
-- Form validations across all onboarding steps
+### P1 - High
+- Implement real file upload (images) and Web Audio API (voice recording)
+- Connect social media OAuth flows
 
-### P2 - Medium Priority
-- Payment gateway integration (Stripe)
-- Real-time content generation
-- Social media posting automation
-- Campaign analytics from real data
-- Notification system
+### P2 - Medium  
+- Stripe payment integration (real)
+- Influencer subscription management
+- Virtual influencer browsing
+- Post/Reel individual CRUD screens
 
-### P3 - Nice to Have
-- Dark mode support
-- Mobile responsive improvements
-- Export analytics reports
-- Team collaboration features
+### P3 - Low
+- Dark mode
+- Mobile responsiveness
+- Exportable reports
+- Campaign metrics over time charts (real data)
 
-## Next Tasks
-1. Connect to backend API at http://18.135.75.87:8000/docs
-2. Implement actual authentication flow
-3. Add real data fetching and state management
-4. Implement file upload to storage
-5. Add voice recording with Web Audio API
+## Reference Documents
+- `/app/frontend/public/Fruitee_API_Endpoints_Reference.md` - Complete API endpoint reference
+- `/app/frontend/public/Fruitee_UI_vs_API_Gap_Analysis.md` - UI vs API gap analysis (50 issues)
+- Swagger Docs: `http://18.135.75.87:8000/docs`
+
+## Test Reports
+- `/app/test_reports/iteration_1.json`
+- `/app/test_reports/iteration_2.json`
+- `/app/test_reports/iteration_3.json` (latest - 100% pass rate)
