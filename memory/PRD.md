@@ -27,7 +27,7 @@ Build a web app called Fruitee - a social media campaign management platform wit
 - Role selection: Influencer or Business
 
 ### Business Flow (Complete - matches reference design)
-1. **Business Profile** - Logo upload, Business Name, Industry, Website, Team Size, Location, Phone, Description, Social Media (Instagram, Twitter/X, TikTok, LinkedIn)
+1. **Business Profile** - Logo upload, Business Name, Website, Location, Phone, About, Social Media (Instagram, TikTok Shop, TikTok, LinkedIn)
 2. **Business Preferences** - 8 numbered sections: AI Consent, Categories, Restricted Categories, Content Tone, Content Pillars, Audience Type, Participation Control, Campaign Matching
 3. **Brands** - Add/remove brands, brand list
 4. **Brand Setup** - Website URL, Brand Logo upload, Product Images (0/3), Brand Colours (picker + hex)

@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Upload, ArrowRight, X, Globe, Users, MapPin, Phone, Building2, Save } from "lucide-react";
+import { Upload, ArrowRight, X, Globe, MapPin, Phone, Building2, Save } from "lucide-react";
 import { isNotEmpty, isValidUrl, isValidPhone, isValidHandle } from "../lib/validation";
 
 const FieldError = ({ message }) =>
@@ -29,7 +29,7 @@ const BusinessProfilePage = () => {
   const [formData, setFormData] = useState({
     businessName: "",
     website: "https://",
-    teamSize: "",
+    tiktokShop: "",
     country: "",
     city: "",
     phone: initialPhone,
@@ -53,7 +53,7 @@ const BusinessProfilePage = () => {
     if (formData.website && !isValidUrl(formData.website)) e.website = "Please enter a valid URL (https://...)";
     if (formData.phone && !isValidPhone(formData.phone)) e.phone = "Please enter a valid phone number";
     if (formData.instagram && !isValidHandle(formData.instagram)) e.instagram = "Invalid handle format";
-    if (formData.twitter && !isValidHandle(formData.twitter)) e.twitter = "Invalid handle format";
+    if (formData.tiktokShop && !isValidHandle(formData.tiktokShop)) e.tiktokShop = "Invalid handle format";
     if (formData.tiktok && !isValidHandle(formData.tiktok)) e.tiktok = "Invalid handle format";
     if (formData.linkedin && !isValidHandle(formData.linkedin)) e.linkedin = "Invalid handle format";
     setErrors(e);
@@ -175,32 +175,6 @@ const BusinessProfilePage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="teamSize">Team Size</Label>
-                <div className="relative">
-                  <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
-                  <Select
-                    value={formData.teamSize}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, teamSize: value })
-                    }
-                  >
-                    <SelectTrigger className="h-12 pl-10 rounded-xl border-gray-200 bg-white/50" data-testid="team-size-select">
-                      <SelectValue placeholder="10-50" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1-10">1-10</SelectItem>
-                      <SelectItem value="10-50">10-50</SelectItem>
-                      <SelectItem value="51-200">51-200</SelectItem>
-                      <SelectItem value="201-500">201-500</SelectItem>
-                      <SelectItem value="500+">500+</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
                 <Label htmlFor="country">Country</Label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
@@ -276,7 +250,7 @@ const BusinessProfilePage = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Business Description</Label>
+              <Label htmlFor="description">About</Label>
               <Textarea
                 id="description"
                 placeholder="Tell us what your business does..."
@@ -318,18 +292,18 @@ const BusinessProfilePage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="twitter">Twitter / X</Label>
+                <Label htmlFor="tiktokShop">TikTok Shop</Label>
                 <Input
-                  id="twitter"
-                  placeholder="@yourhandle"
-                  className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.twitter ? "border-red-400" : ""}`}
-                  value={formData.twitter}
+                  id="tiktokShop"
+                  placeholder="@yourshop"
+                  className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.tiktokShop ? "border-red-400" : ""}`}
+                  value={formData.tiktokShop}
                   onChange={(e) =>
-                    setFormData({ ...formData, twitter: e.target.value })
+                    setFormData({ ...formData, tiktokShop: e.target.value })
                   }
-                  data-testid="twitter-input"
+                  data-testid="tiktok-shop-input"
                 />
-                <FieldError message={errors.twitter} />
+                <FieldError message={errors.tiktokShop} />
               </div>
 
               <div className="space-y-2">
