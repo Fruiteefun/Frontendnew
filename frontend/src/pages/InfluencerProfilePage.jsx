@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { Camera, ArrowRight } from "lucide-react";
-import { isNotEmpty, isMinAge, isValidHandle } from "../lib/validation";
+import { isNotEmpty, isMinAge, isValidHandle, isValidDate } from "../lib/validation";
 
 const FieldError = ({ message }) =>
   message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
@@ -51,6 +51,8 @@ const InfluencerProfilePage = () => {
     if (!isNotEmpty(formData.fullName)) e.fullName = "Full name is required";
     if (!isNotEmpty(formData.dateOfBirth)) {
       e.dateOfBirth = "Date of birth is required";
+    } else if (!isValidDate(formData.dateOfBirth)) {
+      e.dateOfBirth = "Please enter a valid date (year between 1900-2100)";
     } else if (!isMinAge(formData.dateOfBirth, 16)) {
       e.dateOfBirth = "You must be at least 16 years old to use Fruitee";
     }

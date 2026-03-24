@@ -5,7 +5,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Megaphone, CalendarDays, Save } from "lucide-react";
-import { isNotEmpty } from "../lib/validation";
+import { isNotEmpty, isValidDate, isFutureOrToday } from "../lib/validation";
 
 const FieldError = ({ message }) =>
   message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
@@ -22,7 +22,13 @@ const CampaignPage = () => {
     e.preventDefault();
     const e2 = {};
     if (!isNotEmpty(formData.campaignName)) e2.campaignName = "Campaign name is required";
-    if (!isNotEmpty(formData.startDate)) e2.startDate = "Start date is required";
+    if (!isNotEmpty(formData.startDate)) {
+      e2.startDate = "Start date is required";
+    } else if (!isValidDate(formData.startDate)) {
+      e2.startDate = "Please enter a valid date (year between 1900-2100)";
+    } else if (!isFutureOrToday(formData.startDate)) {
+      e2.startDate = "Start date cannot be in the past";
+    }
     setErrors(e2);
     if (Object.keys(e2).length > 0) return;
     navigate("/campaign-type");
@@ -68,6 +74,7 @@ const CampaignPage = () => {
               <Input
                 id="startDate"
                 type="date"
+                min={new Date().toISOString().split("T")[0]}
                 className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.startDate ? "border-red-400" : ""}`}
                 value={formData.startDate}
                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}

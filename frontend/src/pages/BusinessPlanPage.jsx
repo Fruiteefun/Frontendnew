@@ -6,6 +6,10 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { ArrowRight, Plus, X, Target, Users, Swords, TrendingUp, Save } from "lucide-react";
+import { isNumericOrFormatted } from "../lib/validation";
+
+const FieldError = ({ message }) =>
+  message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
 
 const BusinessPlanPage = () => {
   const navigate = useNavigate();
@@ -64,8 +68,19 @@ const BusinessPlanPage = () => {
     );
   };
 
+  const [errors, setErrors] = useState({});
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    const errs = {};
+    if (formData.expectedFollowers && !isNumericOrFormatted(formData.expectedFollowers))
+      errs.expectedFollowers = "Please enter a valid number";
+    if (formData.expectedLikes && !isNumericOrFormatted(formData.expectedLikes))
+      errs.expectedLikes = "Please enter a valid number";
+    if (formData.expectedCustomers && !isNumericOrFormatted(formData.expectedCustomers))
+      errs.expectedCustomers = "Please enter a valid number";
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) return;
     navigate("/influencers");
   };
 
@@ -376,16 +391,17 @@ const BusinessPlanPage = () => {
                 <Input
                   id="expectedFollowers"
                   placeholder="e.g., 10,000"
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.expectedFollowers ? "border-red-400" : ""}`}
                   value={formData.expectedFollowers}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      expectedFollowers: e.target.value,
-                    })
-                  }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (/^[\d,.\s]*$/.test(val)) {
+                      setFormData({ ...formData, expectedFollowers: val });
+                    }
+                  }}
                   data-testid="expected-followers-input"
                 />
+                <FieldError message={errors.expectedFollowers} />
               </div>
 
               <div className="space-y-2">
@@ -393,13 +409,17 @@ const BusinessPlanPage = () => {
                 <Input
                   id="expectedLikes"
                   placeholder="e.g., 50,000"
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.expectedLikes ? "border-red-400" : ""}`}
                   value={formData.expectedLikes}
-                  onChange={(e) =>
-                    setFormData({ ...formData, expectedLikes: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (/^[\d,.\s]*$/.test(val)) {
+                      setFormData({ ...formData, expectedLikes: val });
+                    }
+                  }}
                   data-testid="expected-likes-input"
                 />
+                <FieldError message={errors.expectedLikes} />
               </div>
 
               <div className="space-y-2">
@@ -409,16 +429,17 @@ const BusinessPlanPage = () => {
                 <Input
                   id="expectedCustomers"
                   placeholder="e.g., 500"
-                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.expectedCustomers ? "border-red-400" : ""}`}
                   value={formData.expectedCustomers}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      expectedCustomers: e.target.value,
-                    })
-                  }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (/^[\d,.\s]*$/.test(val)) {
+                      setFormData({ ...formData, expectedCustomers: val });
+                    }
+                  }}
                   data-testid="expected-customers-input"
                 />
+                <FieldError message={errors.expectedCustomers} />
               </div>
             </div>
           </div>

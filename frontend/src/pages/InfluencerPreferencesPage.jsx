@@ -115,7 +115,7 @@ const InfluencerPreferencesPage = () => {
       onClick={onClick}
       data-testid={testId}
     >
-      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
+      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
         checked ? "border-orange-400 bg-orange-400" : "border-gray-300 group-hover:border-orange-300"
       }`}>
         {checked && (

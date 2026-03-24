@@ -5,7 +5,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Globe, Upload, Plus, X, Image, Palette, Save } from "lucide-react";
-import { isValidUrl } from "../lib/validation";
+import { isValidUrl, isValidHexColor } from "../lib/validation";
 
 const FieldError = ({ message }) =>
   message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
@@ -41,7 +41,7 @@ const BrandSetupPage = () => {
   };
 
   const addColor = () => {
-    if (newColor) {
+    if (newColor && isValidHexColor(newColor)) {
       setBrandColors([...brandColors, { id: Date.now(), color: newColor }]);
     }
   };

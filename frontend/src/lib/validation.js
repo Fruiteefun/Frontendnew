@@ -42,3 +42,28 @@ export const isMinLength = (value, min) => {
 export const isValidPassword = (password) => {
   return password && password.length >= 8;
 };
+
+export const isValidDate = (dateStr) => {
+  if (!dateStr) return true;
+  const parts = dateStr.split("-");
+  if (parts.length !== 3) return false;
+  const year = parseInt(parts[0], 10);
+  return year >= 1900 && year <= 2100;
+};
+
+export const isNumericOrFormatted = (value) => {
+  if (!value) return true;
+  return /^[\d,.\s]+$/.test(value);
+};
+
+export const isValidHexColor = (value) => {
+  if (!value) return true;
+  return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(value);
+};
+
+export const isFutureOrToday = (dateStr) => {
+  if (!dateStr) return true;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return new Date(dateStr) >= today;
+};
