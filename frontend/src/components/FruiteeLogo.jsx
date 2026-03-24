@@ -2,7 +2,7 @@ import React from "react";
 
 export const FruiteeLogo = ({ className = "", size = "default" }) => {
   const sizeClasses = {
-    small: "h-8",
+    small: "h-24",
     default: "h-10",
     large: "h-16",
   };
