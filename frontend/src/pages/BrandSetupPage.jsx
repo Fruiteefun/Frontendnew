@@ -4,7 +4,7 @@ import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Globe, Upload, Plus, X, Image, Palette, Save } from "lucide-react";
+import { Globe, Upload, Plus, X, Image, Palette, Save, ArrowLeft } from "lucide-react";
 import { isValidUrl, isValidHexColor } from "../lib/validation";
 
 const FieldError = ({ message }) =>
@@ -254,15 +254,16 @@ const BrandSetupPage = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-between gap-4">
             <Button
               type="button"
               variant="outline"
               className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
-              onClick={() => navigate("/brands")}
-              data-testid="cancel-btn"
+              onClick={() => navigate(-1)}
+              data-testid="back-btn"
             >
-              Cancel
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
             </Button>
             <Button
               type="submit"

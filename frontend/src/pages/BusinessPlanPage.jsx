@@ -5,7 +5,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import { ArrowRight, Plus, X, Target, Users, Swords, TrendingUp, Save } from "lucide-react";
+import { ArrowRight, ArrowLeft, Plus, X, Target, Users, Swords, TrendingUp, Save } from "lucide-react";
 import { isNumericOrFormatted } from "../lib/validation";
 
 const FieldError = ({ message }) =>
@@ -445,15 +445,16 @@ const BusinessPlanPage = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-between gap-4">
             <Button
               type="button"
               variant="outline"
               className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
-              onClick={() => navigate("/campaign-type")}
-              data-testid="cancel-btn"
+              onClick={() => navigate(-1)}
+              data-testid="back-btn"
             >
-              Cancel
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
             </Button>
             <Button
               type="submit"

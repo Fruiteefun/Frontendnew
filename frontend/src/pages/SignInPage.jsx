@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, User, Phone } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, User, Phone, X, Check } from "lucide-react";
 import { Instagram, Twitter, Facebook, Youtube, Linkedin } from "lucide-react";
 import { isValidEmail, isValidPhone, isValidPassword, isNotEmpty } from "../lib/validation";
 
@@ -24,6 +24,12 @@ const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
+  const [resetToken, setResetToken] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [resetComplete, setResetComplete] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -199,6 +205,15 @@ const SignInPage = () => {
                   {isLoading ? "Signing in..." : "Sign In"}
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
+
+                <button
+                  type="button"
+                  onClick={() => setForgotPasswordOpen(true)}
+                  className="w-full text-center text-sm text-orange-500 hover:text-orange-600 font-medium mt-2"
+                  data-testid="forgot-password-link"
+                >
+                  Forgot Password?
+                </button>
               </form>
             </TabsContent>
 
@@ -320,6 +335,97 @@ const SignInPage = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {forgotPasswordOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+          <div className="bg-white rounded-3xl shadow-floating p-8 w-full max-w-md relative" data-testid="forgot-password-modal">
+            <button
+              onClick={() => { setForgotPasswordOpen(false); setForgotSent(false); setResetComplete(false); setForgotEmail(""); setResetToken(""); setNewPassword(""); }}
+              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+              data-testid="close-forgot-modal"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {resetComplete ? (
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center mx-auto">
+                  <Check className="w-8 h-8 text-teal-600" />
+                </div>
+                <h3 className="font-outfit text-xl font-semibold">Password Reset</h3>
+                <p className="text-sm text-muted-foreground">Your password has been reset successfully. You can now sign in with your new password.</p>
+                <Button
+                  onClick={() => { setForgotPasswordOpen(false); setResetComplete(false); }}
+                  className="w-full h-12 rounded-xl bg-gradient-to-r from-orange-400 to-pink-500 text-white font-semibold"
+                  data-testid="back-to-signin-btn"
+                >
+                  Back to Sign In
+                </Button>
+              </div>
+            ) : forgotSent ? (
+              <div className="space-y-4">
+                <h3 className="font-outfit text-xl font-semibold">Reset Your Password</h3>
+                <p className="text-sm text-muted-foreground">Enter the reset token sent to <strong>{forgotEmail}</strong> and your new password.</p>
+                <div className="space-y-2">
+                  <Label>Reset Token</Label>
+                  <Input
+                    placeholder="Enter token from email"
+                    className="h-12 rounded-xl border-gray-200"
+                    value={resetToken}
+                    onChange={(e) => setResetToken(e.target.value)}
+                    data-testid="reset-token-input"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>New Password</Label>
+                  <Input
+                    type="password"
+                    placeholder="Min 8 characters"
+                    className="h-12 rounded-xl border-gray-200"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    data-testid="new-password-input"
+                  />
+                </div>
+                <Button
+                  onClick={() => { if (resetToken && newPassword.length >= 8) setResetComplete(true); }}
+                  className="w-full h-12 rounded-xl bg-gradient-to-r from-orange-400 to-pink-500 text-white font-semibold"
+                  data-testid="reset-password-btn"
+                >
+                  Reset Password
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <h3 className="font-outfit text-xl font-semibold">Forgot Password?</h3>
+                <p className="text-sm text-muted-foreground">Enter your email address and we'll send you a reset link.</p>
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Input
+                      type="email"
+                      placeholder="you@company.com"
+                      className="pl-10 h-12 rounded-xl border-gray-200"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      data-testid="forgot-email-input"
+                    />
+                  </div>
+                </div>
+                <Button
+                  onClick={() => { if (isValidEmail(forgotEmail)) setForgotSent(true); }}
+                  className="w-full h-12 rounded-xl bg-gradient-to-r from-orange-400 to-pink-500 text-white font-semibold"
+                  data-testid="send-reset-btn"
+                >
+                  Send Reset Link
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

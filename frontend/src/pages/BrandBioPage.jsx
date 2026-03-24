@@ -4,14 +4,13 @@ import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import { BookOpen, Save } from "lucide-react";
+import { BookOpen, Save, ArrowLeft } from "lucide-react";
 
 const BrandBioPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    lookAndFeel: "",
-    voice: "",
-    personalityValues: "",
+    description: "",
+    visualIdentity: "",
     customerExperience: "",
   });
 
@@ -40,38 +39,26 @@ const BrandBioPage = () => {
             </h2>
 
             <div className="space-y-2">
-              <Label htmlFor="lookAndFeel">Brand Look & Feel</Label>
+              <Label htmlFor="description">Description</Label>
               <Textarea
-                id="lookAndFeel"
+                id="description"
+                placeholder="Describe your brand's story, mission, and what makes it unique"
+                className="min-h-[120px] rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                data-testid="description-textarea"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="visualIdentity">Visual Identity</Label>
+              <Textarea
+                id="visualIdentity"
                 placeholder="Describe your visual style — logo feel, colors, fonts, and overall aesthetic (e.g. modern, minimal, bold, playful)"
                 className="min-h-[120px] rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                value={formData.lookAndFeel}
-                onChange={(e) => setFormData({ ...formData, lookAndFeel: e.target.value })}
-                data-testid="look-and-feel-textarea"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="voice">Brand Voice</Label>
-              <Textarea
-                id="voice"
-                placeholder="How should your brand sound? (e.g. friendly, professional, witty, premium, bold). Include example phrases if possible."
-                className="min-h-[120px] rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                value={formData.voice}
-                onChange={(e) => setFormData({ ...formData, voice: e.target.value })}
-                data-testid="voice-textarea"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="personalityValues">Brand Personality & Values</Label>
-              <Textarea
-                id="personalityValues"
-                placeholder="What does your brand stand for? Describe its personality and core values (e.g. trustworthy, innovative, sustainable, fun)"
-                className="min-h-[120px] rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                value={formData.personalityValues}
-                onChange={(e) => setFormData({ ...formData, personalityValues: e.target.value })}
-                data-testid="personality-values-textarea"
+                value={formData.visualIdentity}
+                onChange={(e) => setFormData({ ...formData, visualIdentity: e.target.value })}
+                data-testid="visual-identity-textarea"
               />
             </div>
 
@@ -79,7 +66,7 @@ const BrandBioPage = () => {
               <Label htmlFor="customerExperience">Customer Experience</Label>
               <Textarea
                 id="customerExperience"
-                placeholder="Describe the experience you want customers to have (e.g. fast & convenient, premium & personalised, fun & engaging)"
+                placeholder="What kind of experience do you want customers to have with your brand?"
                 className="min-h-[120px] rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
                 value={formData.customerExperience}
                 onChange={(e) => setFormData({ ...formData, customerExperience: e.target.value })}
@@ -89,15 +76,16 @@ const BrandBioPage = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-between gap-4">
             <Button
               type="button"
               variant="outline"
               className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
-              onClick={() => navigate("/business-preferences")}
-              data-testid="cancel-btn"
+              onClick={() => navigate(-1)}
+              data-testid="back-btn"
             >
-              Cancel
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
             </Button>
             <Button
               type="submit"

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
-import { ShieldCheck, Tag, AlertTriangle, MessageCircle, Compass, Users, Radio, Handshake, Globe2, Save } from "lucide-react";
+import { ShieldCheck, Tag, AlertTriangle, MessageCircle, Compass, Users, Radio, Handshake, Globe2, Save, ArrowLeft } from "lucide-react";
 
 const InfluencerPreferencesPage = () => {
   const navigate = useNavigate();
@@ -91,7 +91,7 @@ const InfluencerPreferencesPage = () => {
     const progress = JSON.parse(localStorage.getItem("fruitee_influencer_progress") || "{}");
     progress.preferences = true;
     localStorage.setItem("fruitee_influencer_progress", JSON.stringify(progress));
-    navigate("/create-digital-twin");
+    navigate("/influencer-payment");
   };
 
   const RadioOption = ({ label, selected, onClick, testId }) => (
@@ -391,15 +391,16 @@ const InfluencerPreferencesPage = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-between gap-4">
             <Button
               type="button"
               variant="outline"
               className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
-              onClick={() => navigate("/influencer-profile")}
-              data-testid="cancel-btn"
+              onClick={() => navigate(-1)}
+              data-testid="back-btn"
             >
-              Cancel
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
             </Button>
             <Button
               type="submit"

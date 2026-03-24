@@ -6,73 +6,74 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Check, ArrowRight, ArrowLeft, CreditCard, Lock, Sparkles, CreditCard as CardIcon } from "lucide-react";
 
-const PaymentPage = () => {
+const InfluencerPaymentPage = () => {
   const navigate = useNavigate();
-  const [selectedPlan, setSelectedPlan] = useState("pro");
+  const [selectedPlan, setSelectedPlan] = useState("creator");
   const [cardDetails, setCardDetails] = useState({
     number: "",
     expiry: "",
     cvc: "",
   });
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const plans = [
     {
-      id: "starter",
-      name: "Starter",
-      price: 29,
+      id: "basic",
+      name: "Basic",
+      price: 9,
       color: "from-orange-400 to-orange-500",
       features: [
-        "5 Campaigns",
+        "Digital Twin Creation",
+        "1 Campaign/month",
         "Basic Analytics",
-        "3 Social Platforms",
         "Email Support",
       ],
       popular: false,
     },
     {
-      id: "pro",
-      name: "Pro",
-      price: 79,
+      id: "creator",
+      name: "Creator",
+      price: 29,
       color: "from-orange-400 to-pink-500",
       features: [
+        "Digital Twin Creation",
         "Unlimited Campaigns",
         "Advanced Analytics",
-        "All Platforms",
         "Priority Support",
-        "AI Content",
+        "Voice Cloning",
       ],
       popular: true,
     },
     {
-      id: "enterprise",
-      name: "Enterprise",
-      price: 199,
+      id: "pro",
+      name: "Pro",
+      price: 79,
       color: "from-teal-400 to-teal-500",
       features: [
-        "Everything in Pro",
-        "Custom Integrations",
+        "Everything in Creator",
+        "Custom Branding",
         "Dedicated Manager",
-        "White-label",
+        "Revenue Sharing",
         "API Access",
       ],
       popular: false,
     },
   ];
 
-  const handleSubmit = (e) => {
+  const handlePayment = (e) => {
     e.preventDefault();
-    navigate("/content-plan");
+    setShowSuccess(true);
   };
 
   return (
-    <Layout userType="business">
-      <div className="p-8 max-w-5xl mx-auto" data-testid="payment-page">
+    <Layout userType="influencer">
+      <div className="p-8 max-w-5xl mx-auto" data-testid="influencer-payment-page">
         <div className="text-center mb-12">
           <h1 className="font-outfit text-4xl font-bold text-foreground mb-2">
             Choose Your Plan
           </h1>
           <p className="text-muted-foreground">
-            Start creating amazing campaigns today
+            Subscribe to start creating your digital twin
           </p>
         </div>
 
@@ -128,12 +129,12 @@ const PaymentPage = () => {
                 <Button
                   type="button"
                   className={`w-full h-12 rounded-xl font-semibold transition-all ${
-                    plan.popular
+                    isSelected
                       ? "bg-gradient-to-r from-orange-400 to-purple-500 text-white"
                       : "bg-muted text-foreground hover:bg-muted/80"
                   }`}
                 >
-                  Get Started
+                  {isSelected ? "Selected" : "Select Plan"}
                 </Button>
               </div>
             );
@@ -147,7 +148,7 @@ const PaymentPage = () => {
             <h2 className="font-outfit text-xl font-semibold">Secure Payment</h2>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handlePayment} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="cardNumber">Card Number</Label>
               <div className="relative">
@@ -198,9 +199,9 @@ const PaymentPage = () => {
             <Button
               type="submit"
               className="w-full h-14 rounded-xl bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold text-lg shadow-lg shadow-orange-500/20 transition-all duration-300"
-              data-testid="pay-continue-btn"
+              data-testid="pay-btn"
             >
-              Pay & Continue
+              Pay & Subscribe
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </form>
@@ -208,23 +209,52 @@ const PaymentPage = () => {
           <p className="text-xs text-center text-muted-foreground mt-4">
             Your payment is secured with 256-bit SSL encryption
           </p>
+        </div>
 
-          <div className="flex justify-start mt-6">
+        {/* Back button */}
+        <div className="flex justify-start mt-8">
+          <Button
+            type="button"
+            variant="outline"
+            className="h-12 px-6 rounded-xl border-gray-200 hover:bg-muted"
+            onClick={() => navigate("/influencer-preferences")}
+            data-testid="back-btn"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Back
+          </Button>
+        </div>
+      </div>
+
+      {/* Success Popup */}
+      {showSuccess && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+          <div className="bg-white rounded-3xl shadow-floating p-8 w-full max-w-md text-center space-y-6" data-testid="payment-success-modal">
+            <div className="w-20 h-20 rounded-full bg-teal-100 flex items-center justify-center mx-auto">
+              <Check className="w-10 h-10 text-teal-600" />
+            </div>
+            <h3 className="font-outfit text-2xl font-bold">Payment Successful!</h3>
+            <p className="text-muted-foreground">
+              Your subscription is now active. You can now create your digital twin.
+            </p>
             <Button
-              type="button"
-              variant="outline"
-              className="h-12 px-6 rounded-xl border-gray-200 hover:bg-muted"
-              onClick={() => navigate(-1)}
-              data-testid="back-btn"
+              onClick={() => {
+                const progress = JSON.parse(localStorage.getItem("fruitee_influencer_progress") || "{}");
+                progress.payment = true;
+                localStorage.setItem("fruitee_influencer_progress", JSON.stringify(progress));
+                navigate("/create-digital-twin");
+              }}
+              className="w-full h-14 rounded-xl bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold text-lg shadow-lg shadow-orange-500/20"
+              data-testid="continue-to-clone-btn"
             >
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Back
+              Continue to Create Twin
+              <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </div>
         </div>
-      </div>
+      )}
     </Layout>
   );
 };
 
-export default PaymentPage;
+export default InfluencerPaymentPage;

@@ -11,6 +11,7 @@ import {
   Video,
   Clock,
   Sparkles,
+  Rocket,
 } from "lucide-react";
 
 const ContentPlanPage = () => {
@@ -314,6 +315,13 @@ const ContentPlanPage = () => {
             >
               <Sparkles className="w-5 h-5 mr-2" />
               Generate All Content
+            </Button>
+            <Button
+              className="h-12 px-6 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 text-white font-semibold shadow-lg shadow-green-500/20"
+              data-testid="start-campaign-btn"
+            >
+              <Rocket className="w-5 h-5 mr-2" />
+              Start Campaign
             </Button>
             <Button
               onClick={() => navigate("/brand-campaigns")}

@@ -4,7 +4,6 @@ import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Textarea } from "../components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -12,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Upload, ArrowRight, X, Globe, MapPin, Phone, Building2, Save } from "lucide-react";
+import { Upload, ArrowRight, X, Globe, MapPin, Phone, Building2, Save, ArrowLeft } from "lucide-react";
 import { isNotEmpty, isValidUrl, isValidPhone, isValidHandle } from "../lib/validation";
 
 const FieldError = ({ message }) =>
@@ -25,19 +24,20 @@ const BusinessProfilePage = () => {
   const [errors, setErrors] = useState({});
 
   const initialPhone = location.state?.phone || "";
+  const initialName = location.state?.fullName || "";
 
   const [formData, setFormData] = useState({
+    contactName: initialName,
     businessName: "",
     website: "https://",
     tiktokShop: "",
     country: "",
     city: "",
     phone: initialPhone,
-    description: "",
     instagram: "",
     twitter: "",
     tiktok: "",
-    linkedin: "",
+    youtube: "",
   });
 
   const handleLogoUpload = (e) => {
@@ -55,7 +55,7 @@ const BusinessProfilePage = () => {
     if (formData.instagram && !isValidHandle(formData.instagram)) e.instagram = "Invalid handle format";
     if (formData.tiktokShop && !isValidHandle(formData.tiktokShop)) e.tiktokShop = "Invalid handle format";
     if (formData.tiktok && !isValidHandle(formData.tiktok)) e.tiktok = "Invalid handle format";
-    if (formData.linkedin && !isValidHandle(formData.linkedin)) e.linkedin = "Invalid handle format";
+    if (formData.youtube && !isValidHandle(formData.youtube)) e.youtube = "Invalid handle format";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -140,6 +140,20 @@ const BusinessProfilePage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
+                <Label htmlFor="contactName">Your Name</Label>
+                <Input
+                  id="contactName"
+                  placeholder="John Doe"
+                  className="h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                  value={formData.contactName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, contactName: e.target.value })
+                  }
+                  data-testid="contact-name-input"
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="businessName">Business Name</Label>
                 <Input
                   id="businessName"
@@ -153,7 +167,9 @@ const BusinessProfilePage = () => {
                 />
                 <FieldError message={errors.businessName} />
               </div>
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="website">Website</Label>
                 <div className="relative">
@@ -248,20 +264,6 @@ const BusinessProfilePage = () => {
               </div>
               <FieldError message={errors.phone} />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">About</Label>
-              <Textarea
-                id="description"
-                placeholder="Tell us what your business does..."
-                className="min-h-[100px] rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                data-testid="description-textarea"
-              />
-            </div>
           </div>
 
           {/* Social Media Handles */}
@@ -322,32 +324,33 @@ const BusinessProfilePage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="linkedin">LinkedIn</Label>
+                <Label htmlFor="youtube">YouTube</Label>
                 <Input
-                  id="linkedin"
-                  placeholder="@yourhandle"
-                  className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.linkedin ? "border-red-400" : ""}`}
-                  value={formData.linkedin}
+                  id="youtube"
+                  placeholder="@yourchannel"
+                  className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.youtube ? "border-red-400" : ""}`}
+                  value={formData.youtube}
                   onChange={(e) =>
-                    setFormData({ ...formData, linkedin: e.target.value })
+                    setFormData({ ...formData, youtube: e.target.value })
                   }
-                  data-testid="linkedin-input"
+                  data-testid="youtube-input"
                 />
-                <FieldError message={errors.linkedin} />
+                <FieldError message={errors.youtube} />
               </div>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-between gap-4">
             <Button
               type="button"
               variant="outline"
               className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
-              onClick={() => navigate("/signin")}
-              data-testid="cancel-btn"
+              onClick={() => navigate(-1)}
+              data-testid="back-btn"
             >
-              Cancel
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
             </Button>
             <Button
               type="submit"

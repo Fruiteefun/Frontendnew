@@ -14,12 +14,14 @@ import {
   CheckCircle2,
   Lock,
   Pencil,
+  CreditCard,
 } from "lucide-react";
 
 // Registration flow stages (in order)
 const influencerRegStages = [
   { key: "profile", path: "/influencer-profile", label: "Profile", icon: User },
   { key: "preferences", path: "/influencer-preferences", label: "Preferences", icon: Settings },
+  { key: "payment", path: "/influencer-payment", label: "Payment", icon: CreditCard },
   { key: "create-twin", path: "/create-digital-twin", label: "Create Twin", icon: Sparkles },
   { key: "generation", path: "/digital-twin-progress", label: "Generation", icon: Loader },
   { key: "intro-video", path: "/digital-twin-intro", label: "Intro Video", icon: Video },

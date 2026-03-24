@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
-import { ArrowRight, Save, ShieldCheck, Tag, AlertTriangle, MessageCircle, Compass, Users, Radio, Handshake } from "lucide-react";
+import { ArrowRight, Save, ShieldCheck, Tag, AlertTriangle, MessageCircle, Compass, Users, Radio, Handshake, Globe2, ArrowLeft } from "lucide-react";
 
 const BusinessPreferencesPage = () => {
   const navigate = useNavigate();
@@ -14,10 +14,11 @@ const BusinessPreferencesPage = () => {
     aiPublished: true,
   });
 
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedTones, setSelectedTones] = useState([]);
   const [selectedPillars, setSelectedPillars] = useState([]);
   const [selectedAudiences, setSelectedAudiences] = useState([]);
+  const [selectedRegions, setSelectedRegions] = useState([]);
   const [participationConsent, setParticipationConsent] = useState(true);
   const [matchingConsents, setMatchingConsents] = useState({
     preferences: true,
@@ -31,8 +32,8 @@ const BusinessPreferencesPage = () => {
     "Food & Beverage",
     "Travel & Experiences",
     "Lifestyle & Home",
-    "Services – Domestic (e.g., Home Services, Dog Walker, Electrician, Carer, Car Repair)",
-    "Services – Business (e.g., Accounting, Finance, Legal, Property, Consulting, Recruitment, B2B)",
+    "Services (Domestic)",
+    "Services (Business)",
   ];
 
   const restrictedCategories = [
@@ -195,11 +196,11 @@ const BusinessPreferencesPage = () => {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {categories.map((cat) => (
-                <RadioOption
+                <CheckboxOption
                   key={cat}
                   label={cat}
-                  selected={selectedCategory === cat}
-                  onClick={() => setSelectedCategory(cat)}
+                  checked={selectedCategories.includes(cat)}
+                  onClick={() => toggleSelection(selectedCategories, setSelectedCategories, cat)}
                   testId={`category-${cat.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
                 />
               ))}
@@ -308,6 +309,28 @@ const BusinessPreferencesPage = () => {
             />
           </div>
 
+          {/* 8. Regions */}
+          <div className="bg-white rounded-3xl p-8 shadow-soft space-y-5">
+            <h2 className="font-outfit text-lg font-semibold flex items-center gap-2">
+              <Globe2 className="w-5 h-5 text-orange-500" />
+              8. Regions
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Which regions would you like your campaigns to target?
+            </p>
+            <div className="space-y-4">
+              {["UK", "US", "EU", "India", "Global"].map((region) => (
+                <CheckboxOption
+                  key={region}
+                  label={region}
+                  checked={selectedRegions.includes(region)}
+                  onClick={() => toggleSelection(selectedRegions, setSelectedRegions, region)}
+                  testId={`region-${region.toLowerCase()}`}
+                />
+              ))}
+            </div>
+          </div>
+
           {/* 9. Campaign Matching Understanding */}
           <div className="bg-white rounded-3xl p-8 shadow-soft space-y-5">
             <h2 className="font-outfit text-lg font-semibold flex items-center gap-2">
@@ -331,15 +354,16 @@ const BusinessPreferencesPage = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-between gap-4">
             <Button
               type="button"
               variant="outline"
               className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
-              onClick={() => navigate("/brand-setup")}
-              data-testid="cancel-btn"
+              onClick={() => navigate(-1)}
+              data-testid="back-btn"
             >
-              Cancel
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
             </Button>
             <Button
               type="submit"

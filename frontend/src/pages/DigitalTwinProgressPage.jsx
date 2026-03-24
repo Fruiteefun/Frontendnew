@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Progress } from "../components/ui/progress";
 import { Button } from "../components/ui/button";
-import { Loader2, Sparkles, Brain, Video, Check, ArrowRight } from "lucide-react";
+import { Loader2, Sparkles, Brain, Video, Check, ArrowRight, ArrowLeft } from "lucide-react";
 
 const DigitalTwinProgressPage = () => {
   const navigate = useNavigate();
@@ -155,7 +155,16 @@ const DigitalTwinProgressPage = () => {
 
           {/* Navigation for static view */}
           {showStatic && (
-            <div className="mt-8 flex justify-center">
+            <div className="mt-8 flex justify-center gap-4">
+              <Button
+                onClick={() => navigate(-1)}
+                variant="outline"
+                className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
+                data-testid="back-btn"
+              >
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Back
+              </Button>
               <Button
                 onClick={() => navigate("/digital-twin-intro")}
                 className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
