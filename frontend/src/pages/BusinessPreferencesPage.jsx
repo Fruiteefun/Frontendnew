@@ -15,9 +15,9 @@ const BusinessPreferencesPage = () => {
   });
 
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedTone, setSelectedTone] = useState("");
-  const [selectedPillar, setSelectedPillar] = useState("");
-  const [selectedAudience, setSelectedAudience] = useState("");
+  const [selectedTones, setSelectedTones] = useState([]);
+  const [selectedPillars, setSelectedPillars] = useState([]);
+  const [selectedAudiences, setSelectedAudiences] = useState([]);
   const [participationConsent, setParticipationConsent] = useState(true);
   const [matchingConsents, setMatchingConsents] = useState({
     preferences: true,
@@ -91,6 +91,29 @@ const BusinessPreferencesPage = () => {
       <span className="text-sm text-foreground">{label}</span>
     </div>
   );
+
+  const CheckboxOption = ({ label, checked, onClick, testId }) => (
+    <div
+      className="flex items-center gap-3 cursor-pointer group"
+      onClick={onClick}
+      data-testid={testId}
+    >
+      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
+        checked ? "border-orange-400 bg-orange-400" : "border-gray-300 group-hover:border-orange-300"
+      }`}>
+        {checked && (
+          <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none">
+            <path d="M2 6L5 9L10 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        )}
+      </div>
+      <span className="text-sm text-foreground">{label}</span>
+    </div>
+  );
+
+  const toggleSelection = (arr, setArr, value) => {
+    setArr(arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]);
+  };
 
   const ConsentCheck = ({ label, checked, onChange, testId }) => (
     <div
@@ -213,11 +236,11 @@ const BusinessPreferencesPage = () => {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {toneOptions.map((tone) => (
-                <RadioOption
+                <CheckboxOption
                   key={tone}
                   label={tone}
-                  selected={selectedTone === tone}
-                  onClick={() => setSelectedTone(tone)}
+                  checked={selectedTones.includes(tone)}
+                  onClick={() => toggleSelection(selectedTones, setSelectedTones, tone)}
                   testId={`tone-${tone.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
                 />
               ))}
@@ -235,11 +258,11 @@ const BusinessPreferencesPage = () => {
             </p>
             <div className="space-y-4">
               {pillarOptions.map((pillar) => (
-                <RadioOption
+                <CheckboxOption
                   key={pillar}
                   label={pillar}
-                  selected={selectedPillar === pillar}
-                  onClick={() => setSelectedPillar(pillar)}
+                  checked={selectedPillars.includes(pillar)}
+                  onClick={() => toggleSelection(selectedPillars, setSelectedPillars, pillar)}
                   testId={`pillar-${pillar.split(':')[0].toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
                 />
               ))}
@@ -257,11 +280,11 @@ const BusinessPreferencesPage = () => {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {audienceOptions.map((audience) => (
-                <RadioOption
+                <CheckboxOption
                   key={audience}
                   label={audience}
-                  selected={selectedAudience === audience}
-                  onClick={() => setSelectedAudience(audience)}
+                  checked={selectedAudiences.includes(audience)}
+                  onClick={() => toggleSelection(selectedAudiences, setSelectedAudiences, audience)}
                   testId={`audience-${audience.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
                 />
               ))}
