@@ -186,6 +186,22 @@ export const influencerOnboardApi = {
     }),
 };
 
+// ====== SOCIAL MEDIA OAUTH ======
+export const socialAuthApi = {
+  // Influencer
+  influencerAuthUrl: (platform, returnUrl) =>
+    apiFetch(`/api/v1/influencers/${platform}/auth-url?return_url=${encodeURIComponent(returnUrl)}`),
+
+  // Business
+  businessAuthUrl: (platform, returnUrl) =>
+    apiFetch(`/api/v1/businesses/${platform}/auth-url?return_url=${encodeURIComponent(returnUrl)}`),
+
+  // Brand
+  brandAuthUrl: (brandId, platform, returnUrl) =>
+    apiFetch(`/api/v1/brand/${brandId}/${platform}/auth-url?return_url=${encodeURIComponent(returnUrl)}`),
+};
+
+
 // ====== INFLUENCER CLONE / VOICE / VIDEO ======
 export const influencerCloneApi = {
   createClone: (imageFile) => {

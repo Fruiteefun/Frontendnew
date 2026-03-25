@@ -12,9 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Camera, ArrowRight, Loader2 } from "lucide-react";
+import { Camera, ArrowRight, Loader2, Check } from "lucide-react";
 import { isNotEmpty, isMinAge, isValidDate } from "../lib/validation";
-import { influencerProfileApi, userApi } from "../lib/api";
+import { influencerProfileApi, userApi, socialAuthApi } from "../lib/api";
 import { useAuth } from "../contexts/AuthContext";
 
 const FieldError = ({ message }) =>
@@ -29,6 +29,12 @@ const InfluencerProfilePage = () => {
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [connectedPlatforms, setConnectedPlatforms] = useState({
+    instagram: false,
+    tiktok: false,
+    youtube: false,
+  });
+  const [connecting, setConnecting] = useState(null);
 
   const initialFullName = location.state?.fullName || "";
 
@@ -65,6 +71,11 @@ const InfluencerProfilePage = () => {
           if (profile.image_url) {
             setProfileImage(profile.image_url);
           }
+          setConnectedPlatforms({
+            instagram: !!profile.is_instagram_connected,
+            tiktok: !!profile.is_tiktok_connected,
+            youtube: !!profile.is_youtube_connected,
+          });
         }
       } catch {
         // First time user — no profile yet, that's fine
@@ -74,6 +85,45 @@ const InfluencerProfilePage = () => {
     };
     loadProfile();
   }, []);
+
+  const handleSocialConnect = async (platform) => {
+    setConnecting(platform);
+    try {
+      const returnUrl = window.location.href.split("?")[0];
+      const res = await socialAuthApi.influencerAuthUrl(platform, returnUrl);
+      if (res.success && res.data?.auth_url) {
+        window.location.href = res.data.auth_url;
+      }
+    } catch (err) {
+      setErrors({ api: `Failed to connect ${platform}: ${err.message}` });
+      setConnecting(null);
+    }
+  };
+
+  // On return from OAuth, re-check connection status
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("code") || params.get("state")) {
+      // Returned from OAuth — refresh profile to get updated connection flags
+      const recheckConnection = async () => {
+        try {
+          const res = await userApi.getMe();
+          if (res.success && res.data?.influencer_profile) {
+            const p = res.data.influencer_profile;
+            setConnectedPlatforms({
+              instagram: !!p.is_instagram_connected,
+              tiktok: !!p.is_tiktok_connected,
+              youtube: !!p.is_youtube_connected,
+            });
+          }
+        } catch { /* ignore */ }
+      };
+      recheckConnection();
+      // Clean URL
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
+
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -386,21 +436,36 @@ const InfluencerProfilePage = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                { name: "Instagram", gradient: "from-purple-500 via-pink-500 to-orange-400", icon: <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg> },
-                { name: "TikTok", gradient: "from-gray-800 to-black", icon: <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.4a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.44a8.16 8.16 0 0 0 3.76.92V6.69z"/></svg> },
-                { name: "YouTube", gradient: "from-red-500 to-red-600", icon: <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.13C5.12 19.56 12 19.56 12 19.56s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="white"/></svg> },
-                { name: "TikTok Shop", gradient: "from-teal-500 to-teal-600", icon: <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.4a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.44a8.16 8.16 0 0 0 3.76.92V6.69z"/></svg> },
-              ].map((platform) => (
-                <Button
-                  key={platform.name}
-                  type="button"
-                  className={`h-14 rounded-xl bg-gradient-to-r ${platform.gradient} text-white font-medium flex items-center gap-3 justify-center hover:opacity-90 transition-all`}
-                  data-testid={`connect-${platform.name.toLowerCase().replace(/\s/g, '-')}-btn`}
-                >
-                  {platform.icon}
-                  Connect {platform.name}
-                </Button>
-              ))}
+                { name: "Instagram", key: "instagram", gradient: "from-purple-500 via-pink-500 to-orange-400", icon: <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg> },
+                { name: "TikTok", key: "tiktok", gradient: "from-gray-800 to-black", icon: <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.4a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.44a8.16 8.16 0 0 0 3.76.92V6.69z"/></svg> },
+                { name: "YouTube", key: "youtube", gradient: "from-red-500 to-red-600", icon: <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.13C5.12 19.56 12 19.56 12 19.56s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="white"/></svg> },
+              ].map((platform) => {
+                const isConnected = connectedPlatforms[platform.key];
+                const isLoading = connecting === platform.key;
+                return (
+                  <Button
+                    key={platform.name}
+                    type="button"
+                    disabled={isConnected || isLoading}
+                    onClick={() => handleSocialConnect(platform.key)}
+                    className={`h-14 rounded-xl text-white font-medium flex items-center gap-3 justify-center transition-all ${
+                      isConnected
+                        ? "bg-gradient-to-r from-teal-500 to-green-500 cursor-default"
+                        : `bg-gradient-to-r ${platform.gradient} hover:opacity-90`
+                    }`}
+                    data-testid={`connect-${platform.key}-btn`}
+                  >
+                    {isLoading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : isConnected ? (
+                      <Check className="w-5 h-5" />
+                    ) : (
+                      platform.icon
+                    )}
+                    {isLoading ? "Connecting..." : isConnected ? `${platform.name} Connected` : `Connect ${platform.name}`}
+                  </Button>
+                );
+              })}
             </div>
           </div>
 
