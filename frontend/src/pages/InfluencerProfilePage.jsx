@@ -62,8 +62,8 @@ const InfluencerProfilePage = () => {
             bio: profile.bio || "",
             dateOfBirth: profile.dob ? profile.dob.split("T")[0] : "",
           }));
-          if (profile.profile_image_url) {
-            setProfileImage(profile.profile_image_url);
+          if (profile.image_url) {
+            setProfileImage(profile.image_url);
           }
         }
       } catch {

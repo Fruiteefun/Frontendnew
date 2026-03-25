@@ -45,15 +45,18 @@ Build "Fruitee," a social media campaign management platform with:
 
 ## Pending/Upcoming (P0-P2)
 
-### P0 - CORS Whitelisting
-- User's backend engineer is whitelisting `*.preview.emergentagent.com`
-- Currently works via proxy; direct browser access needs CORS
+### P0 - CORS Whitelisting (Complete - March 25, 2026)
+- Backend engineer whitelisted `*.preview.emergentagent.com`
+- Direct browser access and proxy both work
 
-### P1 - File Uploads
-- Profile picture upload (influencer)
-- Brand logo upload
-- Campaign image upload
-- Uses /media endpoints
+### P1 - File Uploads (Complete - March 25, 2026)
+- All 4 upload endpoints verified working through proxy:
+  - Influencer profile image: POST /users/me/influencer-profile/profile-image
+  - Business logo: POST /users/me/business-profile/logo
+  - Brand logo: POST /brand/{id}/logo
+  - Campaign images: POST /campaign/{id}/images/upload
+- Fixed image_url field name bug on InfluencerProfilePage
+- All pages store File objects and pass to FormData correctly
 
 ### P1 - Social Media OAuth
 - Instagram, TikTok, YouTube connect buttons exist in UI
