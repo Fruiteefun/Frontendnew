@@ -74,7 +74,12 @@ export const authApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    const json = await res.json();
+    let json;
+    try {
+      json = await res.json();
+    } catch {
+      throw new Error("Registration failed");
+    }
     if (!res.ok || !json.success) {
       throw new Error(json.error || json.detail || "Registration failed");
     }
@@ -87,7 +92,12 @@ export const authApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    const json = await res.json();
+    let json;
+    try {
+      json = await res.json();
+    } catch {
+      throw new Error("Registration failed");
+    }
     if (!res.ok || !json.success) {
       throw new Error(json.error || json.detail || "Registration failed");
     }
@@ -100,7 +110,12 @@ export const authApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    const json = await res.json();
+    let json;
+    try {
+      json = await res.json();
+    } catch {
+      throw new Error("Invalid email or password");
+    }
     if (!res.ok || !json.success) {
       throw new Error(json.error || json.detail || "Invalid email or password");
     }
