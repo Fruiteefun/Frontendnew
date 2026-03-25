@@ -174,9 +174,17 @@ const InfluencerProfilePage = () => {
                   max={maxDateStr}
                   className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.dateOfBirth ? "border-red-400" : ""}`}
                   value={formData.dateOfBirth}
-                  onChange={(e) =>
-                    setFormData({ ...formData, dateOfBirth: e.target.value })
-                  }
+                  onChange={(e) => {
+                    let val = e.target.value;
+                    if (val) {
+                      const parts = val.split("-");
+                      if (parts[0] && parts[0].length > 4) {
+                        parts[0] = parts[0].slice(0, 4);
+                        val = parts.join("-");
+                      }
+                    }
+                    setFormData({ ...formData, dateOfBirth: val });
+                  }}
                   data-testid="dob-input"
                 />
                 <FieldError message={errors.dateOfBirth} />

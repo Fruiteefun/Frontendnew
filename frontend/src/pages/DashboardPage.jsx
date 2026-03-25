@@ -160,7 +160,11 @@ const DashboardPage = () => {
                 <Input
                   type="date"
                   value={customStartDate}
-                  onChange={(e) => setCustomStartDate(e.target.value)}
+                  onChange={(e) => {
+                    let val = e.target.value;
+                    if (val) { const p = val.split("-"); if (p[0] && p[0].length > 4) { p[0] = p[0].slice(0, 4); val = p.join("-"); } }
+                    setCustomStartDate(val);
+                  }}
                   className="h-10 w-36 rounded-xl border-gray-200 bg-white"
                   placeholder="Start"
                 />
@@ -168,7 +172,11 @@ const DashboardPage = () => {
                 <Input
                   type="date"
                   value={customEndDate}
-                  onChange={(e) => setCustomEndDate(e.target.value)}
+                  onChange={(e) => {
+                    let val = e.target.value;
+                    if (val) { const p = val.split("-"); if (p[0] && p[0].length > 4) { p[0] = p[0].slice(0, 4); val = p.join("-"); } }
+                    setCustomEndDate(val);
+                  }}
                   className="h-10 w-36 rounded-xl border-gray-200 bg-white"
                   placeholder="End"
                 />

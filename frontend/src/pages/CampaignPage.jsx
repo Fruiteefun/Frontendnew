@@ -77,7 +77,17 @@ const CampaignPage = () => {
                 min={new Date().toISOString().split("T")[0]}
                 className={`h-12 rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100 ${errors.startDate ? "border-red-400" : ""}`}
                 value={formData.startDate}
-                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                onChange={(e) => {
+                  let val = e.target.value;
+                  if (val) {
+                    const parts = val.split("-");
+                    if (parts[0] && parts[0].length > 4) {
+                      parts[0] = parts[0].slice(0, 4);
+                      val = parts.join("-");
+                    }
+                  }
+                  setFormData({ ...formData, startDate: val });
+                }}
                 data-testid="start-date-input"
               />
               <FieldError message={errors.startDate} />
