@@ -21,7 +21,7 @@ const LandingPage = () => {
       <main className="flex-1 flex items-center justify-center px-6">
         <div className="max-w-4xl mx-auto text-center">
           {/* Logo — large, above the badge */}
-          <div className="mb-8">
+          <div className="mb-2">
             <FruiteeLogo size="hero" className="mx-auto" />
           </div>
 
