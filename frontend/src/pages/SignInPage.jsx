@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { authApi } from "../lib/api";
@@ -14,9 +14,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, User, Phone, X, Check } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, User, Phone, X, Check, ArrowLeft, Loader2 } from "lucide-react";
 import { Instagram, Twitter, Facebook, Youtube, Linkedin } from "lucide-react";
 import { isValidEmail, isValidPhone, isValidPassword, isNotEmpty } from "../lib/validation";
+
+const HARDCODED_OTP = "123456";
 
 const FieldError = ({ message }) =>
   message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
@@ -33,6 +35,10 @@ const SignInPage = () => {
   const [resetToken, setResetToken] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [resetComplete, setResetComplete] = useState(false);
+  const [showOtp, setShowOtp] = useState(false);
+  const [otpValues, setOtpValues] = useState(["", "", "", "", "", ""]);
+  const [otpError, setOtpError] = useState("");
+  const otpRefs = useRef([]);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -61,6 +67,65 @@ const SignInPage = () => {
   };
 
   const [apiError, setApiError] = useState("");
+
+  // OTP input handlers
+  const handleOtpChange = (index, value) => {
+    if (value.length > 1) value = value.slice(-1);
+    if (value && !/^\d$/.test(value)) return;
+    const newValues = [...otpValues];
+    newValues[index] = value;
+    setOtpValues(newValues);
+    setOtpError("");
+    // Auto-focus next input
+    if (value && index < 5) {
+      otpRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index, e) => {
+    if (e.key === "Backspace" && !otpValues[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleOtpPaste = (e) => {
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (pasted.length === 6) {
+      setOtpValues(pasted.split(""));
+      otpRefs.current[5]?.focus();
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    const otp = otpValues.join("");
+    if (otp.length !== 6) {
+      setOtpError("Please enter all 6 digits");
+      return;
+    }
+    if (otp !== HARDCODED_OTP) {
+      setOtpError("Invalid verification code. Hint: use 123456");
+      return;
+    }
+    // OTP verified — proceed with registration
+    setIsLoading(true);
+    setOtpError("");
+    try {
+      const res = await register(formData.email, formData.password, formData.userType);
+      if (res.success) {
+        if (formData.userType === "influencer") {
+          localStorage.removeItem("fruitee_influencer_registered");
+          localStorage.removeItem("fruitee_influencer_progress");
+          navigate("/influencer-profile", { state: { fullName: formData.name, phone: formData.phone } });
+        } else {
+          navigate("/profile", { state: { fullName: formData.name, phone: formData.phone } });
+        }
+      }
+    } catch (err) {
+      setOtpError(err.message || "Registration failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e, type) => {
     e.preventDefault();
@@ -91,16 +156,10 @@ const SignInPage = () => {
           }
         }
       } else {
-        const res = await register(formData.email, formData.password, formData.userType);
-        if (res.success) {
-          if (formData.userType === "influencer") {
-            localStorage.removeItem("fruitee_influencer_registered");
-            localStorage.removeItem("fruitee_influencer_progress");
-            navigate("/influencer-profile", { state: { fullName: formData.name, phone: formData.phone } });
-          } else {
-            navigate("/profile", { state: { fullName: formData.name, phone: formData.phone } });
-          }
-        }
+        // Show OTP screen instead of registering immediately
+        setShowOtp(true);
+        setOtpValues(["", "", "", "", "", ""]);
+        setOtpError("");
       }
     } catch (err) {
       setApiError(err.message || "Something went wrong. Please try again.");
@@ -119,6 +178,93 @@ const SignInPage = () => {
       <Instagram className="absolute top-[60%] right-[25%] w-16 h-16 text-purple-500" />
     </div>
   );
+
+  // OTP Verification Screen
+  if (showOtp) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-background flex items-center justify-center p-6 relative" data-testid="otp-page">
+        <SocialIcons />
+        <div className="w-full max-w-md relative z-10">
+          <div className="text-center mb-8">
+            <FruiteeLogo size="large" />
+          </div>
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-floating border border-white/50 p-8">
+            <button
+              onClick={() => setShowOtp(false)}
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors"
+              data-testid="otp-back-btn"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </button>
+
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="font-outfit text-2xl font-bold mb-2">Verify Your Email</h2>
+              <p className="text-sm text-muted-foreground">
+                We've sent a 6-digit code to<br />
+                <span className="font-medium text-foreground">{formData.email}</span>
+              </p>
+            </div>
+
+            {/* OTP Input */}
+            <div className="flex justify-center gap-3 mb-6" onPaste={handleOtpPaste}>
+              {otpValues.map((val, i) => (
+                <input
+                  key={i}
+                  ref={(el) => (otpRefs.current[i] = el)}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={val}
+                  onChange={(e) => handleOtpChange(i, e.target.value)}
+                  onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                  className={`w-12 h-14 text-center text-2xl font-bold rounded-xl border-2 transition-all outline-none ${
+                    val
+                      ? "border-orange-400 bg-orange-50"
+                      : "border-gray-200 bg-white/50"
+                  } focus:border-orange-400 focus:ring-4 focus:ring-orange-100`}
+                  data-testid={`otp-input-${i}`}
+                />
+              ))}
+            </div>
+
+            {otpError && (
+              <p className="text-sm text-red-500 text-center mb-4" data-testid="otp-error">{otpError}</p>
+            )}
+
+            <Button
+              onClick={handleVerifyOtp}
+              disabled={isLoading || otpValues.some((v) => !v)}
+              className="w-full h-12 rounded-xl bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
+              data-testid="verify-otp-btn"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                <>
+                  Verify & Continue
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </>
+              )}
+            </Button>
+
+            <p className="text-xs text-center text-muted-foreground mt-6">
+              Didn't receive the code?{" "}
+              <button className="text-orange-500 hover:underline font-medium" data-testid="resend-otp-btn">
+                Resend
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-background flex items-center justify-center p-6 relative" data-testid="signin-page">
