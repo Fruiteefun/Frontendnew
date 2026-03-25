@@ -62,9 +62,16 @@ Build "Fruitee," a social media campaign management platform with:
 - Instagram, TikTok, YouTube connect buttons exist in UI
 - Need OAuth 2.0 flow via /auth/url and /auth/callback endpoints
 
-### P2 - Stripe Payment
-- PaymentPage and InfluencerPaymentPage exist
-- Need Stripe integration
+### Stripe Payment Integration (Complete - March 25, 2026)
+- **Influencer subscription**: £2.99 + £0.60 VAT = £3.59/mo via Stripe Checkout
+- **Business campaign payment**: 3 durations (1 Week £59.99, 1 Month £179.99, 3 Months £419.99 inc. VAT)
+- Backend endpoints: checkout creation, status polling, webhook handler, campaign prices API
+- Using Stripe test key (sandbox mode)
+
+### Email OTP Verification (Partial - March 25, 2026)
+- OTP screen added to sign-up flow for both business and influencer roles
+- Currently MOCKED with hardcoded OTP: 123456
+- Full Resend email integration planned for later
 
 ### P2 - Additional Features  
 - Virtual Influencer Browsing page
