@@ -1,77 +1,81 @@
 # Fruitee - Product Requirements Document
 
 ## Original Problem Statement
-A social media campaign management platform called "Fruitee" where:
-1. **Influencers** register, onboard with preferences, subscribe/pay, create digital twins, and generate intro videos.
-2. **Businesses** register, onboard, create brands, setup campaigns, select influencers, pay, and view a content calendar/dashboard.
+Build "Fruitee," a social media campaign management platform with:
+- **Business flow**: Register → Business Profile → Preferences → Brand Setup → Brand Bio → Campaigns → Campaign Type → Business Plan → Influencer Browsing
+- **Influencer flow**: Register → Influencer Profile → Preferences → Payment Setup → Dashboard
+- Backend API is external (FastAPI at http://18.135.75.87:8000), frontend is React.
 
 ## Architecture
-- **Frontend**: React + Tailwind CSS + Shadcn UI + React Router
-- **Backend**: FastAPI + MongoDB (not yet connected to frontend)
-- **State**: localStorage mocking (to be replaced with real API)
+- **Frontend**: React + React Router + Tailwind CSS + Shadcn UI
+- **Backend**: Local FastAPI acts as a HTTPS→HTTP reverse proxy to external API
+- **External API**: FastAPI at http://18.135.75.87:8000 (Swagger docs at /docs)
+- **Auth**: JWT tokens stored in localStorage, managed via AuthContext
+- **API Layer**: Centralized `api.js` → proxy at same domain → external backend
 
 ## What's Been Implemented
 
-### Authentication
-- Sign in / Sign up with role selection (Business / Influencer)
-- Forgot / Reset Password flow (modal with email → token → new password → success)
+### Phase 1: UI Build (Complete)
+- All pages built with mock data: SignIn/SignUp, Business Profile, Influencer Profile, Business/Influencer Preferences, Brands, Brand Setup, Brand Bio, Brand Campaigns, Campaign, Campaign Type, Business Plan, Dashboard, Influencer Payment
+- Shadcn UI components, form validation, responsive layouts
 
-### Business Flow (Hub-and-Spoke)
-1. **Business Profile** - Logo upload, Your Name (pre-populated from sign-up), Business Name, Website, Country, City, Phone, Social Media (Instagram, TikTok Shop, TikTok, YouTube)
-2. **Business Preferences** - Consent checkboxes, Category (multi-select checkboxes), Preferred Content Tone (multi-select), Primary Content Pillars (multi-select), Target Audience Type (multi-select), Participation consent, Regions (UK, US, EU, India, Global - multi-select), Campaign Matching
-3. **Brands Hub** - List/create/delete brands
-4. **Brand Setup** - Website, Colors, Fonts, Tone of Voice
-5. **Brand Bio** - Description, Visual Identity, Customer Experience
-6. **Campaign Creation** - Name, Start Date
-7. **Campaign Type** - Product Launch, Event Promo, Brand Awareness, Promotion
-8. **Business Plan** - Market analysis, competitors, growth targets
-9. **Influencer Selection** - Browse and select influencers
-10. **Payment** - Campaign payment (Stripe placeholder)
-11. **Content Plan** - Pre-content plan, content calendar, Generate All Content, Start Campaign
-12. **Dashboard** - Metrics charts, campaign overview
+### Phase 2: Backend Integration (Complete - March 25, 2026)
+- **Reverse Proxy**: Local FastAPI proxies `/api/v1/*` to external backend, solving HTTPS→HTTP mixed content
+- **Auth Flow**: SignIn/SignUp connected to `/auth/register/{type}` and `/auth/login`
+- **AuthContext**: Global state for user, tokens, login/register/logout/refreshUser
+- **Pages connected to live API**:
+  - InfluencerProfilePage → GET/PUT /users/me, PUT /users/me/influencer-profile
+  - BusinessProfilePage → GET/PUT /users/me, PUT /users/me/business-profile  
+  - BusinessPreferencesPage → POST /businesses/onboard
+  - InfluencerPreferencesPage → POST /influencers/onboard
+  - BrandsPage → GET/POST /brands, DELETE /brand/{id}
+  - BrandSetupPage → GET/PUT /brand/{id}, POST /brand/{id}/logo
+  - BrandBioPage → GET/PUT /brand/{id}/brand-bio
+  - BrandCampaignsPage → GET /brands, GET /brand/{id}/campaigns
+  - CampaignPage → POST /brand/{id}/campaigns
+  - CampaignTypePage → PUT /campaign/{id} (with focus enum mapping)
+  - BusinessPlanPage → PUT /campaign/{id}/plan (12+ UI fields → 4 API strings serialization)
+- **Validation**: Required field validation on preferences pages
+- **Gap Analysis fixes**: Gender enum mapping, bio field added, BrandBio 3→2 field concatenation, BusinessPlan serialization
 
-### Influencer Flow (Linear, Locked Steps)
-1. **Influencer Profile** - Photo upload, Display Name, Full Name, DOB (age 16+), Gender, Language, Country, City, Social handles
-2. **Influencer Preferences** - Consent checkboxes, Category (multi-select), Tone, Pillars, Audience, Region
-3. **Payment/Subscription** - 3 plans (Basic $9/mo, Creator $29/mo, Pro $79/mo), Stripe-style payment form, Success popup
-4. **Create Digital Twin** - Photo upload, voice recording
-5. **Twin Generation** - Animated progress (static for returning users)
-6. **Intro Video** - Preview and publish
+### Testing
+- Backend: 23/23 API tests passed (100%)
+- Frontend: 90% functional
+- Test file: /app/backend/tests/test_fruitee_api.py
 
-### Global
-- Dynamic sidebar (role-aware, state-aware)
-- Back buttons on all applicable screens
-- Field validations (email, phone, URL, handles, dates, numeric fields)
-- Settings pages (Business & Influencer)
+## Pending/Upcoming (P0-P2)
 
-## Prioritized Backlog
+### P0 - CORS Whitelisting
+- User's backend engineer is whitelisting `*.preview.emergentagent.com`
+- Currently works via proxy; direct browser access needs CORS
 
-### P0 - Critical
-- Connect frontend to backend REST API (replace all localStorage mocking)
-- Implement real JWT authentication flow
+### P1 - File Uploads
+- Profile picture upload (influencer)
+- Brand logo upload
+- Campaign image upload
+- Uses /media endpoints
 
-### P1 - High
-- Implement real file upload (images) and Web Audio API (voice recording)
-- Connect social media OAuth flows
+### P1 - Social Media OAuth
+- Instagram, TikTok, YouTube connect buttons exist in UI
+- Need OAuth 2.0 flow via /auth/url and /auth/callback endpoints
 
-### P2 - Medium  
-- Stripe payment integration (real)
-- Influencer subscription management
-- Virtual influencer browsing
-- Post/Reel individual CRUD screens
+### P2 - Stripe Payment
+- PaymentPage and InfluencerPaymentPage exist
+- Need Stripe integration
 
-### P3 - Low
+### P2 - Additional Features  
+- Virtual Influencer Browsing page
 - Dark mode
-- Mobile responsiveness
+- Mobile responsiveness improvements
 - Exportable reports
-- Campaign metrics over time charts (real data)
 
-## Reference Documents
-- `/app/frontend/public/Fruitee_API_Endpoints_Reference.md` - Complete API endpoint reference
-- `/app/frontend/public/Fruitee_UI_vs_API_Gap_Analysis.md` - UI vs API gap analysis (50 issues)
-- Swagger Docs: `http://18.135.75.87:8000/docs`
+## Refactoring Needed
+- Remove obsolete localStorage items (fruitee_influencer_progress, fruitee_brands, fruitee_campaigns_*)
+- Use is_profile_complete / is_clone_complete flags from user object for progress tracking
 
-## Test Reports
-- `/app/test_reports/iteration_1.json`
-- `/app/test_reports/iteration_2.json`
-- `/app/test_reports/iteration_3.json` (latest - 100% pass rate)
+## Key Files
+- `/app/frontend/src/lib/api.js` - Central API service layer
+- `/app/frontend/src/contexts/AuthContext.jsx` - Auth state management
+- `/app/backend/server.py` - Reverse proxy + local API
+- `/app/frontend/public/Fruitee_UI_vs_API_Gap_Analysis.md` - Gap analysis
+- `/app/frontend/public/Fruitee_API_Endpoints_Reference.md` - API reference

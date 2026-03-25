@@ -96,6 +96,20 @@ const InfluencerPreferencesPage = () => {
     e.preventDefault();
     setSaving(true);
     setApiError("");
+
+    // Validate required selections
+    const missing = [];
+    if (selectedCategories.length === 0) missing.push("categories");
+    if (selectedTones.length === 0) missing.push("tones");
+    if (selectedPillars.length === 0) missing.push("brand positioning");
+    if (selectedAudiences.length === 0) missing.push("audience types");
+    if (selectedRegions.length === 0) missing.push("regions");
+    if (missing.length > 0) {
+      setApiError(`Please select at least one option for: ${missing.join(", ")}`);
+      setSaving(false);
+      return;
+    }
+
     try {
       await influencerOnboardApi.submit({
         consent_name: consents.name,
