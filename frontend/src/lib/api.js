@@ -68,23 +68,44 @@ const apiFetch = async (path, options = {}) => {
 
 // ====== AUTH ======
 export const authApi = {
-  registerBusiness: (email, password) =>
-    apiFetch("/api/v1/auth/register/business", {
+  registerBusiness: async (email, password) => {
+    const res = await fetch(`${API_BASE}/api/v1/auth/register/business`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
-    }),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.error || json.detail || "Registration failed");
+    }
+    return json;
+  },
 
-  registerInfluencer: (email, password) =>
-    apiFetch("/api/v1/auth/register/influencer", {
+  registerInfluencer: async (email, password) => {
+    const res = await fetch(`${API_BASE}/api/v1/auth/register/influencer`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
-    }),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.error || json.detail || "Registration failed");
+    }
+    return json;
+  },
 
-  login: (email, password) =>
-    apiFetch("/api/v1/auth/login", {
+  login: async (email, password) => {
+    const res = await fetch(`${API_BASE}/api/v1/auth/login`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
-    }),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.error || json.detail || "Invalid email or password");
+    }
+    return json;
+  },
 
   logout: () =>
     apiFetch("/api/v1/auth/logout", { method: "POST" }),
