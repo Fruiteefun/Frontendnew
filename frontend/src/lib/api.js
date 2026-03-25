@@ -1,4 +1,4 @@
-const API_BASE = process.env.REACT_APP_API_URL;
+const API_BASE = process.env.REACT_APP_BACKEND_URL;
 
 // Token management
 const getToken = () => localStorage.getItem("fruitee_access_token");
@@ -51,11 +51,19 @@ const apiFetch = async (path, options = {}) => {
     }
   }
 
-  const json = await res.json();
-  if (!res.ok && !json.success) {
-    throw new Error(json.detail || json.error || "Request failed");
+  try {
+    const json = await res.json();
+    if (!res.ok && !json.success) {
+      throw new Error(json.detail || json.error || "Request failed");
+    }
+    return json;
+  } catch (parseError) {
+    // Handle cases where response body was already consumed or is not JSON
+    if (!res.ok) {
+      throw new Error(`Request failed with status ${res.status}`);
+    }
+    throw parseError;
   }
-  return json;
 };
 
 // ====== AUTH ======

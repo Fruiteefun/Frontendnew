@@ -2,10 +2,15 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
-import { ShieldCheck, Tag, AlertTriangle, MessageCircle, Compass, Users, Radio, Handshake, Globe2, Save, ArrowLeft } from "lucide-react";
+import { ShieldCheck, Tag, AlertTriangle, MessageCircle, Compass, Users, Radio, Handshake, Globe2, Save, ArrowLeft, Loader2 } from "lucide-react";
+import { influencerOnboardApi } from "../lib/api";
+import { useAuth } from "../contexts/AuthContext";
 
 const InfluencerPreferencesPage = () => {
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
+  const [saving, setSaving] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const [consents, setConsents] = useState({
     name: true,
@@ -87,12 +92,36 @@ const InfluencerPreferencesPage = () => {
     "Prefer to remain local to my current region",
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const progress = JSON.parse(localStorage.getItem("fruitee_influencer_progress") || "{}");
-    progress.preferences = true;
-    localStorage.setItem("fruitee_influencer_progress", JSON.stringify(progress));
-    navigate("/influencer-payment");
+    setSaving(true);
+    setApiError("");
+    try {
+      await influencerOnboardApi.submit({
+        consent_name: consents.name,
+        consent_likeness: consents.likeness,
+        consent_voice: consents.voice,
+        consent_category_limits: consents.categories,
+        consent_pause_participation: consents.pause,
+        consent_identified_as_ai: consents.aiIdentified,
+        consent_remains_live: consents.published,
+        allowed_categories: selectedCategories,
+        preferred_tones: selectedTones,
+        brand_positioning: selectedPillars,
+        audience_type: selectedAudiences,
+        understands_pausing_participation: participationConsent,
+        category_preferences: {},
+        understands_shown_campaigns: matchingConsents.aligned,
+        understands_automated_matching: matchingConsents.automated,
+        allowed_regions: selectedRegions,
+      });
+      await refreshUser();
+      navigate("/influencer-payment");
+    } catch (err) {
+      setApiError(err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const RadioOption = ({ label, selected, onClick, testId }) => (
@@ -165,6 +194,11 @@ const InfluencerPreferencesPage = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {apiError && (
+            <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm" data-testid="api-error">
+              {apiError}
+            </div>
+          )}
           {/* 1. AI Usage & Legal Consent */}
           <div className="bg-white rounded-3xl p-8 shadow-soft space-y-5">
             <h2 className="font-outfit text-lg font-semibold flex items-center gap-2">
@@ -405,11 +439,12 @@ const InfluencerPreferencesPage = () => {
             </Button>
             <Button
               type="submit"
+              disabled={saving}
               className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-purple-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
               data-testid="save-continue-btn"
             >
-              <Save className="w-4 h-4 mr-2" />
-              Save & Continue
+              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+              {saving ? "Saving..." : "Save & Continue"}
             </Button>
           </div>
         </form>

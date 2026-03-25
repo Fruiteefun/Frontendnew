@@ -5,8 +5,9 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import { ArrowRight, ArrowLeft, Plus, X, Target, Users, Swords, TrendingUp, Save } from "lucide-react";
+import { ArrowRight, ArrowLeft, Plus, X, Target, Users, Swords, TrendingUp, Save, Loader2 } from "lucide-react";
 import { isNumericOrFormatted } from "../lib/validation";
+import { campaignsApi } from "../lib/api";
 
 const FieldError = ({ message }) =>
   message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
@@ -69,8 +70,9 @@ const BusinessPlanPage = () => {
   };
 
   const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = {};
     if (formData.expectedFollowers && !isNumericOrFormatted(formData.expectedFollowers))
@@ -81,7 +83,60 @@ const BusinessPlanPage = () => {
       errs.expectedCustomers = "Please enter a valid number";
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
-    navigate("/influencers");
+
+    const campaignId = localStorage.getItem("fruitee_activeCampaignId");
+    if (!campaignId) { navigate("/campaign"); return; }
+
+    setSaving(true);
+    try {
+      // Serialize 12+ UI fields into 4 API strings (gap analysis #2-4)
+      const targetMarket = [
+        formData.territory && `Territory: ${formData.territory}`,
+        formData.marketSizeValue && `Market Size (Value): ${formData.marketSizeValue}`,
+        formData.marketSizeCustomers && `Market Size (Customers): ${formData.marketSizeCustomers}`,
+      ].filter(Boolean).join("\n") || "Not specified";
+
+      const targetCustomer = [
+        formData.targetAge && `Age: ${formData.targetAge}`,
+        formData.targetGender && `Gender: ${formData.targetGender}`,
+        formData.targetInterests && `Interests: ${formData.targetInterests}`,
+        formData.targetIncome && `Income Level: ${formData.targetIncome}`,
+        formData.targetLifestyle && `Lifestyle: ${formData.targetLifestyle}`,
+      ].filter(Boolean).join("\n") || "Not specified";
+
+      const competitorLines = competitors
+        .filter((c) => c.name)
+        .map((c, i) => [
+          `Competitor ${i + 1}: ${c.name}`,
+          c.positioning && `  Positioning: ${c.positioning}`,
+          c.platforms && `  Platforms: ${c.platforms}`,
+          c.contentStyle && `  Content Style: ${c.contentStyle}`,
+          c.keyTactic && `  Key Tactic: ${c.keyTactic}`,
+        ].filter(Boolean).join("\n"));
+      const competitionAnalysis = [
+        ...competitorLines,
+        formData.advantageOverCompetitors && `\nAdvantage: ${formData.advantageOverCompetitors}`,
+      ].filter(Boolean).join("\n\n") || "Not specified";
+
+      const growthTarget = [
+        formData.expectedFollowers && `Expected Followers: ${formData.expectedFollowers}`,
+        formData.expectedLikes && `Expected Likes: ${formData.expectedLikes}`,
+        formData.expectedCustomers && `Expected Customers: ${formData.expectedCustomers}`,
+      ].filter(Boolean).join("\n") || "Not specified";
+
+      await campaignsApi.updatePlan(campaignId, {
+        target_market: targetMarket,
+        target_customer: targetCustomer,
+        competition_analysis: competitionAnalysis,
+        growth_target: growthTarget,
+      });
+
+      navigate("/influencers");
+    } catch (err) {
+      setErrors({ api: err.message });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -445,6 +500,9 @@ const BusinessPlanPage = () => {
           </div>
 
           {/* Action Buttons */}
+          {errors.api && (
+            <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm mb-4" data-testid="api-error">{errors.api}</div>
+          )}
           <div className="flex justify-between gap-4">
             <Button
               type="button"
@@ -458,11 +516,12 @@ const BusinessPlanPage = () => {
             </Button>
             <Button
               type="submit"
+              disabled={saving}
               className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-purple-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
               data-testid="save-continue-btn"
             >
-              <Save className="w-4 h-4 mr-2" />
-              Save & Continue
+              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+              {saving ? "Saving..." : "Save & Continue"}
             </Button>
           </div>
         </form>

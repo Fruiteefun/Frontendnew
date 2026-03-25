@@ -4,21 +4,24 @@ import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Megaphone, CalendarDays, Save } from "lucide-react";
+import { Megaphone, CalendarDays, Save, Loader2 } from "lucide-react";
 import { isNotEmpty, isValidDate, isFutureOrToday } from "../lib/validation";
+import { campaignsApi } from "../lib/api";
 
 const FieldError = ({ message }) =>
   message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
 
 const CampaignPage = () => {
   const navigate = useNavigate();
+  const brandId = localStorage.getItem("fruitee_activeBrandId");
   const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     campaignName: "",
     startDate: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const e2 = {};
     if (!isNotEmpty(formData.campaignName)) e2.campaignName = "Campaign name is required";
@@ -31,7 +34,23 @@ const CampaignPage = () => {
     }
     setErrors(e2);
     if (Object.keys(e2).length > 0) return;
-    navigate("/campaign-type");
+    if (!brandId) { navigate("/brands"); return; }
+
+    setSaving(true);
+    try {
+      const res = await campaignsApi.create(brandId, {
+        name: formData.campaignName,
+        start_date: new Date(formData.startDate).toISOString(),
+      });
+      if (res.success && res.data) {
+        localStorage.setItem("fruitee_activeCampaignId", res.data.id);
+      }
+      navigate("/campaign-type");
+    } catch (err) {
+      setErrors({ api: err.message });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -95,6 +114,9 @@ const CampaignPage = () => {
           </div>
 
           {/* Action Buttons */}
+          {errors.api && (
+            <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm" data-testid="api-error">{errors.api}</div>
+          )}
           <div className="flex justify-end gap-4">
             <Button
               type="button"
@@ -107,11 +129,12 @@ const CampaignPage = () => {
             </Button>
             <Button
               type="submit"
+              disabled={saving}
               className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-purple-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
               data-testid="save-continue-btn"
             >
-              <Save className="w-4 h-4 mr-2" />
-              Save & Continue
+              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+              {saving ? "Creating..." : "Save & Continue"}
             </Button>
           </div>
         </form>

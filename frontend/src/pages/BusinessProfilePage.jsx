@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Upload, ArrowRight, X, Globe, MapPin, Phone, Building2, Save, ArrowLeft } from "lucide-react";
+import { Upload, ArrowRight, X, Globe, MapPin, Phone, Building2, Save, ArrowLeft, Loader2 } from "lucide-react";
 import { isNotEmpty, isValidUrl, isValidPhone } from "../lib/validation";
 import { businessProfileApi, userApi } from "../lib/api";
 import { useAuth } from "../contexts/AuthContext";
@@ -24,8 +24,10 @@ const BusinessProfilePage = () => {
   const location = useLocation();
   const { refreshUser } = useAuth();
   const [logo, setLogo] = useState(null);
+  const [logoFile, setLogoFile] = useState(null);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const initialPhone = location.state?.phone || "";
   const initialName = location.state?.fullName || "";
@@ -44,17 +46,50 @@ const BusinessProfilePage = () => {
     youtube: "",
   });
 
+  // Load existing profile data on mount
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const res = await userApi.getMe();
+        if (res.success && res.data) {
+          const d = res.data;
+          const bp = d.business_profile || {};
+          const addr = bp.address || "";
+          const addrParts = addr.split(", ");
+          setFormData((prev) => ({
+            ...prev,
+            contactName: bp.contact_name || d.name || prev.contactName,
+            businessName: bp.name || "",
+            website: bp.website || "https://",
+            phone: bp.mobile || prev.phone,
+            city: addrParts[0] || "",
+            country: addrParts[1] || "",
+          }));
+          if (bp.logo_url) {
+            setLogo(bp.logo_url);
+          }
+        }
+      } catch {
+        // First time — no profile
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProfile();
+  }, []);
+
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       setLogo(URL.createObjectURL(file));
+      setLogoFile(file);
     }
   };
 
   const validate = () => {
     const e = {};
     if (!isNotEmpty(formData.businessName)) e.businessName = "Business name is required";
-    if (formData.website && !isValidUrl(formData.website)) e.website = "Please enter a valid URL (https://...)";
+    if (formData.website && formData.website !== "https://" && !isValidUrl(formData.website)) e.website = "Please enter a valid URL (https://...)";
     if (formData.phone && !isValidPhone(formData.phone)) e.phone = "Please enter a valid phone number";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -69,17 +104,17 @@ const BusinessProfilePage = () => {
       if (formData.contactName) {
         await userApi.updateMe({ name: formData.contactName });
       }
-      // Update business profile
+      // Update business profile — concatenate city + country into address (gap analysis #7)
       await businessProfileApi.update({
         name: formData.businessName,
         contact_name: formData.contactName,
-        website: formData.website,
-        mobile: formData.phone,
-        address: [formData.city, formData.country].filter(Boolean).join(", "),
+        website: formData.website !== "https://" ? formData.website : undefined,
+        mobile: formData.phone || undefined,
+        address: [formData.city, formData.country].filter(Boolean).join(", ") || undefined,
       });
-      // Upload logo if selected
-      if (logo) {
-        await businessProfileApi.uploadLogo(logo);
+      // Upload logo if a new file was selected
+      if (logoFile) {
+        await businessProfileApi.uploadLogo(logoFile);
       }
       await refreshUser();
       navigate("/business-preferences");

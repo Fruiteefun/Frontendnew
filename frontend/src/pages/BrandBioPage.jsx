@@ -1,22 +1,67 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import { BookOpen, Save, ArrowLeft } from "lucide-react";
+import { BookOpen, Save, ArrowLeft, Loader2 } from "lucide-react";
+import { brandsApi } from "../lib/api";
 
 const BrandBioPage = () => {
   const navigate = useNavigate();
+  const brandId = localStorage.getItem("fruitee_activeBrandId");
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState("");
   const [formData, setFormData] = useState({
     description: "",
     visualIdentity: "",
     customerExperience: "",
   });
 
-  const handleSubmit = (e) => {
+  // Load existing brand bio
+  useEffect(() => {
+    const loadBio = async () => {
+      if (!brandId) { setLoading(false); return; }
+      try {
+        const res = await brandsApi.getBio(brandId);
+        if (res.success && res.data) {
+          setFormData({
+            description: res.data.description || "",
+            visualIdentity: res.data.visual_identity || "",
+            customerExperience: "",
+          });
+        }
+      } catch {
+        // No bio yet
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadBio();
+  }, [brandId]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate("/brand-campaigns");
+    if (!brandId) { navigate("/brands"); return; }
+    setSaving(true);
+    setApiError("");
+    try {
+      // Gap analysis #9: 3 UI fields → 2 API fields. Append customerExperience to description.
+      const fullDescription = formData.customerExperience
+        ? `${formData.description}\n\nCustomer Experience: ${formData.customerExperience}`
+        : formData.description;
+
+      await brandsApi.updateBio(brandId, {
+        description: fullDescription,
+        visual_identity: formData.visualIdentity,
+      });
+      navigate("/brand-campaigns");
+    } catch (err) {
+      setApiError(err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -32,6 +77,11 @@ const BrandBioPage = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {apiError && (
+            <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm" data-testid="api-error">
+              {apiError}
+            </div>
+          )}
           <div className="bg-white rounded-3xl p-8 shadow-soft space-y-6">
             <h2 className="font-outfit text-lg font-semibold flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-orange-500" />
@@ -89,11 +139,12 @@ const BrandBioPage = () => {
             </Button>
             <Button
               type="submit"
+              disabled={saving}
               className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-purple-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
               data-testid="save-continue-btn"
             >
-              <Save className="w-4 h-4 mr-2" />
-              Save & Continue
+              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+              {saving ? "Saving..." : "Save & Continue"}
             </Button>
           </div>
         </form>

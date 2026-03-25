@@ -5,8 +5,9 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import { Megaphone, Rocket, CalendarDays, Tag, ArrowRight, ArrowLeft, Globe, Plus, X, Image } from "lucide-react";
+import { Megaphone, Rocket, CalendarDays, Tag, ArrowRight, ArrowLeft, Globe, Plus, X, Image, Loader2 } from "lucide-react";
 import { isValidUrl } from "../lib/validation";
+import { campaignsApi } from "../lib/api";
 
 const FieldError = ({ message }) =>
   message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
@@ -93,13 +94,75 @@ const CampaignTypePage = () => {
     setCampaignImages(campaignImages.filter((img) => img.id !== id));
   };
 
-  const handleContinue = () => {
+  const [saving, setSaving] = useState(false);
+
+  // Map UI type IDs to API focus enum values (gap analysis #11)
+  const focusMap = {
+    "brand-awareness": "increase_brand_awareness",
+    "product-launch": "launch_products",
+    "event-promo": "promote_event",
+    "promotion": "launch_promotion",
+  };
+
+  const handleContinue = async () => {
     if (!selectedType) return;
     const e = {};
-    if (campaignData.website && !isValidUrl(campaignData.website)) e.website = "Please enter a valid URL (https://...)";
+    if (campaignData.website && campaignData.website !== "https://" && !isValidUrl(campaignData.website)) e.website = "Please enter a valid URL (https://...)";
     setErrors(e);
     if (Object.keys(e).length > 0) return;
-    navigate("/business-plan");
+
+    const campaignId = localStorage.getItem("fruitee_activeCampaignId");
+    if (!campaignId) { navigate("/campaign"); return; }
+
+    setSaving(true);
+    try {
+      const updatePayload = {
+        focus: focusMap[selectedType],
+        description: campaignData.details || undefined,
+        website: campaignData.website !== "https://" ? campaignData.website : undefined,
+      };
+
+      // Add products for product-launch
+      if (selectedType === "product-launch" && products.some((p) => p.name)) {
+        updatePayload.products = products
+          .filter((p) => p.name)
+          .map((p) => ({ name: p.name, description: p.description || p.name, price: p.price || null }));
+      }
+
+      // Add event for event-promo (API takes single event object)
+      if (selectedType === "event-promo" && events[0]?.name) {
+        const ev = events[0];
+        updatePayload.event = {
+          name: ev.name,
+          venue: ev.venue || "TBD",
+          ticket_prices: ev.tickets || "TBD",
+          start_date: new Date().toISOString(),
+          end_date: new Date().toISOString(),
+        };
+      }
+
+      // Add promotions for promotion
+      if (selectedType === "promotion" && promotions.some((p) => p.name)) {
+        updatePayload.promotions = promotions
+          .filter((p) => p.name)
+          .map((p) => ({ name: p.name, description: p.description || p.name, code: p.code || "PROMO" }));
+      }
+
+      await campaignsApi.update(campaignId, updatePayload);
+
+      // Upload campaign images
+      for (const img of campaignImages) {
+        if (img.file) {
+          await campaignsApi.uploadImage(campaignId, img.file);
+        }
+      }
+
+      navigate("/business-plan");
+    } catch (err) {
+      setErrors({ api: err.message });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -400,6 +463,9 @@ const CampaignTypePage = () => {
         </div>
 
         {/* Action Buttons */}
+        {errors.api && (
+          <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm mb-4" data-testid="api-error">{errors.api}</div>
+        )}
         <div className="flex justify-between gap-4">
           <Button
             type="button"
@@ -413,12 +479,13 @@ const CampaignTypePage = () => {
           </Button>
           <Button
             onClick={handleContinue}
-            disabled={!selectedType}
+            disabled={!selectedType || saving}
             className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-purple-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300 disabled:opacity-50"
             data-testid="continue-btn"
           >
-            Continue
-            <ArrowRight className="w-5 h-5 ml-2" />
+            {saving ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : null}
+            {saving ? "Saving..." : "Continue"}
+            {!saving && <ArrowRight className="w-5 h-5 ml-2" />}
           </Button>
         </div>
       </div>

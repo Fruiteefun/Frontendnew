@@ -3,48 +3,57 @@ import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
-import { Plus, ArrowLeft, Megaphone, ChevronRight, Calendar, Trash2, Palette, Settings } from "lucide-react";
+import { Plus, ArrowLeft, Megaphone, ChevronRight, Calendar, Trash2, Palette, Settings, Loader2 } from "lucide-react";
+import { brandsApi, campaignsApi } from "../lib/api";
 
 const BrandCampaignsPage = () => {
   const navigate = useNavigate();
   const brandId = localStorage.getItem("fruitee_activeBrandId");
   const [brandName, setBrandName] = useState("");
-
-  const [campaigns, setCampaigns] = useState(() => {
-    const saved = localStorage.getItem(`fruitee_campaigns_${brandId}`);
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get brand name
-    const brands = JSON.parse(localStorage.getItem("fruitee_brands") || "[]");
-    const brand = brands.find((b) => b.id === brandId);
-    if (brand) setBrandName(brand.name);
+    const fetchData = async () => {
+      if (!brandId) { setLoading(false); return; }
+      try {
+        // Fetch brand details
+        const brandRes = await brandsApi.get(brandId);
+        if (brandRes.success && brandRes.data) {
+          setBrandName(brandRes.data.name);
+        }
+        // Fetch campaigns for this brand
+        const campRes = await campaignsApi.list(brandId, 1, 50);
+        if (campRes.success) {
+          // Handle different response formats: data.result, data.items, or data as array
+          const campaignsData = campRes.data?.result || campRes.data?.items || (Array.isArray(campRes.data) ? campRes.data : []);
+          setCampaigns(campaignsData);
+        }
+      } catch {
+        // No data yet
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, [brandId]);
 
-  useEffect(() => {
-    localStorage.setItem(`fruitee_campaigns_${brandId}`, JSON.stringify(campaigns));
-  }, [campaigns, brandId]);
-
   const handleCreateCampaign = () => {
-    const newCampaign = {
-      id: Date.now().toString(),
-      name: "",
-      startDate: "",
-      status: "Draft",
-    };
-    setCampaigns([...campaigns, newCampaign]);
-    localStorage.setItem("fruitee_activeCampaignId", newCampaign.id);
     navigate("/campaign");
   };
 
   const handleCampaignClick = (campaign) => {
     localStorage.setItem("fruitee_activeCampaignId", campaign.id);
-    navigate("/campaign");
+    navigate("/campaign-type");
   };
 
-  const handleDeleteCampaign = (id) => {
-    setCampaigns(campaigns.filter((c) => c.id !== id));
+  const handleDeleteCampaign = async (id) => {
+    try {
+      await campaignsApi.delete(id);
+      setCampaigns(campaigns.filter((c) => c.id !== id));
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   const handleEditBrand = () => {
@@ -109,7 +118,11 @@ const BrandCampaignsPage = () => {
         </div>
 
         {/* Campaigns List */}
-        {campaigns.length === 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-orange-400" />
+          </div>
+        ) : campaigns.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 shadow-soft text-center">
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center">
               <Megaphone className="w-8 h-8 text-orange-400" />
@@ -147,18 +160,18 @@ const BrandCampaignsPage = () => {
                       {campaign.name || "Untitled Campaign"}
                     </h3>
                     <div className="flex items-center gap-3 mt-1">
-                      {campaign.startDate && (
+                      {campaign.start_date && (
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
-                          {campaign.startDate}
+                          {new Date(campaign.start_date).toLocaleDateString()}
                         </span>
                       )}
                       <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        campaign.status === "Active"
+                        campaign.status === "active"
                           ? "bg-teal-100 text-teal-600"
                           : "bg-gray-100 text-gray-500"
                       }`}>
-                        {campaign.status}
+                        {campaign.status || "Draft"}
                       </span>
                     </div>
                   </div>

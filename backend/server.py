@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
+from fastapi.responses import Response
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -9,10 +10,14 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List
 import uuid
 from datetime import datetime, timezone
+import httpx
 
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+# External API backend URL
+EXTERNAL_API_URL = os.environ.get('EXTERNAL_API_URL', 'http://18.135.75.87:8000')
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -68,6 +73,42 @@ async def get_status_checks():
 
 # Include the router in the main app
 app.include_router(api_router)
+
+# ====== Reverse Proxy to External Backend ======
+# Forwards /api/v1/* to the external API to avoid mixed-content (HTTP from HTTPS)
+@app.api_route("/api/v1/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"])
+async def proxy_to_external_api(request: Request, path: str):
+    target_url = f"{EXTERNAL_API_URL}/api/v1/{path}"
+    
+    # Preserve query params
+    if request.url.query:
+        target_url += f"?{request.url.query}"
+    
+    # Forward headers (except host)
+    headers = dict(request.headers)
+    headers.pop("host", None)
+    headers.pop("Host", None)
+    
+    body = await request.body()
+    
+    async with httpx.AsyncClient(timeout=60.0) as http_client:
+        resp = await http_client.request(
+            method=request.method,
+            url=target_url,
+            headers=headers,
+            content=body,
+        )
+    
+    # Build response, exclude hop-by-hop headers
+    excluded = {"transfer-encoding", "connection", "keep-alive"}
+    resp_headers = {k: v for k, v in resp.headers.items() if k.lower() not in excluded}
+    
+    return Response(
+        content=resp.content,
+        status_code=resp.status_code,
+        headers=resp_headers,
+        media_type=resp.headers.get("content-type"),
+    )
 
 app.add_middleware(
     CORSMiddleware,

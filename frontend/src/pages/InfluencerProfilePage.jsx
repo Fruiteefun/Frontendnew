@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -11,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Camera, ArrowRight } from "lucide-react";
+import { Camera, ArrowRight, Loader2 } from "lucide-react";
 import { isNotEmpty, isMinAge, isValidDate } from "../lib/validation";
 import { influencerProfileApi, userApi } from "../lib/api";
 import { useAuth } from "../contexts/AuthContext";
@@ -22,11 +23,12 @@ const FieldError = ({ message }) =>
 const InfluencerProfilePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { refreshUser } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [profileImage, setProfileImage] = useState(null);
   const [profileImageFile, setProfileImageFile] = useState(null);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const initialFullName = location.state?.fullName || "";
 
@@ -38,15 +40,46 @@ const InfluencerProfilePage = () => {
     language: "",
     country: "",
     city: "",
-    instagram: "",
-    tiktok: "",
-    youtube: "",
+    bio: "",
   });
+
+  // Load existing profile data on mount
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const res = await userApi.getMe();
+        if (res.success && res.data) {
+          const d = res.data;
+          const profile = d.influencer_profile || {};
+          setFormData((prev) => ({
+            ...prev,
+            fullName: profile.name || d.name || prev.fullName,
+            displayName: profile.display_name || "",
+            gender: profile.gender || "",
+            language: profile.language || "",
+            country: profile.country || "",
+            city: profile.city || "",
+            bio: profile.bio || "",
+            dateOfBirth: profile.dob ? profile.dob.split("T")[0] : "",
+          }));
+          if (profile.profile_image_url) {
+            setProfileImage(profile.profile_image_url);
+          }
+        }
+      } catch {
+        // First time user — no profile yet, that's fine
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProfile();
+  }, []);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       setProfileImage(URL.createObjectURL(file));
+      setProfileImageFile(file);
     }
   };
 
@@ -81,27 +114,26 @@ const InfluencerProfilePage = () => {
       // Update user name
       await userApi.updateMe({ name: formData.fullName });
 
-      // Update influencer profile
+      // Update influencer profile — map gender to API enum (male/female/other)
+      const genderMap = { male: "male", female: "female", other: "other", "prefer-not": "other" };
       await influencerProfileApi.update({
         name: formData.fullName,
         display_name: formData.displayName,
-        gender: formData.gender,
-        age: age,
-        dob: formData.dateOfBirth,
+        gender: genderMap[formData.gender] || formData.gender,
+        age,
+        dob: new Date(formData.dateOfBirth).toISOString(),
         country: formData.country,
         city: formData.city,
         language: formData.language,
+        bio: formData.bio || undefined,
       });
 
-      // Upload profile image if selected
+      // Upload profile image if a new file was selected
       if (profileImageFile) {
         await influencerProfileApi.uploadImage(profileImageFile);
       }
 
       await refreshUser();
-      const progress = JSON.parse(localStorage.getItem("fruitee_influencer_progress") || "{}");
-      progress.profile = true;
-      localStorage.setItem("fruitee_influencer_progress", JSON.stringify(progress));
       navigate("/influencer-preferences");
     } catch (err) {
       setErrors({ api: err.message });
@@ -115,6 +147,16 @@ const InfluencerProfilePage = () => {
   maxDate.setFullYear(maxDate.getFullYear() - 16);
   const maxDateStr = maxDate.toISOString().split("T")[0];
 
+  if (loading) {
+    return (
+      <Layout userType="influencer">
+        <div className="p-8 max-w-2xl mx-auto flex items-center justify-center min-h-[400px]">
+          <Loader2 className="w-8 h-8 animate-spin text-orange-400" />
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout userType="influencer">
       <div className="p-8 max-w-2xl mx-auto" data-testid="influencer-profile-page">
@@ -126,6 +168,12 @@ const InfluencerProfilePage = () => {
             Set up your influencer profile
           </p>
         </div>
+
+        {errors.api && (
+          <div className="mb-4 p-4 bg-red-50 text-red-600 rounded-xl text-sm" data-testid="api-error">
+            {errors.api}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Profile Image Upload */}
@@ -308,6 +356,20 @@ const InfluencerProfilePage = () => {
               />
               <FieldError message={errors.city} />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bio">Bio</Label>
+              <Textarea
+                id="bio"
+                placeholder="Tell brands a bit about yourself..."
+                className="min-h-[100px] rounded-xl border-gray-200 bg-white/50 focus:bg-white focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                value={formData.bio}
+                onChange={(e) =>
+                  setFormData({ ...formData, bio: e.target.value })
+                }
+                data-testid="bio-textarea"
+              />
+            </div>
           </div>
 
           {/* Connect Social Media */}
@@ -355,11 +417,13 @@ const InfluencerProfilePage = () => {
             </Button>
             <Button
               type="submit"
+              disabled={saving}
               className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
               data-testid="continue-btn"
             >
-              Continue
-              <ArrowRight className="w-5 h-5 ml-2" />
+              {saving ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+              {saving ? "Saving..." : "Continue"}
+              {!saving && <ArrowRight className="w-5 h-5 ml-2" />}
             </Button>
           </div>
         </form>

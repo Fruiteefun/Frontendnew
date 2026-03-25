@@ -1,28 +1,59 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Globe, Upload, Plus, X, Image, Palette, Save, ArrowLeft } from "lucide-react";
+import { Globe, Upload, Plus, X, Image, Palette, Save, ArrowLeft, Loader2 } from "lucide-react";
 import { isValidUrl, isValidHexColor } from "../lib/validation";
+import { brandsApi } from "../lib/api";
 
 const FieldError = ({ message }) =>
   message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
 
 const BrandSetupPage = () => {
   const navigate = useNavigate();
+  const brandId = localStorage.getItem("fruitee_activeBrandId");
   const [websiteUrl, setWebsiteUrl] = useState("https://");
   const [brandLogo, setBrandLogo] = useState(null);
+  const [brandLogoFile, setBrandLogoFile] = useState(null);
   const [productImages, setProductImages] = useState([]);
   const [brandColors, setBrandColors] = useState([]);
   const [newColor, setNewColor] = useState("#F97316");
   const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Load existing brand data
+  useEffect(() => {
+    const loadBrand = async () => {
+      if (!brandId) { setLoading(false); return; }
+      try {
+        const res = await brandsApi.get(brandId);
+        if (res.success && res.data) {
+          const b = res.data;
+          setWebsiteUrl(b.website || "https://");
+          if (b.brand_colours?.length) {
+            setBrandColors(b.brand_colours.map((c, i) => ({ id: i, color: c })));
+          }
+          if (b.logo_url) {
+            setBrandLogo({ preview: b.logo_url });
+          }
+        }
+      } catch {
+        // New brand — no data yet
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadBrand();
+  }, [brandId]);
 
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       setBrandLogo({ file, preview: URL.createObjectURL(file) });
+      setBrandLogoFile(file);
     }
   };
 
@@ -50,13 +81,29 @@ const BrandSetupPage = () => {
     setBrandColors(brandColors.filter((c) => c.id !== id));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const e2 = {};
-    if (websiteUrl && !isValidUrl(websiteUrl)) e2.website = "Please enter a valid URL (https://...)";
+    if (websiteUrl && websiteUrl !== "https://" && !isValidUrl(websiteUrl)) e2.website = "Please enter a valid URL (https://...)";
     setErrors(e2);
     if (Object.keys(e2).length > 0) return;
-    navigate("/business-preferences");
+    if (!brandId) { navigate("/brands"); return; }
+
+    setSaving(true);
+    try {
+      await brandsApi.update(brandId, {
+        website: websiteUrl !== "https://" ? websiteUrl : undefined,
+        brand_colours: brandColors.map((c) => c.color),
+      });
+      if (brandLogoFile) {
+        await brandsApi.uploadLogo(brandId, brandLogoFile);
+      }
+      navigate("/brand-bio");
+    } catch (err) {
+      setErrors({ api: err.message });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -299,11 +346,12 @@ const BrandSetupPage = () => {
             </Button>
             <Button
               type="submit"
+              disabled={saving}
               className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-purple-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
               data-testid="save-continue-btn"
             >
-              <Save className="w-4 h-4 mr-2" />
-              Save & Continue
+              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+              {saving ? "Saving..." : "Save & Continue"}
             </Button>
           </div>
         </form>

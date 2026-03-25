@@ -3,49 +3,66 @@ import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
-import { Plus, Tag, ChevronRight, Megaphone, Trash2 } from "lucide-react";
+import { Plus, Tag, ChevronRight, Megaphone, Trash2, Loader2 } from "lucide-react";
+import { brandsApi } from "../lib/api";
 
 const BrandsPage = () => {
   const navigate = useNavigate();
   const [newBrandName, setNewBrandName] = useState("");
-  const [brands, setBrands] = useState(() => {
-    const saved = localStorage.getItem("fruitee_brands");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [brands, setBrands] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("fruitee_brands", JSON.stringify(brands));
-  }, [brands]);
+    const fetchBrands = async () => {
+      try {
+        const res = await brandsApi.list(1, 50);
+        if (res.success) {
+          // Handle different response formats: data.result, data.items, or data as array
+          const brandsData = res.data?.result || res.data?.items || (Array.isArray(res.data) ? res.data : []);
+          setBrands(brandsData);
+        }
+      } catch {
+        // Fallback — no brands yet
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBrands();
+  }, []);
 
-  const handleAddBrand = (e) => {
+  const handleAddBrand = async (e) => {
     e.preventDefault();
     if (!newBrandName.trim()) return;
-    const newBrand = {
-      id: Date.now().toString(),
-      name: newBrandName,
-      profileComplete: false,
-      preferencesComplete: false,
-      campaigns: [],
-    };
-    setBrands([...brands, newBrand]);
-    setNewBrandName("");
-    // Navigate to Brand Profile for this brand
-    localStorage.setItem("fruitee_activeBrandId", newBrand.id);
-    navigate("/brand-setup");
+    setCreating(true);
+    try {
+      const res = await brandsApi.create({ name: newBrandName });
+      if (res.success) {
+        const newBrand = res.data;
+        setBrands([...brands, newBrand]);
+        setNewBrandName("");
+        localStorage.setItem("fruitee_activeBrandId", newBrand.id);
+        navigate("/brand-setup");
+      }
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setCreating(false);
+    }
   };
 
-  const handleDeleteBrand = (id) => {
-    setBrands(brands.filter((b) => b.id !== id));
+  const handleDeleteBrand = async (id) => {
+    try {
+      await brandsApi.delete(id);
+      setBrands(brands.filter((b) => b.id !== id));
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   const handleBrandClick = (brand) => {
     localStorage.setItem("fruitee_activeBrandId", brand.id);
     navigate("/brand-campaigns");
-  };
-
-  const getCampaignCount = (brand) => {
-    const saved = localStorage.getItem(`fruitee_campaigns_${brand.id}`);
-    return saved ? JSON.parse(saved).length : 0;
   };
 
   return (
@@ -77,17 +94,22 @@ const BrandsPage = () => {
             </div>
             <Button
               type="submit"
+              disabled={creating}
               className="h-12 px-6 rounded-xl bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold"
               data-testid="add-brand-btn"
             >
-              <Plus className="w-5 h-5 mr-2" />
-              Add Brand
+              {creating ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Plus className="w-5 h-5 mr-2" />}
+              {creating ? "Creating..." : "Add Brand"}
             </Button>
           </form>
         </div>
 
         {/* Brands Grid */}
-        {brands.length === 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-orange-400" />
+          </div>
+        ) : brands.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 shadow-soft text-center">
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center">
               <Tag className="w-8 h-8 text-orange-400" />
@@ -99,9 +121,7 @@ const BrandsPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {brands.map((brand) => {
-              const campaignCount = getCampaignCount(brand);
-              return (
+            {brands.map((brand) => (
                 <div
                   key={brand.id}
                   className="bg-white rounded-3xl shadow-soft hover:shadow-md transition-all duration-300 border-2 border-transparent hover:border-orange-200 cursor-pointer group overflow-hidden"
@@ -123,11 +143,8 @@ const BrandsPage = () => {
                       <div className="flex items-center gap-3 mt-1">
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Megaphone className="w-3 h-3" />
-                          {campaignCount} campaign{campaignCount !== 1 ? "s" : ""}
+                          {brand.campaign_count || 0} campaign{(brand.campaign_count || 0) !== 1 ? "s" : ""}
                         </span>
-                        {brand.profileComplete && (
-                          <span className="text-xs bg-teal-100 text-teal-600 px-2 py-0.5 rounded-full">Profile done</span>
-                        )}
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-orange-400 transition-colors flex-shrink-0" />
@@ -143,8 +160,7 @@ const BrandsPage = () => {
                     </button>
                   </div>
                 </div>
-              );
-            })}
+            ))}
           </div>
         )}
       </div>

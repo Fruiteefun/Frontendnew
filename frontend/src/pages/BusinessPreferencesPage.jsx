@@ -2,10 +2,15 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
-import { ArrowRight, Save, ShieldCheck, Tag, AlertTriangle, MessageCircle, Compass, Users, Radio, Handshake, Globe2, ArrowLeft } from "lucide-react";
+import { ArrowRight, Save, ShieldCheck, Tag, AlertTriangle, MessageCircle, Compass, Users, Radio, Handshake, Globe2, ArrowLeft, Loader2 } from "lucide-react";
+import { businessOnboardApi } from "../lib/api";
+import { useAuth } from "../contexts/AuthContext";
 
 const BusinessPreferencesPage = () => {
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
+  const [saving, setSaving] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const [consents, setConsents] = useState({
     aiContent: true,
@@ -73,9 +78,33 @@ const BusinessPreferencesPage = () => {
     "Professionals / Career-focused",
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate("/brand-bio");
+    setSaving(true);
+    setApiError("");
+    try {
+      await businessOnboardApi.submit({
+        consent_business_details: consents.aiContent,
+        understands_marketing_assistance: consents.aiDisclaimer,
+        understands_featuring_influencer: consents.aiInfluencers,
+        understands_content_remaining_live: consents.aiPublished,
+        allowed_categories: selectedCategories,
+        preferred_tones: selectedTones,
+        brand_positioning: selectedPillars,
+        audience_type: selectedAudiences,
+        understands_pausing_participation: participationConsent,
+        category_preferences: {},
+        understands_automated_matching: matchingConsents.preferences,
+        understands_shown_campaigns: matchingConsents.matching,
+        allowed_regions: selectedRegions,
+      });
+      await refreshUser();
+      navigate("/brands");
+    } catch (err) {
+      setApiError(err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const RadioOption = ({ label, selected, onClick, testId }) => (
@@ -148,6 +177,11 @@ const BusinessPreferencesPage = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {apiError && (
+            <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm" data-testid="api-error">
+              {apiError}
+            </div>
+          )}
           {/* 1. AI Usage & Legal Consent */}
           <div className="bg-white rounded-3xl p-8 shadow-soft space-y-5">
             <h2 className="font-outfit text-lg font-semibold flex items-center gap-2">
@@ -367,11 +401,12 @@ const BusinessPreferencesPage = () => {
             </Button>
             <Button
               type="submit"
+              disabled={saving}
               className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-purple-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
               data-testid="save-continue-btn"
             >
-              <Save className="w-4 h-4 mr-2" />
-              Save & Continue
+              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+              {saving ? "Saving..." : "Save & Continue"}
             </Button>
           </div>
         </form>
