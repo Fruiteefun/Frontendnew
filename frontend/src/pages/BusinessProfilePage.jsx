@@ -12,7 +12,9 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { Upload, ArrowRight, X, Globe, MapPin, Phone, Building2, Save, ArrowLeft } from "lucide-react";
-import { isNotEmpty, isValidUrl, isValidPhone, isValidHandle } from "../lib/validation";
+import { isNotEmpty, isValidUrl, isValidPhone } from "../lib/validation";
+import { businessProfileApi, userApi } from "../lib/api";
+import { useAuth } from "../contexts/AuthContext";
 
 const FieldError = ({ message }) =>
   message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
@@ -20,8 +22,10 @@ const FieldError = ({ message }) =>
 const BusinessProfilePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { refreshUser } = useAuth();
   const [logo, setLogo] = useState(null);
   const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
 
   const initialPhone = location.state?.phone || "";
   const initialName = location.state?.fullName || "";
@@ -52,18 +56,38 @@ const BusinessProfilePage = () => {
     if (!isNotEmpty(formData.businessName)) e.businessName = "Business name is required";
     if (formData.website && !isValidUrl(formData.website)) e.website = "Please enter a valid URL (https://...)";
     if (formData.phone && !isValidPhone(formData.phone)) e.phone = "Please enter a valid phone number";
-    if (formData.instagram && !isValidHandle(formData.instagram)) e.instagram = "Invalid handle format";
-    if (formData.tiktokShop && !isValidHandle(formData.tiktokShop)) e.tiktokShop = "Invalid handle format";
-    if (formData.tiktok && !isValidHandle(formData.tiktok)) e.tiktok = "Invalid handle format";
-    if (formData.youtube && !isValidHandle(formData.youtube)) e.youtube = "Invalid handle format";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-    navigate("/brands");
+    setSaving(true);
+    try {
+      // Update user name first
+      if (formData.contactName) {
+        await userApi.updateMe({ name: formData.contactName });
+      }
+      // Update business profile
+      await businessProfileApi.update({
+        name: formData.businessName,
+        contact_name: formData.contactName,
+        website: formData.website,
+        mobile: formData.phone,
+        address: [formData.city, formData.country].filter(Boolean).join(", "),
+      });
+      // Upload logo if selected
+      if (logo) {
+        await businessProfileApi.uploadLogo(logo);
+      }
+      await refreshUser();
+      navigate("/business-preferences");
+    } catch (err) {
+      setErrors({ api: err.message });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -267,6 +291,10 @@ const BusinessProfilePage = () => {
           </div>
 
           {/* Social Media Handles */}
+          {errors.api && (
+            <p className="text-sm text-red-500 text-center bg-red-50 rounded-xl p-3">{errors.api}</p>
+          )}
+
           {/* Action Buttons */}
           <div className="flex justify-between gap-4">
             <Button
@@ -281,11 +309,12 @@ const BusinessProfilePage = () => {
             </Button>
             <Button
               type="submit"
+              disabled={saving}
               className="h-12 px-8 rounded-full bg-gradient-to-r from-orange-400 to-purple-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-orange-500/20 transition-all duration-300"
               data-testid="save-continue-btn"
             >
               <Save className="w-4 h-4 mr-2" />
-              Save & Continue
+              {saving ? "Saving..." : "Save & Continue"}
             </Button>
           </div>
         </form>

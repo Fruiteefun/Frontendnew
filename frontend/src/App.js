@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "./components/ui/sonner";
+import { AuthProvider } from "./contexts/AuthContext";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -45,6 +46,7 @@ import DashboardPage from "./pages/DashboardPage";
 function App() {
   return (
     <div className="App min-h-screen bg-background">
+      <AuthProvider>
       <BrowserRouter>
         <ScrollToTop />
         <Routes>
@@ -80,6 +82,7 @@ function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
         </Routes>
       </BrowserRouter>
+      </AuthProvider>
       <Toaster />
     </div>
   );

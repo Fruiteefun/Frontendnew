@@ -1,125 +1,152 @@
 <analysis>**original_problem_statement**: 
-I want to create a Web app called Fruitee, a social media campaign management platform. 
-Overview:
-1. Influencers register, onboard with preferences, create digital twins, and generate intro videos.
-2. Businesses register, onboard, create brands, setup campaigns, select influencers, pay, and view a content calendar/dashboard.
-Status: Backend and Swagger docs are ready. Task: Build the UI using React for desktop, based on provided UI mockups (https://fruiteecolours.lovable.app/). Use mock data initially.
+The user wants to build a web app called Fruitee, a social media campaign management platform.
+- **Initial State**: The backend and Swagger docs were ready. The initial task was to build the React UI based on mockups, using mock data.
+- **Latest Goal**: After building a comprehensive mocked frontend, the user has now requested to connect the entire application to the live backend API, resolving all discrepancies identified in a UI-vs-API gap analysis.
 
-**User's preferred language**: INSTRUCT NEXT AGENT: Respond in English.
+**User's preferred language**: English. INSTRUCT NEXT AGENT: Respond in English.
 
-**what currently exists?** 
-A fully functional, deeply mocked React frontend application. It uses Tailwind CSS, Shadcn UI, and React Router. 
-- **Business Flow**: Uses a Hub-and-Spoke architecture. A business signs in, lands on a Brands hub, and clicks into a specific brand to view/create campaigns. (Brand Profile -> Brand Preferences -> Brand Bio -> Campaign -> Campaign Type -> Campaign Plan, etc.).
-- **Influencer Flow**: Uses a linear, locked-step registration flow. Users must complete steps sequentially (Profile -> Preferences -> Create Twin -> Generation -> Intro Video). Once registered, the sidebar changes to an Edit mode and the Twin Generation becomes static/read-only unless explicitly regenerated. 
-- **State Management**: Heavily utilizes  and React Router state to mock authentication, user roles, and progress locking. No backend API is connected yet.
+**what currently exists?**
+The project has transitioned from a fully mocked React application to a hybrid state where core authentication and profile features are connected to the live backend API.
+- An **API service layer** () has been created to centralize all backend communication.
+- A global **Auth Context** () now manages user state, authentication status, and JWT tokens, replacing the previous -based mock system for authentication.
+- The **Sign-In/Sign-Up page** is fully integrated with the backend's  and  endpoints.
+- The **Business and Influencer Profile pages** are connected to the  and  endpoints, allowing users to fetch and save their profile data to the database.
+- Numerous UI/UX fixes and features requested by the user have been implemented and tested, including multi-select checkboxes, improved form validations, a Forgot Password modal, and new sub-forms on the Campaign Type page.
 
 **Last working item**: 
-- **Last item agent was working**: Updating the Business sign-up/profile form based on the user's latest message. Specifically: 1. Remove team size field. 2. Rename Business description to About. 3. Replace Twitter/X with TikTok Shop in the Social Media Handles section. 
+- **Last item agent was working**: Connecting the  to the backend API. The agent implemented the logic to fetch the user's data on page load () and to update the profile on form submission ( using ).
 - **Status**: IN PROGRESS
 - **Agent Testing Done**: N
-- **Which testing method agent to use?**: Screenshot tool (to verify UI rendering of the removed/updated fields).
+- **Which testing method agent to use?**: Backend testing agent. The test should cover the full end-to-end flow: 1. Register a new influencer. 2. Log in. 3. Navigate to the profile page. 4. Fill and submit the form. 5. Verify the data was saved by making a separate API call to  and asserting the response contains the submitted data.
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-Issue 1: Implement pending UI changes on 
-- Attempted fixes: Agent viewed the file but the session ended before running the  tool.
-- Next debug checklist: Modify . Remove  input. Change label Business Description to About. Change the Twitter / X social media handle input to TikTok Shop (update icons/labels accordingly).
-- Why fix this issue and what will be achieved with the fix?: Fulfills the user's exact UI layout request for the Business onboarding.
-- Status: IN PROGRESS
-- Is recurring issue?: N
-- Should Test frontend/backend/both after fix?: Frontend
-- Blocked on other issue: None
+- **Issue 1**: Validate the 4-digit year restriction on all date input fields.
+  - **Attempted fixes**: The agent added  handlers to clamp the year value on , , and .
+  - **Next debug checklist**: Use the screenshot tool to visit each of the three pages. Attempt to manually type a 5-digit year (e.g., 12345) into the date inputs and verify that the input value is clamped to 4 digits.
+  - **Why fix this issue and what will be achieved with the fix?**: Fulfills a direct user request for stricter form validation and prevents bad data entry.
+  - **Status**: USER VERIFICATION PENDING
+  - **Is recurring issue?**: N
+  - **Should Test frontend/backend/both after fix?**: Frontend
 
 **In progress Task List**:
-Task 1: Complete and verify  updates.
-- Where to resume: Run  on  to apply the 3 requested field changes, then take a screenshot of  (or register as a business to view it).
-- What will be achieved with this?: Finalizes the business profile form requirements.
-- Status: IN PROGRESS
-- Should Test frontend/backend/both after fix?: Frontend
-- Blocked on something: None
+- **Task 1**: Complete Phase 1 of the backend integration.
+  - **Where to resume**: Start by thoroughly testing the  integration as described in the Last working item. Once verified, proceed to connect the next pages in the user flow.
+  - **What will be achieved with this?**: This will complete the foundational part of the backend integration, where a newly registered user can fully set up their initial profile.
+  - **Status**: IN PROGRESS
+  - **Should Test frontend/backend/both after fix?**: Both
+  - **Blocked on something**: None
 
 **Upcoming and Future Tasks**
 Upcoming Tasks:
-- P0: Connect frontend UI to the real backend REST API using the provided Swagger endpoints (replace all  and mock data).
-- P1: Implement actual file upload (images) and Web Audio API (voice recording) logic for the Create Digital Twin page.
-- P1: Implement real Authentication / JWT flow (replacing the mocked role-based routing).
+- **P0: Connect Onboarding/Preferences Pages**: Integrate  and  with their respective  endpoints. This is the next step after profile creation.
+- **P1: Connect Core Form Pages**: Wire up the remaining forms (, , , ) to their API endpoints. This will require implementing the data serialization logic identified in the gap analysis (e.g., combining 12 UI fields into 4 API strings on ).
+- **P2: Implement File Uploads**: Replace the mock image upload logic with real file uploads to the backend for profile pictures and brand logos, using the  endpoints.
+- **P2: Implement Social Media OAuth**: The UI has been updated to show Connect buttons. The next step is to implement the full OAuth 2.0 flow for Instagram, TikTok, etc., using the  and  endpoints provided by the backend.
 
 Future Tasks:
-- P2: Implement Stripe payment gateway integration for the Payment page.
-- P3: Dark mode, mobile responsiveness, and exportable reports.
+- Implement Stripe payment integration on the .
+- Build the Virtual Influencer Browsing page.
+- Implement dark mode, enhance mobile responsiveness, and add exportable reports.
 
 **Completed work in this session**
-- Verified  multi-select chips.
-- Overhauled 11 Business pages to exactly match the reference UI design.
-- Added comprehensive field validations (Age 16+, URL formatting, numeric-only phones) via a new  utility.
-- Refactored Business Flow to Hub-and-Spoke architecture (created , updated ).
-- Created new screens: , , .
-- Refactored  to have a dynamic, context-aware sidebar based on  role (business vs influencer) and page context.
-- Implemented Influencer progress locking (sidebar locks future steps until completed).
-- Implemented returning Influencer logic (static twin generation screen, pre-filled social media icons).
+- **Backend Integration (Phase 1 Started)**:
+  - Created an API service layer () and a global .
+  - Connected Sign-In/Sign-Up, Logout, Business Profile, and Influencer Profile pages to the live backend API, replacing the mock  system for authentication.
+- **UI/UX Overhaul**:
+  - Increased logo size globally ().
+  - Converted numerous radio button groups to multi-select square checkboxes on preferences pages.
+  - Added a Forgot Password feature to the .
+  - Added a new  into the onboarding flow.
+  - Added Back buttons to all relevant screens.
+  - Added dynamic sub-forms for adding products, events, and promotions on the .
+- **API Gap Analysis**:
+  - Generated and iteratively updated a comprehensive UI-vs-API gap analysis document, successfully resolving over 60% of the initially identified mismatches.
 
 **Earlier issues found/mentioned but not fixed**
-- None.
+- The full list of 19 remaining discrepancies is documented in .
+- **Issue 1 (High)**:  has a major serialization mismatch where over a dozen granular UI fields must be combined into just four free-text API fields (, , etc.).
+- **Issue 2 (Medium)**: The Influencer Profile's  field exists in the API but is missing from the UI.
+- **Issue 3 (Medium)**: The  has three text areas, but the API only accepts two fields, requiring data concatenation on submit.
 
 **Known issue recurrence from previous fork**
-- Issue recurrence: React Maximum update depth exceeded (Infinite Loop).
-- Recurrence count: 0 in this session (2 in previous fork).
-- Status: RESOLVED
-- Note: Remain cautious when wrapping Shadcn primitives inside custom  elements with  handlers.
+- **Issue recurrence**: React Maximum update depth exceeded error.
+- **Recurrence count**: 0 in this session.
+- **Status**: RESOLVED
+- **Note**: The agent has been cautious and this issue has not resurfaced.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-Frontend: React, React Router DOM, Tailwind CSS, Recharts, Lucide React, Shadcn UI (Radix). State is currently heavily reliant on  to persist mock data between routes.
-Backend: FastAPI, MongoDB (Currently unlinked/unused).
+- **Frontend**: React, React Router DOM, Tailwind CSS, Shadcn UI.
+- **Backend**: FastAPI, MongoDB.
+- **State Management**: Transitioning from  mocks to a centralized  () for authentication and user data. An API service layer () now manages all backend communication and JWT token handling.
 
 **key DB schema**
-- N/A (Frontend mocked data).
+- The backend API schemas are fully documented in the reference markdown file created by the agent.
 
 **changes in tech stack**
-- Added central  for form validations.
+- No new libraries were added, but a fundamental architectural shift was made to support backend integration via a new API service layer and a React Context for authentication.
 
 **All files of reference**
--  (Needs edits based on last user message).
--  (Controls the complex, dynamic sidebar rendering for both roles).
--  &  (Contain returning-user vs new-user logic).
--  (Centralized validation rules).
+- : The new, central API service layer.
+- : The new global provider for authentication state.
+- : The first fully integrated page.
+- : Recently connected to the backend.
+- : The last page the agent worked on connecting.
+- : The official roadmap for remaining integration tasks.
 
 **Areas that need refactoring**
--  dependency: The app currently heavily relies on  (, , ) to mock backend persistence and control the UI state. When connecting to the backend API, this logic must be cleanly abstracted out and replaced by real API state management (e.g., Context API or Redux with backend sync).
+- **UI State Management**:  items like  are now obsolete. The UI should rely on the  and  flags from the user object (available via the ) to control progress locking and UI state.
 
 **key api endpoints**
-- Swagger provided in prompt:  (Not yet integrated).
+- 
+- 
+- 
+- 
+- The full list of 100+ endpoints is in .
 
 **Critical Info for New Agent**
-- **Business Architecture**: It is NO LONGER a linear flow. It is Hub-and-Spoke.  is the hub. Clicking a brand opens . The sidebar dynamically hides campaign steps when at the hub level.
-- **Influencer Architecture**: It is state-dependent. During registration, the sidebar is locked. After registration, steps become Edit [Page] and the Twin Generation page becomes a static read-only confirmation page unless the user explicitly triggers a re-generation.
-- Always check the  logic in  if sidebar navigation acts unexpectedly.
+- The application is now in a **hybrid state**. Auth and profile pages are live; the rest is mocked. Do not assume any page beyond the profile pages is connected.
+- Your primary mission is to continue the backend integration. Use the existing  service and .
+- The document at  is your **source of truth** for what to work on next. Address the HIGH and MEDIUM priority items first.
+- All authentication is now handled via JWT tokens stored in  by the . The old mock logic is gone.
 
 **documents and test reports created in this job**
 - 
 - 
+- 
+- 
+- 
 
 **Last 10 User Messages and any pending HUMAN messages**
-1. User: Asked for a Brand Bio page between Brand Preferences and Campaign. (Completed).
-2. User: Asked for specific returning-user logic on Influencer flow (Twin generation static, intro video pre-posted). (Completed).
-3. User: *Pending Request* - Modify Business sign-up: 1. remove team size, 2. rename Business description to About, 3. replace Twitter/X with TikTok Shop. (Not Started / In Progress).
+1.  **Request**: Remove the connect social media frame from the business profile page and fix date fields allowing 5-digit years. **Status**: Completed.
+2.  **Request**: now lets connect to the backend using the swagger links. **Status**: In Progress.
+3.  **Clarification**: User confirmed the API layer is already built. **Status**: Acknowledged.
+4.  **Request**: Re-run the gap analysis after a batch of fixes. **Status**: Completed.
+5.  **Request**: Compare UI with Swagger after a large batch of fixes. **Status**: Completed.
+6.  **Request**: have you compared the UI with the swagger document?. **Status**: Completed.
+7.  **Request**: Create a downloadable gap analysis document. **Status**: Completed.
+8.  **Request**: Create a downloadable API endpoint list. **Status**: Completed.
+9.  **Request**: A list of 11 UI/feature changes and fixes. **Status**: Completed.
+10. **Feedback**: Multi-select options should be square checkboxes, and some field validations are incorrect. **Status**: Completed.
 
-**Project Health Check**
-Mocked (Frontend is fully functional locally but data does not persist to a backend).
+**Project Health Check:**
+- **Hybrid**: Authentication and Profile features are connected to the live backend. Most other features are still mocked.
 
 **3rd Party Integrations**
-- None currently implemented.
+- None implemented. Stripe and Social Media OAuth are planned for future tasks.
 
 **Testing status**
-- Testing agent used after significant changes: YES (iteration_2.json generated after business flow overhaul).
-- Troubleshoot agent used after agent stuck in loop: NO.
-- Test files created: 
-- Known regressions: None.
+- **Testing agent used**: YES, successfully used for two large batches of UI changes.
+- **Troubleshoot agent used**: NO.
+- **Test files created**: None. Test reports were generated at .
+- **Known regressions**: None.
 
-**Credentials to test flow**
-- Mocked Sign In: Enter any valid email format and password > 8 chars. Select Business or Influencer from the Role dropdown to test respective flows.
+**Credentials to test flow:**
+- **Registration**: Use the UI to register a new user (business or influencer). This is now connected to the live backend.
+- **Login**: An existing test user  with password  was used by the agent and should be available for login.
 
 **What agent forgot to execute**
-The agent read  to apply the user's final requested edits (remove team size, rename description, change Twitter to TikTok Shop), but the session terminated before the agent could execute the  tool.</analysis>
+- The agent implemented a fix to restrict date year inputs to 4 digits but did not run a test or take a screenshot to verify the fix. This needs to be checked.</analysis>

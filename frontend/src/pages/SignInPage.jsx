@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { authApi } from "../lib/api";
 import { FruiteeLogo } from "../components/FruiteeLogo";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -21,6 +23,7 @@ const FieldError = ({ message }) =>
 
 const SignInPage = () => {
   const navigate = useNavigate();
+  const { login, register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -42,7 +45,6 @@ const SignInPage = () => {
     const e = {};
     if (!isValidEmail(formData.email)) e.email = "Please enter a valid email address";
     if (!isNotEmpty(formData.password)) e.password = "Password is required";
-    if (!isNotEmpty(formData.userType)) e.userType = "Please select your role";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -58,37 +60,53 @@ const SignInPage = () => {
     return Object.keys(e).length === 0;
   };
 
+  const [apiError, setApiError] = useState("");
+
   const handleSubmit = async (e, type) => {
     e.preventDefault();
     setErrors({});
+    setApiError("");
 
     if (type === "signin" && !validateSignIn()) return;
     if (type === "signup" && !validateSignUp()) return;
 
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      // Store user type for sidebar/settings routing
-      localStorage.setItem("fruitee_userType", formData.userType);
+    try {
       if (type === "signin") {
-        // Returning user → straight to their hub
-        if (formData.userType === "influencer") {
-          localStorage.setItem("fruitee_influencer_registered", "true");
-          navigate("/dashboard");
-        } else {
-          navigate("/brands");
+        const res = await login(formData.email, formData.password);
+        if (res.success) {
+          if (res.data.role === "influencer") {
+            if (res.data.is_profile_complete) {
+              localStorage.setItem("fruitee_influencer_registered", "true");
+              navigate("/dashboard");
+            } else {
+              navigate("/influencer-profile");
+            }
+          } else {
+            if (res.data.is_profile_complete) {
+              navigate("/brands");
+            } else {
+              navigate("/profile");
+            }
+          }
         }
       } else {
-        // New user → registration flow
-        if (formData.userType === "influencer") {
-          localStorage.removeItem("fruitee_influencer_registered");
-          localStorage.removeItem("fruitee_influencer_progress");
-          navigate("/influencer-profile", { state: { fullName: formData.name, phone: formData.phone } });
-        } else {
-          navigate("/profile", { state: { fullName: formData.name, phone: formData.phone } });
+        const res = await register(formData.email, formData.password, formData.userType);
+        if (res.success) {
+          if (formData.userType === "influencer") {
+            localStorage.removeItem("fruitee_influencer_registered");
+            localStorage.removeItem("fruitee_influencer_progress");
+            navigate("/influencer-profile", { state: { fullName: formData.name, phone: formData.phone } });
+          } else {
+            navigate("/profile", { state: { fullName: formData.name, phone: formData.phone } });
+          }
         }
       }
-    }, 1000);
+    } catch (err) {
+      setApiError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const SocialIcons = () => (
@@ -195,6 +213,10 @@ const SignInPage = () => {
                   </Select>
                   <FieldError message={errors.userType} />
                 </div>
+
+                {apiError && (
+                  <p className="text-sm text-red-500 text-center bg-red-50 rounded-xl p-3" data-testid="api-error">{apiError}</p>
+                )}
 
                 <Button
                   type="submit"

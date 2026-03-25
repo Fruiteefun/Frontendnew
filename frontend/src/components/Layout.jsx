@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import { FruiteeLogo } from "./FruiteeLogo";
 import {
   User,
@@ -59,6 +60,8 @@ function isInfluencerRegistered() {
 export const Layout = ({ children, userType = "business" }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const auth = useAuth();
+  const logoutFn = auth?.logout || (() => {});
 
   const isInfluencer = userType === "influencer";
   const registered = isInfluencer && isInfluencerRegistered();
@@ -183,18 +186,17 @@ export const Layout = ({ children, userType = "business" }) => {
         </nav>
 
         <div className="p-3 border-t border-orange-100/50">
-          <Link
-            to="/signin"
-            onClick={() => {
-              localStorage.removeItem("fruitee_influencer_registered");
-              localStorage.removeItem("fruitee_influencer_progress");
+          <button
+            onClick={async () => {
+              try { await logoutFn(); } catch {}
+              navigate("/signin");
             }}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-red-50 hover:text-red-500 transition-all"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-red-50 hover:text-red-500 transition-all w-full"
             data-testid="logout-btn"
           >
             <LogOut className="w-4 h-4" />
             Log out
-          </Link>
+          </button>
         </div>
       </aside>
 

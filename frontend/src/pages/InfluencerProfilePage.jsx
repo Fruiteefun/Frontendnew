@@ -12,7 +12,9 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { Camera, ArrowRight } from "lucide-react";
-import { isNotEmpty, isMinAge, isValidHandle, isValidDate } from "../lib/validation";
+import { isNotEmpty, isMinAge, isValidDate } from "../lib/validation";
+import { influencerProfileApi, userApi } from "../lib/api";
+import { useAuth } from "../contexts/AuthContext";
 
 const FieldError = ({ message }) =>
   message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
@@ -20,8 +22,11 @@ const FieldError = ({ message }) =>
 const InfluencerProfilePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { refreshUser } = useAuth();
   const [profileImage, setProfileImage] = useState(null);
+  const [profileImageFile, setProfileImageFile] = useState(null);
   const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
 
   const initialFullName = location.state?.fullName || "";
 
@@ -60,21 +65,49 @@ const InfluencerProfilePage = () => {
     if (!isNotEmpty(formData.language)) e.language = "Please select a language";
     if (!isNotEmpty(formData.country)) e.country = "Please select a country";
     if (!isNotEmpty(formData.city)) e.city = "City is required";
-    if (formData.instagram && !isValidHandle(formData.instagram)) e.instagram = "Invalid handle format";
-    if (formData.tiktok && !isValidHandle(formData.tiktok)) e.tiktok = "Invalid handle format";
-    if (formData.youtube && !isValidHandle(formData.youtube)) e.youtube = "Invalid handle format";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-    // Mark profile stage as complete
-    const progress = JSON.parse(localStorage.getItem("fruitee_influencer_progress") || "{}");
-    progress.profile = true;
-    localStorage.setItem("fruitee_influencer_progress", JSON.stringify(progress));
-    navigate("/influencer-preferences");
+    setSaving(true);
+    try {
+      // Calculate age from DOB
+      const dob = new Date(formData.dateOfBirth);
+      const age = Math.floor((Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+
+      // Update user name
+      await userApi.updateMe({ name: formData.fullName });
+
+      // Update influencer profile
+      await influencerProfileApi.update({
+        name: formData.fullName,
+        display_name: formData.displayName,
+        gender: formData.gender,
+        age: age,
+        dob: formData.dateOfBirth,
+        country: formData.country,
+        city: formData.city,
+        language: formData.language,
+      });
+
+      // Upload profile image if selected
+      if (profileImageFile) {
+        await influencerProfileApi.uploadImage(profileImageFile);
+      }
+
+      await refreshUser();
+      const progress = JSON.parse(localStorage.getItem("fruitee_influencer_progress") || "{}");
+      progress.profile = true;
+      localStorage.setItem("fruitee_influencer_progress", JSON.stringify(progress));
+      navigate("/influencer-preferences");
+    } catch (err) {
+      setErrors({ api: err.message });
+    } finally {
+      setSaving(false);
+    }
   };
 
   // Max date = 16 years ago from today
