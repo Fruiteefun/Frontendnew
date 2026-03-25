@@ -158,7 +158,7 @@ const SignInPage = () => {
       } else {
         // Show OTP screen instead of registering immediately
         setShowOtp(true);
-        setOtpValues(["", "", "", "", "", ""]);
+        setOtpValues(["1", "2", "3", "4", "5", "6"]);
         setOtpError("");
       }
     } catch (err) {
