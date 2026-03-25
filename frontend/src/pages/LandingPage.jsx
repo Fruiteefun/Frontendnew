@@ -17,14 +17,14 @@ const LandingPage = () => {
         <div className="w-full h-full rounded-full bg-gradient-to-br from-teal-300 to-yellow-200 blur-3xl transform -translate-x-1/2 translate-y-1/2" />
       </div>
 
-      {/* Header */}
-      <header className="p-6">
-        <FruiteeLogo size="default" />
-      </header>
-
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center px-6">
         <div className="max-w-4xl mx-auto text-center">
+          {/* Logo — large, above the badge */}
+          <div className="mb-8">
+            <FruiteeLogo size="hero" className="mx-auto" />
+          </div>
+
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-soft border border-orange-100 mb-8">
             <span className="w-2 h-2 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 animate-pulse" />
@@ -43,8 +43,7 @@ const LandingPage = () => {
 
           {/* Subheadline */}
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12">
-            Connect brands with influencers, create AI-powered digital twins, 
-            and run campaigns that deliver real results.
+            Not an AI reel tool — a growth engine
           </p>
 
           {/* CTA Button */}
@@ -58,19 +57,6 @@ const LandingPage = () => {
           </Button>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="p-6 text-center">
-        <p className="text-sm text-muted-foreground">
-          Already have an account?{" "}
-          <button
-            onClick={() => navigate("/signin")}
-            className="text-orange-500 hover:text-orange-600 font-medium"
-          >
-            Sign in
-          </button>
-        </p>
-      </footer>
     </div>
   );
 };

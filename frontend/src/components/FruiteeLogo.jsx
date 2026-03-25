@@ -5,6 +5,7 @@ export const FruiteeLogo = ({ className = "", size = "default" }) => {
     small: "h-24",
     default: "h-32",
     large: "h-48",
+    hero: "h-36 md:h-48",
   };
 
   return (
