@@ -26,7 +26,8 @@ const InfluencerPreferencesPage = () => {
     aligned: true,
     automated: true,
   });
-  const [selectedRegion, setSelectedRegion] = useState("global");
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [selectedRegions, setSelectedRegions] = useState([]);
 
   const categories = [
     "Fashion & Apparel",
@@ -372,18 +373,18 @@ const InfluencerPreferencesPage = () => {
           <div className="bg-white rounded-3xl p-8 shadow-soft space-y-5">
             <h2 className="font-outfit text-lg font-semibold flex items-center gap-2">
               <Globe2 className="w-5 h-5 text-orange-500" />
-              9. Region Comfort
+              9. Regions
             </h2>
             <p className="text-sm text-muted-foreground">
-              Which regions are you comfortable being featured in? You may select multiple regions.
+              Which regions do your followers lie in?
             </p>
             <div className="space-y-4">
               {regionOptions.map((region) => (
-                <RadioOption
+                <CheckboxOption
                   key={region}
                   label={region}
-                  selected={selectedRegion === region.toLowerCase().replace(/[^a-z0-9]/g, '-')}
-                  onClick={() => setSelectedRegion(region.toLowerCase().replace(/[^a-z0-9]/g, '-'))}
+                  checked={selectedRegions.includes(region)}
+                  onClick={() => toggleSelection(selectedRegions, setSelectedRegions, region)}
                   testId={`region-${region.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
                 />
               ))}

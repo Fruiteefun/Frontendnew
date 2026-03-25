@@ -5,7 +5,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import { Megaphone, Rocket, CalendarDays, Tag, ArrowRight, Globe, Plus, X, Image } from "lucide-react";
+import { Megaphone, Rocket, CalendarDays, Tag, ArrowRight, ArrowLeft, Globe, Plus, X, Image } from "lucide-react";
 import { isValidUrl } from "../lib/validation";
 
 const FieldError = ({ message }) =>
@@ -20,6 +20,33 @@ const CampaignTypePage = () => {
   });
   const [campaignImages, setCampaignImages] = useState([]);
   const [errors, setErrors] = useState({});
+
+  const [products, setProducts] = useState([{ name: "", description: "", price: "" }]);
+  const addProduct = () => setProducts([...products, { name: "", description: "", price: "" }]);
+  const removeProduct = (i) => setProducts(products.filter((_, idx) => idx !== i));
+  const updateProduct = (i, field, value) => {
+    const updated = [...products];
+    updated[i][field] = value;
+    setProducts(updated);
+  };
+
+  const [events, setEvents] = useState([{ name: "", venue: "", dates: "", tickets: "" }]);
+  const addEvent = () => setEvents([...events, { name: "", venue: "", dates: "", tickets: "" }]);
+  const removeEvent = (i) => setEvents(events.filter((_, idx) => idx !== i));
+  const updateEvent = (i, field, value) => {
+    const updated = [...events];
+    updated[i][field] = value;
+    setEvents(updated);
+  };
+
+  const [promotions, setPromotions] = useState([{ name: "", description: "", code: "" }]);
+  const addPromotion = () => setPromotions([...promotions, { name: "", description: "", code: "" }]);
+  const removePromotion = (i) => setPromotions(promotions.filter((_, idx) => idx !== i));
+  const updatePromotion = (i, field, value) => {
+    const updated = [...promotions];
+    updated[i][field] = value;
+    setPromotions(updated);
+  };
 
   const campaignTypes = [
     {
@@ -196,6 +223,175 @@ const CampaignTypePage = () => {
                         data-testid="campaign-details-textarea"
                       />
                     </div>
+
+                    {/* Product Launch - Products */}
+                    {type.id === "product-launch" && (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-base font-semibold">Products / Services</Label>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="rounded-lg"
+                            onClick={addProduct}
+                            data-testid="add-product-btn"
+                          >
+                            <Plus className="w-4 h-4 mr-1" /> Add Product
+                          </Button>
+                        </div>
+                        {products.map((product, i) => (
+                          <div key={i} className="bg-gray-50 rounded-xl p-4 space-y-3 relative" data-testid={`product-${i}`}>
+                            {products.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeProduct(i)}
+                                className="absolute top-3 right-3 w-6 h-6 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center"
+                                data-testid={`remove-product-${i}`}
+                              >
+                                <X className="w-3 h-3 text-red-600" />
+                              </button>
+                            )}
+                            <Input
+                              placeholder="Product Name"
+                              className="h-11 rounded-lg border-gray-200 bg-white"
+                              value={product.name}
+                              onChange={(e) => updateProduct(i, "name", e.target.value)}
+                              data-testid={`product-name-${i}`}
+                            />
+                            <Textarea
+                              placeholder="Description"
+                              className="min-h-[70px] rounded-lg border-gray-200 bg-white"
+                              value={product.description}
+                              onChange={(e) => updateProduct(i, "description", e.target.value)}
+                              data-testid={`product-desc-${i}`}
+                            />
+                            <Input
+                              placeholder="Price (e.g. $49.99)"
+                              className="h-11 rounded-lg border-gray-200 bg-white"
+                              value={product.price}
+                              onChange={(e) => updateProduct(i, "price", e.target.value)}
+                              data-testid={`product-price-${i}`}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Event Promo - Events */}
+                    {type.id === "event-promo" && (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-base font-semibold">Events</Label>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="rounded-lg"
+                            onClick={addEvent}
+                            data-testid="add-event-btn"
+                          >
+                            <Plus className="w-4 h-4 mr-1" /> Add Event
+                          </Button>
+                        </div>
+                        {events.map((event, i) => (
+                          <div key={i} className="bg-gray-50 rounded-xl p-4 space-y-3 relative" data-testid={`event-${i}`}>
+                            {events.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeEvent(i)}
+                                className="absolute top-3 right-3 w-6 h-6 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center"
+                                data-testid={`remove-event-${i}`}
+                              >
+                                <X className="w-3 h-3 text-red-600" />
+                              </button>
+                            )}
+                            <Input
+                              placeholder="Event Name"
+                              className="h-11 rounded-lg border-gray-200 bg-white"
+                              value={event.name}
+                              onChange={(e) => updateEvent(i, "name", e.target.value)}
+                              data-testid={`event-name-${i}`}
+                            />
+                            <Input
+                              placeholder="Venue"
+                              className="h-11 rounded-lg border-gray-200 bg-white"
+                              value={event.venue}
+                              onChange={(e) => updateEvent(i, "venue", e.target.value)}
+                              data-testid={`event-venue-${i}`}
+                            />
+                            <Input
+                              placeholder="Dates (e.g. June 15-17, 2026)"
+                              className="h-11 rounded-lg border-gray-200 bg-white"
+                              value={event.dates}
+                              onChange={(e) => updateEvent(i, "dates", e.target.value)}
+                              data-testid={`event-dates-${i}`}
+                            />
+                            <Input
+                              placeholder="Ticket Prices (e.g. $50 - $200)"
+                              className="h-11 rounded-lg border-gray-200 bg-white"
+                              value={event.tickets}
+                              onChange={(e) => updateEvent(i, "tickets", e.target.value)}
+                              data-testid={`event-tickets-${i}`}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Promotion - Promos */}
+                    {type.id === "promotion" && (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-base font-semibold">Promotions</Label>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="rounded-lg"
+                            onClick={addPromotion}
+                            data-testid="add-promotion-btn"
+                          >
+                            <Plus className="w-4 h-4 mr-1" /> Add Promotion
+                          </Button>
+                        </div>
+                        {promotions.map((promo, i) => (
+                          <div key={i} className="bg-gray-50 rounded-xl p-4 space-y-3 relative" data-testid={`promotion-${i}`}>
+                            {promotions.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removePromotion(i)}
+                                className="absolute top-3 right-3 w-6 h-6 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center"
+                                data-testid={`remove-promotion-${i}`}
+                              >
+                                <X className="w-3 h-3 text-red-600" />
+                              </button>
+                            )}
+                            <Input
+                              placeholder="Promo Name"
+                              className="h-11 rounded-lg border-gray-200 bg-white"
+                              value={promo.name}
+                              onChange={(e) => updatePromotion(i, "name", e.target.value)}
+                              data-testid={`promo-name-${i}`}
+                            />
+                            <Textarea
+                              placeholder="Description"
+                              className="min-h-[70px] rounded-lg border-gray-200 bg-white"
+                              value={promo.description}
+                              onChange={(e) => updatePromotion(i, "description", e.target.value)}
+                              data-testid={`promo-desc-${i}`}
+                            />
+                            <Input
+                              placeholder="Promo Code (e.g. SUMMER25)"
+                              className="h-11 rounded-lg border-gray-200 bg-white"
+                              value={promo.code}
+                              onChange={(e) => updatePromotion(i, "code", e.target.value)}
+                              data-testid={`promo-code-${i}`}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -204,15 +400,16 @@ const CampaignTypePage = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-end gap-4">
+        <div className="flex justify-between gap-4">
           <Button
             type="button"
             variant="outline"
             className="h-12 px-8 rounded-full border-gray-200 hover:bg-muted"
-            onClick={() => navigate("/campaign")}
+            onClick={() => navigate(-1)}
             data-testid="back-btn"
           >
-            Cancel
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
           </Button>
           <Button
             onClick={handleContinue}
