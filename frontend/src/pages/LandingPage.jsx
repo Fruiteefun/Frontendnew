@@ -21,12 +21,12 @@ const LandingPage = () => {
       <main className="flex-1 flex items-center justify-center px-6">
         <div className="max-w-4xl mx-auto text-center">
           {/* Logo — large, above the badge */}
-          <div className="mb-0">
+          <div className="mb-4">
             <FruiteeLogo size="hero" className="mx-auto" />
           </div>
 
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-soft border border-orange-100 mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-soft border border-orange-100 mb-3">
             <span className="w-2 h-2 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 animate-pulse" />
             <span className="text-sm font-medium text-muted-foreground">
               Social Media Campaign Platform
@@ -34,7 +34,7 @@ const LandingPage = () => {
           </div>
 
           {/* Headline */}
-          <h1 className="font-outfit text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] text-foreground mb-4">
+          <h1 className="font-outfit text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] text-foreground mb-3">
             Make Social{" "}
             <span className="bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent italic">
               Effortless
@@ -42,7 +42,7 @@ const LandingPage = () => {
           </h1>
 
           {/* Subheadline */}
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6">
             Not an AI reel tool — a growth engine
           </p>
 
