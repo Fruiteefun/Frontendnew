@@ -52,14 +52,14 @@ const InfluencerProfilePage = () => {
   // Load existing profile data on mount
   useEffect(() => {
     const loadProfile = async () => {
+      let apiData = {};
       try {
         const res = await userApi.getMe();
         if (res.success && res.data) {
           const d = res.data;
           const profile = d.influencer_profile || {};
-          setFormData((prev) => ({
-            ...prev,
-            fullName: profile.name || d.name || prev.fullName,
+          apiData = {
+            fullName: profile.name || d.name || "",
             displayName: profile.display_name || "",
             gender: profile.gender || "",
             language: profile.language || "",
@@ -67,7 +67,7 @@ const InfluencerProfilePage = () => {
             city: profile.city || "",
             bio: profile.bio || "",
             dateOfBirth: profile.dob ? profile.dob.split("T")[0] : "",
-          }));
+          };
           if (profile.image_url) {
             setProfileImage(profile.image_url);
           }
@@ -78,24 +78,28 @@ const InfluencerProfilePage = () => {
           });
         }
       } catch {
-        // First time user — no profile yet, that's fine
+        // First time user — no profile yet
       }
 
       // Restore draft form data saved before OAuth redirect
+      // Draft values take priority over API values (user's unsaved edits)
+      let draftData = {};
       const draft = localStorage.getItem("fruitee_profile_draft");
       if (draft) {
         try {
           const saved = JSON.parse(draft);
-          setFormData((prev) => {
-            const merged = { ...prev };
-            for (const key of Object.keys(saved)) {
-              if (saved[key]) merged[key] = saved[key];
-            }
-            return merged;
-          });
-        } catch { /* ignore parse errors */ }
-        localStorage.removeItem("fruitee_profile_draft");
+          for (const key of Object.keys(saved)) {
+            if (saved[key]) draftData[key] = saved[key];
+          }
+        } catch { /* ignore */ }
       }
+
+      // Merge: start with current state, apply API data, then overlay draft
+      setFormData((prev) => ({
+        ...prev,
+        ...apiData,
+        ...draftData,
+      }));
 
       setLoading(false);
     };
