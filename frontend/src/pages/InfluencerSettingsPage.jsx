@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
+import { userApi } from "../lib/api";
 import {
   Mail,
   Lock,
@@ -12,10 +13,26 @@ import {
   LogOut,
   AlertTriangle,
   Trash2,
+  Loader2,
 } from "lucide-react";
 
 const InfluencerSettingsPage = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const res = await userApi.getMe();
+        if (res.success && res.data) {
+          setEmail(res.data.email || "");
+        }
+      } catch { /* ignore */ }
+      setLoading(false);
+    };
+    loadUser();
+  }, []);
 
   return (
     <Layout userType="influencer">
@@ -34,6 +51,11 @@ const InfluencerSettingsPage = () => {
           </h1>
         </div>
 
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-orange-400" />
+          </div>
+        ) : (
         <div className="space-y-6">
           {/* Email */}
           <div className="bg-white rounded-3xl p-6 shadow-soft">
@@ -43,7 +65,7 @@ const InfluencerSettingsPage = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Email</p>
-                <p className="font-semibold text-foreground">creator@example.com</p>
+                <p className="font-semibold text-foreground" data-testid="user-email">{email}</p>
               </div>
             </div>
           </div>
@@ -140,6 +162,7 @@ const InfluencerSettingsPage = () => {
             Log Out
           </Button>
         </div>
+        )}
       </div>
     </Layout>
   );

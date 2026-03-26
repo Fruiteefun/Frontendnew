@@ -1,37 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../components/ui/table";
+import { userApi } from "../lib/api";
 import {
   Mail,
   Lock,
   User,
   Settings2,
   Tag,
-  DollarSign,
-  Download,
   ArrowLeft,
   LogOut,
   AlertTriangle,
   Trash2,
+  Loader2,
 } from "lucide-react";
 
 const BusinessSettingsPage = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const invoices = [
-    { id: "INV-B001", date: "2026-03-05", campaign: "Spring Launch", amount: "$2,500.00" },
-    { id: "INV-B002", date: "2026-02-10", campaign: "Brand Awareness", amount: "$1,800.00" },
-    { id: "INV-B003", date: "2026-01-15", campaign: "Holiday Push", amount: "$3,200.00" },
-  ];
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const res = await userApi.getMe();
+        if (res.success && res.data) {
+          setEmail(res.data.email || "");
+        }
+      } catch { /* ignore */ }
+      setLoading(false);
+    };
+    loadUser();
+  }, []);
 
   return (
     <Layout userType="business">
@@ -50,6 +51,11 @@ const BusinessSettingsPage = () => {
           </h1>
         </div>
 
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-orange-400" />
+          </div>
+        ) : (
         <div className="space-y-6">
           {/* Email */}
           <div className="bg-white rounded-3xl p-6 shadow-soft">
@@ -59,7 +65,7 @@ const BusinessSettingsPage = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Email</p>
-                <p className="font-semibold text-foreground">business@example.com</p>
+                <p className="font-semibold text-foreground" data-testid="user-email">{email}</p>
               </div>
             </div>
           </div>
@@ -123,51 +129,6 @@ const BusinessSettingsPage = () => {
             </div>
           </div>
 
-          {/* Campaign Payments */}
-          <div className="bg-white rounded-3xl p-6 shadow-soft">
-            <div className="flex items-center gap-2 mb-4">
-              <DollarSign className="w-5 h-5 text-green-500" />
-              <h2 className="font-outfit text-lg font-semibold">Campaign Payments</h2>
-            </div>
-
-            {/* Total Spent */}
-            <div className="text-center p-6 bg-gradient-to-br from-orange-50 to-pink-50 rounded-2xl mb-6">
-              <p className="text-4xl font-outfit font-bold bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent">
-                $7,500.00
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">Total Spent</p>
-            </div>
-
-            {/* Invoices */}
-            <h3 className="font-medium mb-3">Invoices</h3>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Invoice</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Campaign</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead className="text-right">PDF</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {invoices.map((invoice) => (
-                  <TableRow key={invoice.id}>
-                    <TableCell className="font-medium">{invoice.id}</TableCell>
-                    <TableCell>{invoice.date}</TableCell>
-                    <TableCell>{invoice.campaign}</TableCell>
-                    <TableCell>{invoice.amount}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Download className="w-4 h-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-
           {/* Account Actions */}
           <div className="bg-white rounded-3xl p-6 shadow-soft">
             <h2 className="font-outfit text-lg font-semibold mb-4">Account</h2>
@@ -201,6 +162,7 @@ const BusinessSettingsPage = () => {
             Log Out
           </Button>
         </div>
+        )}
       </div>
     </Layout>
   );

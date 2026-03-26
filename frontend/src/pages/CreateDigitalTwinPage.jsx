@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
 import { useDropzone } from "react-dropzone";
-import { Upload, Mic, MicOff, Check, Image, ArrowRight } from "lucide-react";
+import { Upload, Mic, MicOff, Check, Image, ArrowRight, Loader2 } from "lucide-react";
+import { influencerCloneApi } from "../lib/api";
 
 const CreateDigitalTwinPage = () => {
   const navigate = useNavigate();
@@ -11,6 +12,12 @@ const CreateDigitalTwinPage = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [hasRecorded, setHasRecorded] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [apiError, setApiError] = useState("");
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const timerRef = useRef(null);
 
   const onDrop = useCallback((acceptedFiles) => {
     const file = acceptedFiles[0];
@@ -24,43 +31,87 @@ const CreateDigitalTwinPage = () => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      "image/*": [".jpeg", ".jpg", ".png"],
-    },
-    maxSize: 10 * 1024 * 1024, // 10MB
+    accept: { "image/*": [".jpeg", ".jpg", ".png"] },
+    maxSize: 10 * 1024 * 1024,
     multiple: false,
   });
 
-  const toggleRecording = () => {
-    if (isRecording) {
-      setIsRecording(false);
-      setHasRecorded(true);
-    } else {
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        setAudioBlob(blob);
+        setHasRecorded(true);
+        stream.getTracks().forEach((t) => t.stop());
+      };
+
+      mediaRecorder.start();
       setIsRecording(true);
       setHasRecorded(false);
-      // Simulate recording timer
+      setRecordingTime(0);
+
       let time = 0;
-      const interval = setInterval(() => {
+      timerRef.current = setInterval(() => {
         time += 1;
         setRecordingTime(time);
         if (time >= 30) {
-          clearInterval(interval);
+          mediaRecorder.stop();
+          clearInterval(timerRef.current);
           setIsRecording(false);
-          setHasRecorded(true);
         }
       }, 1000);
+    } catch {
+      setApiError("Microphone access denied. Please allow microphone access and try again.");
     }
   };
 
-  const handleSubmit = () => {
-    const progress = JSON.parse(localStorage.getItem("fruitee_influencer_progress") || "{}");
-    progress["create-twin"] = true;
-    localStorage.setItem("fruitee_influencer_progress", JSON.stringify(progress));
-    // If registered, this is an edit → trigger regeneration
-    if (localStorage.getItem("fruitee_influencer_registered") === "true") {
-      localStorage.setItem("fruitee_twin_regenerating", "true");
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+      mediaRecorderRef.current.stop();
     }
-    navigate("/digital-twin-progress");
+    if (timerRef.current) clearInterval(timerRef.current);
+    setIsRecording(false);
+  };
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!uploadedImage?.file || !audioBlob) return;
+    setSubmitting(true);
+    setApiError("");
+
+    try {
+      // Upload clone image
+      await influencerCloneApi.createClone(uploadedImage.file);
+
+      // Upload voice recording
+      const audioFile = new File([audioBlob], "voice_recording.webm", { type: "audio/webm" });
+      await influencerCloneApi.createVoice(audioFile);
+
+      // Generate avatar video
+      await influencerCloneApi.generateAvatarVideo();
+
+      navigate("/digital-twin-progress");
+    } catch (err) {
+      setApiError(err.message || "Failed to create digital twin. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const scriptText = `"Hi everyone! I'm so excited to share something amazing with you. I've been working on creating my very own digital twin — a version of me that can connect with all of you in new and creative ways. Stay tuned for more!"`;
@@ -82,6 +133,12 @@ const CreateDigitalTwinPage = () => {
           </p>
         </div>
 
+        {apiError && (
+          <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-sm" data-testid="api-error">
+            {apiError}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Upload Photo Section */}
           <div className="bg-white rounded-3xl p-8 shadow-soft">
@@ -102,13 +159,13 @@ const CreateDigitalTwinPage = () => {
                 </span>
               </p>
               <p className="flex items-start gap-2 text-muted-foreground">
-                <span className="w-4 h-4 flex-shrink-0 text-center">✕</span>
+                <span className="w-4 h-4 flex-shrink-0 text-center">x</span>
                 <span>Avoid sunglasses, hats or heavy filters</span>
               </p>
               <p className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-teal-500 mt-0.5 flex-shrink-0" />
                 <span>
-                  Minimum resolution: <strong>512 × 512 px</strong>
+                  Minimum resolution: <strong>512 x 512 px</strong>
                 </span>
               </p>
             </div>
@@ -240,12 +297,21 @@ const CreateDigitalTwinPage = () => {
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!uploadedImage || !hasRecorded}
+            disabled={!uploadedImage || !hasRecorded || submitting}
             className="h-14 px-10 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white font-semibold text-lg shadow-lg shadow-orange-500/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             data-testid="generate-twin-btn"
           >
-            Generate Your Digital Twin
-            <ArrowRight className="w-5 h-5 ml-2" />
+            {submitting ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                Generate Your Digital Twin
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </>
+            )}
           </Button>
         </div>
       </div>

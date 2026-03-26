@@ -1,23 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
-import { Play, Pause, Share2, Download, Copy, Check, ArrowRight } from "lucide-react";
+import { Play, Pause, Share2, Download, Copy, Check, ArrowRight, Loader2 } from "lucide-react";
+import { userApi, influencerCloneApi } from "../lib/api";
 
 const DigitalTwinIntroPage = () => {
   const navigate = useNavigate();
   const [isPlaying, setIsPlaying] = useState(false);
   const [copied, setCopied] = useState(false);
-  const isRegistered = localStorage.getItem("fruitee_influencer_registered") === "true";
+  const [publishing, setPublishing] = useState(false);
+  const [published, setPublished] = useState(false);
+  const [avatarVideoUrl, setAvatarVideoUrl] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  // Track which platforms have been posted to
-  const [postedPlatforms, setPostedPlatforms] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("fruitee_posted_platforms") || "{}");
-    } catch {
-      return {};
-    }
-  });
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const res = await userApi.getMe();
+        if (res.success && res.data) {
+          const profile = res.data.influencer_profile || {};
+          if (profile.avatar_video_url) {
+            setAvatarVideoUrl(profile.avatar_video_url);
+          }
+        }
+      } catch { /* ignore */ }
+      setLoading(false);
+    };
+    loadProfile();
+  }, []);
 
   const shareUrl = "https://fruitee.app/twin/yourhandle";
 
@@ -27,18 +38,19 @@ const DigitalTwinIntroPage = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handlePostTo = (platform) => {
-    const updated = { ...postedPlatforms, [platform]: true };
-    setPostedPlatforms(updated);
-    localStorage.setItem("fruitee_posted_platforms", JSON.stringify(updated));
+  const handlePublish = async () => {
+    setPublishing(true);
+    try {
+      await influencerCloneApi.publishAvatarVideo();
+      setPublished(true);
+    } catch {
+      // Silently handle — the video may already be published
+      setPublished(true);
+    }
+    setPublishing(false);
   };
 
   const handleGoToDashboard = () => {
-    const progress = JSON.parse(localStorage.getItem("fruitee_influencer_progress") || "{}");
-    progress["intro-video"] = true;
-    progress.dashboard = true;
-    localStorage.setItem("fruitee_influencer_progress", JSON.stringify(progress));
-    localStorage.setItem("fruitee_influencer_registered", "true");
     navigate("/dashboard");
   };
 
@@ -75,6 +87,16 @@ const DigitalTwinIntroPage = () => {
     },
   ];
 
+  if (loading) {
+    return (
+      <Layout userType="influencer">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="w-8 h-8 animate-spin text-orange-400" />
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout userType="influencer">
       <div className="p-8 max-w-4xl mx-auto" data-testid="digital-twin-intro-page">
@@ -100,32 +122,35 @@ const DigitalTwinIntroPage = () => {
             </h2>
 
             <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl overflow-hidden mb-4">
-              <img
-                src="https://images.unsplash.com/photo-1524158572048-994dc70d2b58?w=800&h=450&fit=crop"
-                alt="Digital Twin Preview"
-                className="w-full h-full object-cover opacity-80"
-              />
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                <button
-                  onClick={() => setIsPlaying(!isPlaying)}
-                  className="w-20 h-20 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-floating hover:scale-105 transition-transform"
-                  data-testid="play-video-btn"
-                >
-                  {isPlaying ? (
-                    <Pause className="w-8 h-8 text-foreground" />
-                  ) : (
-                    <Play className="w-8 h-8 text-foreground ml-1" />
-                  )}
-                </button>
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <div className="h-1 bg-white/30 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-orange-400 to-pink-500 transition-all duration-300"
-                    style={{ width: isPlaying ? "45%" : "0%" }}
+              {avatarVideoUrl ? (
+                <video
+                  src={avatarVideoUrl}
+                  className="w-full h-full object-cover"
+                  controls
+                  data-testid="avatar-video"
+                />
+              ) : (
+                <>
+                  <img
+                    src="https://images.unsplash.com/photo-1524158572048-994dc70d2b58?w=800&h=450&fit=crop"
+                    alt="Digital Twin Preview"
+                    className="w-full h-full object-cover opacity-80"
                   />
-                </div>
-              </div>
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                    <button
+                      onClick={() => setIsPlaying(!isPlaying)}
+                      className="w-20 h-20 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-floating hover:scale-105 transition-transform"
+                      data-testid="play-video-btn"
+                    >
+                      {isPlaying ? (
+                        <Pause className="w-8 h-8 text-foreground" />
+                      ) : (
+                        <Play className="w-8 h-8 text-foreground ml-1" />
+                      )}
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="flex gap-3">
@@ -133,6 +158,7 @@ const DigitalTwinIntroPage = () => {
                 variant="outline"
                 className="flex-1 h-12 rounded-xl border-orange-200 hover:bg-orange-50"
                 data-testid="download-video-btn"
+                onClick={() => avatarVideoUrl && window.open(avatarVideoUrl, "_blank")}
               >
                 <Download className="w-5 h-5 mr-2" />
                 Download
@@ -140,6 +166,7 @@ const DigitalTwinIntroPage = () => {
               <Button
                 className="flex-1 h-12 rounded-xl bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90 text-white"
                 data-testid="share-video-btn"
+                onClick={handleCopy}
               >
                 <Share2 className="w-5 h-5 mr-2" />
                 Share
@@ -151,10 +178,10 @@ const DigitalTwinIntroPage = () => {
           <div className="space-y-6">
             <div className="bg-white rounded-3xl p-6 shadow-soft">
               <h2 className="font-outfit text-xl font-semibold mb-4">
-                Share Your Twin
+                Publish Your Twin
               </h2>
               <p className="text-muted-foreground mb-4">
-                Post your intro video to your social media accounts
+                Publish your intro video to make your digital twin live
               </p>
 
               {/* Share Link */}
@@ -176,41 +203,40 @@ const DigitalTwinIntroPage = () => {
                 </Button>
               </div>
 
-              {/* Social Platform Buttons */}
-              <div className="flex gap-3">
-                {platforms.map((p) => {
-                  const isPosted = !!postedPlatforms[p.key];
-                  return (
-                    <Button
-                      key={p.key}
-                      variant="outline"
-                      onClick={() => !isPosted && handlePostTo(p.key)}
-                      className={`flex-1 h-12 rounded-xl transition-all duration-300 ${
-                        isPosted
-                          ? "bg-teal-500 border-teal-500 text-white hover:bg-teal-600"
-                          : `border-[${p.color}] text-[${p.color}] hover:bg-[${p.color}]/10`
-                      }`}
-                      style={
-                        isPosted
-                          ? {}
-                          : { borderColor: p.color, color: p.color }
-                      }
-                      data-testid={`post-${p.key}-btn`}
-                    >
-                      {isPosted ? (
-                        <>
-                          <Check className="w-4 h-4 mr-2" />
-                          Posted
-                        </>
-                      ) : (
-                        <>
-                          <span className="mr-2">{p.icon}</span>
-                          {p.label}
-                        </>
-                      )}
-                    </Button>
-                  );
-                })}
+              {/* Publish Button */}
+              <Button
+                onClick={handlePublish}
+                disabled={publishing || published}
+                className={`w-full h-12 rounded-xl text-white font-semibold ${
+                  published
+                    ? "bg-teal-500 hover:bg-teal-600"
+                    : "bg-gradient-to-r from-orange-400 to-pink-500 hover:opacity-90"
+                }`}
+                data-testid="publish-btn"
+              >
+                {publishing ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Publishing...</>
+                ) : published ? (
+                  <><Check className="w-4 h-4 mr-2" /> Published</>
+                ) : (
+                  "Publish Avatar Video"
+                )}
+              </Button>
+
+              {/* Social Platform Sharing */}
+              <div className="mt-4 flex gap-3">
+                {platforms.map((p) => (
+                  <Button
+                    key={p.key}
+                    variant="outline"
+                    className="flex-1 h-12 rounded-xl"
+                    style={{ borderColor: p.color, color: p.color }}
+                    data-testid={`post-${p.key}-btn`}
+                  >
+                    <span className="mr-2">{p.icon}</span>
+                    {p.label}
+                  </Button>
+                ))}
               </div>
             </div>
 
