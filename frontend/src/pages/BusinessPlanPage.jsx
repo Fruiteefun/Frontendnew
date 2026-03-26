@@ -270,20 +270,6 @@ const BusinessPlanPage = () => {
           </p>
         </div>
 
-        {/* Generate Button */}
-        <div className="mb-6">
-          <Button
-            type="button"
-            onClick={handleGenerate}
-            disabled={generating || !campaignId}
-            className="h-12 px-6 rounded-xl bg-gradient-to-r from-teal-400 to-teal-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-teal-500/20"
-            data-testid="generate-plan-btn"
-          >
-            {generating ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Sparkles className="w-5 h-5 mr-2" />}
-            {generating ? "Generating Plan..." : "Auto-Generate Plan from Brand Data"}
-          </Button>
-        </div>
-
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-orange-400" />
