@@ -121,10 +121,11 @@ const SignInPage = () => {
         }
       }
     } catch (err) {
-      setOtpError(err.message || "Registration failed. Please try again.");
-      // If email already registered, suggest signing in
-      if (err.message?.toLowerCase().includes("already registered")) {
+      const msg = err.message || "Registration failed. Please try again.";
+      if (msg.toLowerCase().includes("already registered")) {
         setOtpError("This email is already registered. Please go back and sign in instead.");
+      } else {
+        setOtpError(msg);
       }
     } finally {
       setIsLoading(false);
