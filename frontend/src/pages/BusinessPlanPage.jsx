@@ -1,19 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import { ArrowRight, ArrowLeft, Plus, X, Target, Users, Swords, TrendingUp, Save, Loader2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, Plus, X, Target, Users, Swords, TrendingUp, Save, Loader2, Sparkles } from "lucide-react";
 import { isNumericOrFormatted } from "../lib/validation";
 import { campaignsApi } from "../lib/api";
 
 const FieldError = ({ message }) =>
   message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
 
+// Parse "Key: Value\nKey2: Value2" formatted strings back into field values
+const parseSection = (text, keys) => {
+  const result = {};
+  if (!text) return result;
+  for (const key of keys) {
+    const regex = new RegExp(`${key}:\\s*(.+?)(?:\\n|$)`, "i");
+    const match = text.match(regex);
+    if (match) result[key] = match[1].trim();
+  }
+  return result;
+};
+
 const BusinessPlanPage = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
   const [competitors, setCompetitors] = useState([
     {
       id: 1,
@@ -72,6 +86,111 @@ const BusinessPlanPage = () => {
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
 
+  const campaignId = localStorage.getItem("fruitee_activeCampaignId");
+
+  // Populate form from API plan data (4 strings → individual fields)
+  const populateFromPlan = (plan) => {
+    if (plan.target_market) {
+      const tm = parseSection(plan.target_market, ["Territory", "Market Size (Value)", "Market Size (Customers)"]);
+      setFormData((prev) => ({
+        ...prev,
+        territory: tm["Territory"] || plan.target_market || prev.territory,
+        marketSizeValue: tm["Market Size (Value)"] || prev.marketSizeValue,
+        marketSizeCustomers: tm["Market Size (Customers)"] || prev.marketSizeCustomers,
+      }));
+    }
+    if (plan.target_customer) {
+      const tc = parseSection(plan.target_customer, ["Age", "Gender", "Interests", "Income Level", "Lifestyle"]);
+      setFormData((prev) => ({
+        ...prev,
+        targetAge: tc["Age"] || prev.targetAge,
+        targetGender: tc["Gender"] || prev.targetGender,
+        targetInterests: tc["Interests"] || prev.targetInterests,
+        targetIncome: tc["Income Level"] || prev.targetIncome,
+        targetLifestyle: tc["Lifestyle"] || plan.target_customer || prev.targetLifestyle,
+      }));
+    }
+    if (plan.competition_analysis) {
+      // Parse competitors from the competition_analysis string
+      const compBlocks = plan.competition_analysis.split(/Competitor \d+:/i).filter(Boolean);
+      if (compBlocks.length > 0) {
+        const parsed = compBlocks.map((block, i) => {
+          const lines = block.trim().split("\n").map(l => l.trim());
+          const name = lines[0] || "";
+          const pos = parseSection(block, ["Positioning"]);
+          const plat = parseSection(block, ["Platforms"]);
+          const style = parseSection(block, ["Content Style"]);
+          const tactic = parseSection(block, ["Key Tactic"]);
+          return {
+            id: Date.now() + i,
+            name,
+            positioning: pos["Positioning"] || "",
+            platforms: plat["Platforms"] || "",
+            contentStyle: style["Content Style"] || "",
+            keyTactic: tactic["Key Tactic"] || "",
+          };
+        });
+        if (parsed.some(c => c.name)) setCompetitors(parsed);
+      }
+      const advMatch = plan.competition_analysis.match(/Advantage:\s*(.+)/i);
+      if (advMatch) setFormData((prev) => ({ ...prev, advantageOverCompetitors: advMatch[1].trim() }));
+    }
+    if (plan.growth_target) {
+      const gt = parseSection(plan.growth_target, ["Expected Followers", "Expected Likes", "Expected Customers"]);
+      setFormData((prev) => ({
+        ...prev,
+        expectedFollowers: gt["Expected Followers"] || prev.expectedFollowers,
+        expectedLikes: gt["Expected Likes"] || prev.expectedLikes,
+        expectedCustomers: gt["Expected Customers"] || prev.expectedCustomers,
+      }));
+    }
+  };
+
+  // Load existing plan on mount
+  useEffect(() => {
+    const loadPlan = async () => {
+      if (!campaignId) { setLoading(false); return; }
+      try {
+        const res = await campaignsApi.getPlan(campaignId);
+        if (res.success && res.data) {
+          populateFromPlan(res.data);
+        }
+      } catch { /* no plan yet */ }
+      setLoading(false);
+    };
+    loadPlan();
+  }, [campaignId]);
+
+  // Generate plan from previous screen data
+  const handleGenerate = async () => {
+    if (!campaignId) return;
+    setGenerating(true);
+    setErrors({});
+    try {
+      const res = await campaignsApi.generatePlan(campaignId);
+      if (res.success && res.data) {
+        populateFromPlan(res.data);
+      } else {
+        // Generation might be async — poll for the result
+        await new Promise(r => setTimeout(r, 3000));
+        const planRes = await campaignsApi.getPlan(campaignId);
+        if (planRes.success && planRes.data) {
+          populateFromPlan(planRes.data);
+        } else {
+          setErrors({ api: "Plan generation is processing. Please try refreshing in a moment." });
+        }
+      }
+    } catch (err) {
+      const msg = err.message || "";
+      if (msg.includes("500") || msg.includes("Internal")) {
+        setErrors({ api: "Plan generation service is temporarily unavailable. You can fill in the fields manually." });
+      } else {
+        setErrors({ api: msg || "Failed to generate plan" });
+      }
+    }
+    setGenerating(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = {};
@@ -84,8 +203,8 @@ const BusinessPlanPage = () => {
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
-    const campaignId = localStorage.getItem("fruitee_activeCampaignId");
-    if (!campaignId) { navigate("/campaign"); return; }
+    const cId = campaignId;
+    if (!cId) { navigate("/campaign"); return; }
 
     setSaving(true);
     try {
@@ -124,7 +243,7 @@ const BusinessPlanPage = () => {
         formData.expectedCustomers && `Expected Customers: ${formData.expectedCustomers}`,
       ].filter(Boolean).join("\n") || "Not specified";
 
-      await campaignsApi.updatePlan(campaignId, {
+      await campaignsApi.updatePlan(cId, {
         target_market: targetMarket,
         target_customer: targetCustomer,
         competition_analysis: competitionAnalysis,
@@ -151,6 +270,25 @@ const BusinessPlanPage = () => {
           </p>
         </div>
 
+        {/* Generate Button */}
+        <div className="mb-6">
+          <Button
+            type="button"
+            onClick={handleGenerate}
+            disabled={generating || !campaignId}
+            className="h-12 px-6 rounded-xl bg-gradient-to-r from-teal-400 to-teal-500 hover:opacity-90 text-white font-semibold shadow-lg shadow-teal-500/20"
+            data-testid="generate-plan-btn"
+          >
+            {generating ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Sparkles className="w-5 h-5 mr-2" />}
+            {generating ? "Generating Plan..." : "Auto-Generate Plan from Brand Data"}
+          </Button>
+        </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-orange-400" />
+          </div>
+        ) : (
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Target Market */}
           <div className="bg-white rounded-3xl p-8 shadow-soft space-y-6">
@@ -525,6 +663,7 @@ const BusinessPlanPage = () => {
             </Button>
           </div>
         </form>
+        )}
       </div>
     </Layout>
   );
