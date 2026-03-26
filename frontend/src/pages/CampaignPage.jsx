@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
@@ -14,12 +14,32 @@ const FieldError = ({ message }) =>
 const CampaignPage = () => {
   const navigate = useNavigate();
   const brandId = localStorage.getItem("fruitee_activeBrandId");
+  const campaignId = localStorage.getItem("fruitee_activeCampaignId");
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(!!campaignId);
   const [formData, setFormData] = useState({
     campaignName: "",
     startDate: "",
   });
+
+  // Load existing campaign data on mount
+  useEffect(() => {
+    if (!campaignId) return;
+    const loadCampaign = async () => {
+      try {
+        const res = await campaignsApi.get(campaignId);
+        if (res.success && res.data) {
+          setFormData({
+            campaignName: res.data.name || "",
+            startDate: res.data.start_date ? res.data.start_date.split("T")[0] : "",
+          });
+        }
+      } catch { /* new campaign */ }
+      setLoading(false);
+    };
+    loadCampaign();
+  }, [campaignId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,12 +58,20 @@ const CampaignPage = () => {
 
     setSaving(true);
     try {
-      const res = await campaignsApi.create(brandId, {
-        name: formData.campaignName,
-        start_date: new Date(formData.startDate).toISOString(),
-      });
-      if (res.success && res.data) {
-        localStorage.setItem("fruitee_activeCampaignId", res.data.id);
+      let res;
+      if (campaignId) {
+        res = await campaignsApi.update(campaignId, {
+          name: formData.campaignName,
+          start_date: new Date(formData.startDate).toISOString(),
+        });
+      } else {
+        res = await campaignsApi.create(brandId, {
+          name: formData.campaignName,
+          start_date: new Date(formData.startDate).toISOString(),
+        });
+        if (res.success && res.data) {
+          localStorage.setItem("fruitee_activeCampaignId", res.data.id);
+        }
       }
       navigate("/campaign-type");
     } catch (err) {
@@ -58,13 +86,18 @@ const CampaignPage = () => {
       <div className="p-8 max-w-3xl mx-auto" data-testid="campaign-page">
         <div className="mb-8">
           <h1 className="font-outfit text-4xl font-bold text-foreground mb-2">
-            Create Your Campaign
+            {campaignId ? "Edit Campaign" : "Create Your Campaign"}
           </h1>
           <p className="text-muted-foreground">
             Set up your campaign details
           </p>
         </div>
 
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-orange-400" />
+          </div>
+        ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="bg-white rounded-3xl p-8 shadow-soft space-y-6">
             {/* 1. Campaign Name */}
@@ -138,6 +171,7 @@ const CampaignPage = () => {
             </Button>
           </div>
         </form>
+        )}
       </div>
     </Layout>
   );

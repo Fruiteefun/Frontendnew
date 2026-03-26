@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
 import { Check, ArrowRight, ArrowLeft, Lock, Calendar, Loader2 } from "lucide-react";
+import { campaignsApi } from "../lib/api";
 
 const API_BASE = process.env.REACT_APP_BACKEND_URL;
 
@@ -27,7 +28,6 @@ const PaymentPage = () => {
         const data = await res.json();
         setPrices(data.prices);
       } catch {
-        // Fallback prices
         setPrices({
           "1_week": { base_price: 49.99, vat: 10.00, total: 59.99, label: "1 Week" },
           "1_month": { base_price: 149.99, vat: 30.00, total: 179.99, label: "1 Month" },
@@ -74,6 +74,10 @@ const PaymentPage = () => {
   const handlePayment = async () => {
     setLoading(true);
     try {
+      // Select duration via API
+      if (campaignId) {
+        await campaignsApi.selectDuration(campaignId, selectedDuration).catch(() => {});
+      }
       const res = await fetch(`${API_BASE}/api/stripe/checkout/campaign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
