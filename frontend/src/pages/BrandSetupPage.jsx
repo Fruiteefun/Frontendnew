@@ -35,9 +35,13 @@ const BrandSetupPage = () => {
     if (!brandId) return;
     setConnecting(platform);
     try {
-      // Save form state before OAuth redirect
+      // Save ALL form state before OAuth redirect
       localStorage.setItem("fruitee_brand_setup_draft", JSON.stringify({
-        websiteUrl, brandColors, newColor,
+        websiteUrl,
+        brandColors,
+        newColor,
+        brandLogoPreview: brandLogo?.preview || "",
+        productImagePreviews: productImages.map(img => img.preview || ""),
       }));
       const returnUrl = window.location.href.split("?")[0];
       const apiPlatform = platform.replace("_shop", "-shop");
@@ -57,16 +61,21 @@ const BrandSetupPage = () => {
   useEffect(() => {
     const loadBrand = async () => {
       if (!brandId) { setLoading(false); return; }
+
+      let apiWebsite = "https://";
+      let apiColors = [];
+      let apiLogoPreview = "";
+
       try {
         const res = await brandsApi.get(brandId);
         if (res.success && res.data) {
           const b = res.data;
-          setWebsiteUrl(b.website || "https://");
+          apiWebsite = b.website || "https://";
           if (b.brand_colours?.length) {
-            setBrandColors(b.brand_colours.map((c, i) => ({ id: i, color: c })));
+            apiColors = b.brand_colours.map((c, i) => ({ id: i, color: c }));
           }
           if (b.logo_url) {
-            setBrandLogo({ preview: b.logo_url });
+            apiLogoPreview = b.logo_url;
           }
           setConnectedPlatforms({
             instagram: !!b.is_instagram_connected,
@@ -79,15 +88,32 @@ const BrandSetupPage = () => {
         // New brand — no data yet
       }
 
-      // Restore draft saved before OAuth redirect
+      // Restore draft saved before OAuth redirect — draft overrides API
       const draft = localStorage.getItem("fruitee_brand_setup_draft");
       if (draft) {
         try {
           const saved = JSON.parse(draft);
-          if (saved.websiteUrl) setWebsiteUrl(saved.websiteUrl);
-          if (saved.brandColors?.length) setBrandColors(saved.brandColors);
+          setWebsiteUrl(saved.websiteUrl && saved.websiteUrl !== "https://" ? saved.websiteUrl : apiWebsite);
+          if (saved.brandColors?.length) {
+            setBrandColors(saved.brandColors);
+          } else if (apiColors.length) {
+            setBrandColors(apiColors);
+          }
           if (saved.newColor) setNewColor(saved.newColor);
+          if (saved.brandLogoPreview) {
+            setBrandLogo({ preview: saved.brandLogoPreview });
+          } else if (apiLogoPreview) {
+            setBrandLogo({ preview: apiLogoPreview });
+          }
+          if (saved.productImagePreviews?.length) {
+            setProductImages(saved.productImagePreviews.map((url, i) => ({ id: i, preview: url })));
+          }
         } catch { /* ignore */ }
+      } else {
+        // No draft — use API data
+        setWebsiteUrl(apiWebsite);
+        if (apiColors.length) setBrandColors(apiColors);
+        if (apiLogoPreview) setBrandLogo({ preview: apiLogoPreview });
       }
 
       setLoading(false);
