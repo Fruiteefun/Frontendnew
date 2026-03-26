@@ -79,9 +79,25 @@ const InfluencerProfilePage = () => {
         }
       } catch {
         // First time user — no profile yet, that's fine
-      } finally {
-        setLoading(false);
       }
+
+      // Restore draft form data saved before OAuth redirect
+      const draft = localStorage.getItem("fruitee_profile_draft");
+      if (draft) {
+        try {
+          const saved = JSON.parse(draft);
+          setFormData((prev) => {
+            const merged = { ...prev };
+            for (const key of Object.keys(saved)) {
+              if (saved[key]) merged[key] = saved[key];
+            }
+            return merged;
+          });
+        } catch { /* ignore parse errors */ }
+        localStorage.removeItem("fruitee_profile_draft");
+      }
+
+      setLoading(false);
     };
     loadProfile();
   }, []);
@@ -89,6 +105,8 @@ const InfluencerProfilePage = () => {
   const handleSocialConnect = async (platform) => {
     setConnecting(platform);
     try {
+      // Save form data before redirecting so it persists after OAuth return
+      localStorage.setItem("fruitee_profile_draft", JSON.stringify(formData));
       const returnUrl = window.location.href.split("?")[0];
       const res = await socialAuthApi.influencerAuthUrl(platform, returnUrl);
       if (res.success && res.data?.auth_url) {
@@ -184,6 +202,7 @@ const InfluencerProfilePage = () => {
       }
 
       await refreshUser();
+      localStorage.removeItem("fruitee_profile_draft");
       navigate("/influencer-preferences");
     } catch (err) {
       setErrors({ api: err.message });
