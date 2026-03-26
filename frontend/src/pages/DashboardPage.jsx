@@ -35,7 +35,7 @@ import {
 } from "recharts";
 
 const DashboardPage = () => {
-  const userType = localStorage.getItem("fruitee_userType") || "business";
+  const userType = localStorage.getItem("userRole") || "business";
   const [periodFilter, setPeriodFilter] = useState("last-month");
   const [campaignFilter, setCampaignFilter] = useState("all");
   const [customStartDate, setCustomStartDate] = useState("");

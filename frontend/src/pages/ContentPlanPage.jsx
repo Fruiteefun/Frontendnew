@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 const ContentPlanPage = () => {
-  const userType = localStorage.getItem("fruitee_userType") || "business";
+  const userType = localStorage.getItem("userRole") || "business";
   const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date(2026, 2, 1)); // March 2026
 
