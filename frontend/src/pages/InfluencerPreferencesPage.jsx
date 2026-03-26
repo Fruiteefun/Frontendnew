@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
@@ -10,6 +10,7 @@ const InfluencerPreferencesPage = () => {
   const navigate = useNavigate();
   const { refreshUser } = useAuth();
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState("");
 
   const [consents, setConsents] = useState({
@@ -91,6 +92,50 @@ const InfluencerPreferencesPage = () => {
     "Asia",
     "Prefer to remain local to my current region",
   ];
+
+  // Load saved preferences on mount
+  useEffect(() => {
+    const loadSavedPreferences = async () => {
+      try {
+        const res = await influencerOnboardApi.getQuestions();
+        if (res.success && res.data) {
+          const fieldMap = {};
+          for (const section of res.data) {
+            for (const field of section.fields || []) {
+              if (field.key && field.default != null) {
+                fieldMap[field.key] = field.default;
+              }
+            }
+          }
+          if (fieldMap.consent_name != null) {
+            setConsents({
+              name: !!fieldMap.consent_name,
+              likeness: !!fieldMap.consent_likeness,
+              voice: !!fieldMap.consent_voice,
+              categories: !!fieldMap.consent_category_limits,
+              pause: !!fieldMap.consent_pause_participation,
+              aiIdentified: !!fieldMap.consent_identified_as_ai,
+              published: !!fieldMap.consent_remains_live,
+            });
+          }
+          if (Array.isArray(fieldMap.allowed_categories) && fieldMap.allowed_categories.length > 0) setSelectedCategories(fieldMap.allowed_categories);
+          if (Array.isArray(fieldMap.preferred_tones) && fieldMap.preferred_tones.length > 0) setSelectedTones(fieldMap.preferred_tones);
+          if (Array.isArray(fieldMap.brand_positioning) && fieldMap.brand_positioning.length > 0) setSelectedPillars(fieldMap.brand_positioning);
+          if (Array.isArray(fieldMap.audience_type) && fieldMap.audience_type.length > 0) setSelectedAudiences(fieldMap.audience_type);
+          if (Array.isArray(fieldMap.allowed_regions) && fieldMap.allowed_regions.length > 0) setSelectedRegions(fieldMap.allowed_regions);
+          if (fieldMap.understands_pausing_participation != null) setParticipationConsent(!!fieldMap.understands_pausing_participation);
+          if (fieldMap.understands_shown_campaigns != null || fieldMap.understands_automated_matching != null) {
+            setMatchingConsents({
+              aligned: !!fieldMap.understands_shown_campaigns,
+              automated: !!fieldMap.understands_automated_matching,
+            });
+          }
+        }
+      } catch { /* first time user — no saved prefs */ }
+      setLoading(false);
+    };
+    loadSavedPreferences();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -207,6 +252,11 @@ const InfluencerPreferencesPage = () => {
           </p>
         </div>
 
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-orange-400" />
+          </div>
+        ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           {apiError && (
             <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm" data-testid="api-error">
@@ -462,6 +512,7 @@ const InfluencerPreferencesPage = () => {
             </Button>
           </div>
         </form>
+        )}
       </div>
     </Layout>
   );
