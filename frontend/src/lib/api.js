@@ -74,16 +74,22 @@ export const authApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    let json;
     try {
-      json = await res.json();
-    } catch {
-      throw new Error("Registration failed");
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || json.detail || json.message || `Registration failed (${res.status})`);
+      }
+      return json;
+    } catch (err) {
+      if (err.message && (err.message.includes("already registered") || err.message.includes("Registration failed") || err.message.includes("valid email") || err.message.includes("Field required"))) {
+        throw err;
+      }
+      if (res.status === 400) throw new Error("Registration failed. This email may already be registered.");
+      if (res.status === 422) throw new Error("Invalid registration details. Please check your input.");
+      if (res.status === 429) throw new Error("Too many attempts. Please wait and try again.");
+      if (res.status >= 500) throw new Error("Server error. Please try again later.");
+      throw new Error("Registration failed. Please try again.");
     }
-    if (!res.ok || !json.success) {
-      throw new Error(json.error || json.detail || "Registration failed");
-    }
-    return json;
   },
 
   registerInfluencer: async (email, password) => {
@@ -92,16 +98,24 @@ export const authApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    let json;
     try {
-      json = await res.json();
-    } catch {
-      throw new Error("Registration failed");
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || json.detail || json.message || `Registration failed (${res.status})`);
+      }
+      return json;
+    } catch (err) {
+      // If we already extracted a meaningful API error, rethrow it
+      if (err.message && (err.message.includes("already registered") || err.message.includes("Registration failed") || err.message.includes("valid email") || err.message.includes("Field required"))) {
+        throw err;
+      }
+      // Otherwise the body couldn't be parsed — derive message from status code
+      if (res.status === 400) throw new Error("Registration failed. This email may already be registered.");
+      if (res.status === 422) throw new Error("Invalid registration details. Please check your input.");
+      if (res.status === 429) throw new Error("Too many attempts. Please wait and try again.");
+      if (res.status >= 500) throw new Error("Server error. Please try again later.");
+      throw new Error("Registration failed. Please try again.");
     }
-    if (!res.ok || !json.success) {
-      throw new Error(json.error || json.detail || "Registration failed");
-    }
-    return json;
   },
 
   login: async (email, password) => {
@@ -110,16 +124,21 @@ export const authApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    let json;
     try {
-      json = await res.json();
-    } catch {
-      throw new Error("Invalid email or password");
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || json.detail || json.message || "Invalid email or password");
+      }
+      return json;
+    } catch (err) {
+      if (err.message && (err.message.includes("Invalid") || err.message.includes("credentials") || err.message.includes("disabled") || err.message.includes("email"))) {
+        throw err;
+      }
+      if (res.status === 401) throw new Error("Incorrect email or password. Please try again.");
+      if (res.status === 429) throw new Error("Too many login attempts. Please wait and try again.");
+      if (res.status >= 500) throw new Error("Server error. Please try again later.");
+      throw new Error("Login failed. Please try again.");
     }
-    if (!res.ok || !json.success) {
-      throw new Error(json.error || json.detail || "Invalid email or password");
-    }
-    return json;
   },
 
   logout: () =>

@@ -20,6 +20,20 @@ import { isValidEmail, isValidPhone, isValidPassword, isNotEmpty } from "../lib/
 
 const HARDCODED_OTP = "123456";
 
+const friendlyError = (msg) => {
+  const m = (msg || "").toLowerCase();
+  if (m.includes("already registered")) return "This email is already registered. Please go back and sign in instead.";
+  if (m.includes("invalid credentials")) return "Incorrect email or password. Please try again.";
+  if (m.includes("not a valid email")) return "Please enter a valid email address.";
+  if (m.includes("email") && m.includes("field required") && m.includes("password")) return "Email and password are required.";
+  if (m.includes("email") && m.includes("field required")) return "Email is required.";
+  if (m.includes("password") && m.includes("field required")) return "Password is required.";
+  if (m.includes("account") && m.includes("disabled")) return "Your account has been disabled. Please contact support.";
+  if (m.includes("too many")) return "Too many attempts. Please wait a moment and try again.";
+  if (m.includes("network") || m.includes("fetch")) return "Connection error. Please check your internet and try again.";
+  return msg || "Something went wrong. Please try again.";
+};
+
 const FieldError = ({ message }) =>
   message ? <p className="text-xs text-red-500 mt-1" data-testid="field-error">{message}</p> : null;
 
@@ -121,12 +135,7 @@ const SignInPage = () => {
         }
       }
     } catch (err) {
-      const msg = err.message || "Registration failed. Please try again.";
-      if (msg.toLowerCase().includes("already registered")) {
-        setOtpError("This email is already registered. Please go back and sign in instead.");
-      } else {
-        setOtpError(msg);
-      }
+      setOtpError(friendlyError(err.message));
     } finally {
       setIsLoading(false);
     }
@@ -167,7 +176,7 @@ const SignInPage = () => {
         setOtpError("");
       }
     } catch (err) {
-      setApiError(err.message || "Something went wrong. Please try again.");
+      setApiError(friendlyError(err.message));
     } finally {
       setIsLoading(false);
     }

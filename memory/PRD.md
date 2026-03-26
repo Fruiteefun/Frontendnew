@@ -58,6 +58,11 @@ Build "Fruitee," a social media campaign management platform with:
 - Fixed image_url field name bug on InfluencerProfilePage
 - All pages store File objects and pass to FormData correctly
 
+### Error Handling Improvements (Complete - March 26, 2026)
+- Fixed auth error messages: registration and login now show user-friendly errors instead of raw API/network errors
+- Status-code-based fallback in api.js for when response body can't be parsed
+- friendlyError helper in SignInPage.jsx maps common patterns to plain English
+
 ### Earnings Preview Page (Complete - March 26, 2026)
 - New page `/earnings-preview` inserted between Influencer Preferences and Payment
 - Fetches tiered pricing from `GET /campaigns/pricing-list` API
