@@ -58,6 +58,13 @@ Build "Fruitee," a social media campaign management platform with:
 - Fixed image_url field name bug on InfluencerProfilePage
 - All pages store File objects and pass to FormData correctly
 
+### Earnings Preview Page (Complete - March 26, 2026)
+- New page `/earnings-preview` inserted between Influencer Preferences and Payment
+- Fetches tiered pricing from `GET /campaigns/pricing-list` API
+- Shows 6 tiers (Nano → Celebrity) with per-platform (Instagram/TikTok/YouTube) pricing
+- Highlights user's current tier based on follower count
+- Flow: Preferences → Earnings Preview → Payment
+
 ### P1 - Social Media OAuth
 - Instagram, TikTok, YouTube connect buttons exist in UI
 - Need OAuth 2.0 flow via /auth/url and /auth/callback endpoints
@@ -87,5 +94,6 @@ Build "Fruitee," a social media campaign management platform with:
 - `/app/frontend/src/lib/api.js` - Central API service layer
 - `/app/frontend/src/contexts/AuthContext.jsx` - Auth state management
 - `/app/backend/server.py` - Reverse proxy + local API
+- `/app/frontend/src/pages/EarningsPreviewPage.jsx` - Tiered earnings display
 - `/app/frontend/public/Fruitee_UI_vs_API_Gap_Analysis.md` - Gap analysis
 - `/app/frontend/public/Fruitee_API_Endpoints_Reference.md` - API reference

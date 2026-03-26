@@ -24,6 +24,7 @@ import CreateDigitalTwinPage from "./pages/CreateDigitalTwinPage";
 import DigitalTwinProgressPage from "./pages/DigitalTwinProgressPage";
 import DigitalTwinIntroPage from "./pages/DigitalTwinIntroPage";
 import InfluencerSettingsPage from "./pages/InfluencerSettingsPage";
+import EarningsPreviewPage from "./pages/EarningsPreviewPage";
 
 // Business Pages
 import BusinessProfilePage from "./pages/BusinessProfilePage";
@@ -57,6 +58,7 @@ function App() {
           {/* Influencer Flow */}
           <Route path="/influencer-profile" element={<InfluencerProfilePage />} />
           <Route path="/influencer-preferences" element={<InfluencerPreferencesPage />} />
+          <Route path="/earnings-preview" element={<EarningsPreviewPage />} />
           <Route path="/influencer-payment" element={<InfluencerPaymentPage />} />
           <Route path="/create-digital-twin" element={<CreateDigitalTwinPage />} />
           <Route path="/digital-twin-progress" element={<DigitalTwinProgressPage />} />

@@ -130,7 +130,7 @@ const InfluencerPreferencesPage = () => {
         allowed_regions: selectedRegions,
       });
       await refreshUser();
-      navigate("/influencer-payment");
+      navigate("/earnings-preview");
     } catch (err) {
       setApiError(err.message);
     } finally {

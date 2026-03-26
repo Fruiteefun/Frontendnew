@@ -7,10 +7,10 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://fruitee-creator-hub.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://social-earnings-11.preview.emergentagent.com').rstrip('/')
 
 # Test origin URL for Stripe redirects
-TEST_ORIGIN = "https://fruitee-creator-hub.preview.emergentagent.com"
+TEST_ORIGIN = "https://social-earnings-11.preview.emergentagent.com"
 
 
 class TestCampaignPrices:

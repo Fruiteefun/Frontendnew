@@ -7,7 +7,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://fruitee-creator-hub.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://social-earnings-11.preview.emergentagent.com').rstrip('/')
 
 # Generate unique test identifiers
 TEST_ID = str(int(time.time()))
