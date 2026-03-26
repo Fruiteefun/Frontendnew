@@ -209,7 +209,7 @@ const EarningsPreviewPage = () => {
                           <p className={`text-2xl font-outfit font-bold ${
                             isLocked ? "text-gray-400" : "text-foreground"
                           }`}>
-                            {formatPrice(price)}
+                            {isLocked ? "—" : formatPrice(price)}
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">{dur.desc}</p>
                         </div>
@@ -220,8 +220,8 @@ const EarningsPreviewPage = () => {
                   {/* Unlock message for locked tiers */}
                   {isLocked && (
                     <div className="mt-3 flex items-start gap-2 px-4 py-3 bg-blue-50 rounded-xl">
-                      <TrendingUp className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                      <p className="text-xs text-blue-700">
+                      <TrendingUp className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm font-medium text-blue-700">
                         Grow to {meta.engagement} engagement and {meta.followers} followers to unlock this tier
                       </p>
                     </div>
