@@ -97,18 +97,25 @@ const CreateDigitalTwinPage = () => {
 
     try {
       // Upload clone image
-      await influencerCloneApi.createClone(uploadedImage.file);
+      const cloneRes = await influencerCloneApi.createClone(uploadedImage.file);
+      if (!cloneRes.success) throw new Error(cloneRes.error || "Image upload failed");
 
       // Upload voice recording
       const audioFile = new File([audioBlob], "voice_recording.webm", { type: "audio/webm" });
-      await influencerCloneApi.createVoice(audioFile);
+      const voiceRes = await influencerCloneApi.createVoice(audioFile);
+      if (!voiceRes.success) throw new Error(voiceRes.error || "Voice upload failed");
 
       // Generate avatar video
       await influencerCloneApi.generateAvatarVideo();
 
       navigate("/digital-twin-progress");
     } catch (err) {
-      setApiError(err.message || "Failed to create digital twin. Please try again.");
+      const msg = err.message || "";
+      if (msg.includes("500") || msg.includes("Internal Server")) {
+        setApiError("The digital twin service is temporarily unavailable. Please try again in a few minutes.");
+      } else {
+        setApiError(msg || "Failed to create digital twin. Please try again.");
+      }
     } finally {
       setSubmitting(false);
     }
