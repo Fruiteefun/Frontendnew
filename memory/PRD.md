@@ -58,6 +58,13 @@ Build "Fruitee," a social media campaign management platform with:
 - Fixed image_url field name bug on InfluencerProfilePage
 - All pages store File objects and pass to FormData correctly
 
+### Remaining Mock Pages Connected to Backend (Complete - March 26, 2026)
+- DashboardPage: Loads real metrics from `influencerMetricsApi.get()` and campaigns from `getCampaigns()`. Shows proper empty states.
+- ContentPlanPage: Loads from `campaignsApi.getContentPlan()`, has Generate button calling `generateContentPlan()` and Start Campaign button.
+- InfluencersPage: Loads from `campaignsApi.recommendInfluencers()` with filter UI and selection/API submission.
+- CampaignPage: Loads existing campaign via `campaignsApi.get()` for edit mode, supports both create and update.
+- PaymentPage: Uses `campaignsApi.selectDuration()` before Stripe checkout, with proper price display.
+
 ### Page Data Fetching Audit & Fixes (Complete - March 26, 2026)
 - InfluencerSettingsPage: Loads real email from `/users/me`, removed mock payments/invoices, fixed quick links
 - BusinessSettingsPage: Loads real email from `/users/me`, removed mock invoices
