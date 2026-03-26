@@ -58,6 +58,14 @@ Build "Fruitee," a social media campaign management platform with:
 - Fixed image_url field name bug on InfluencerProfilePage
 - All pages store File objects and pass to FormData correctly
 
+### Page Data Fetching Audit & Fixes (Complete - March 26, 2026)
+- InfluencerSettingsPage: Loads real email from `/users/me`, removed mock payments/invoices, fixed quick links
+- BusinessSettingsPage: Loads real email from `/users/me`, removed mock invoices
+- BusinessPreferencesPage: Loads saved preferences from `/businesses/onboard/questions` on revisit
+- CreateDigitalTwinPage: Connected to `influencerCloneApi.createClone()` + `createVoice()` + `generateAvatarVideo()`
+- DigitalTwinProgressPage: Polls `userApi.getMe()` for real `clone_job_status`, `voice_job_status`, `avatar_video_job_status`
+- DigitalTwinIntroPage: Loads `avatar_video_url` from profile, uses `publishAvatarVideo()` API
+
 ### Error Handling Improvements (Complete - March 26, 2026)
 - Fixed auth error messages: registration and login now show user-friendly errors instead of raw API/network errors
 - Status-code-based fallback in api.js for when response body can't be parsed
