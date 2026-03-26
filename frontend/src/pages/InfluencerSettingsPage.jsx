@@ -1,49 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/ui/button";
-import { Switch } from "../components/ui/switch";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../components/ui/table";
 import {
   Mail,
   Lock,
   User,
   Settings2,
   Sparkles,
-  CreditCard,
-  DollarSign,
-  FileText,
-  Download,
   ArrowLeft,
   LogOut,
   AlertTriangle,
   Trash2,
-  CheckCircle,
-  Clock,
 } from "lucide-react";
 
 const InfluencerSettingsPage = () => {
   const navigate = useNavigate();
-  const [autoRenew, setAutoRenew] = useState(true);
-
-  const invoices = [
-    { id: "INV-001", date: "2026-03-01", amount: "$120.00" },
-    { id: "INV-002", date: "2026-02-01", amount: "$120.00" },
-    { id: "INV-003", date: "2026-01-01", amount: "$120.00" },
-  ];
-
-  const payments = [
-    { id: "PAY-001", date: "2026-03-10", amount: "$450.00", status: "received" },
-    { id: "PAY-002", date: "2026-02-15", amount: "$300.00", status: "due" },
-    { id: "PAY-003", date: "2026-01-20", amount: "$600.00", status: "received" },
-  ];
 
   return (
     <Layout userType="influencer">
@@ -113,7 +85,7 @@ const InfluencerSettingsPage = () => {
                 <span className="font-medium">Edit Profile</span>
               </Link>
               <Link
-                to="/business-preferences"
+                to="/influencer-preferences"
                 className="flex items-center gap-4 p-3 rounded-xl hover:bg-muted transition-colors"
                 data-testid="edit-preferences-link"
               >
@@ -133,130 +105,6 @@ const InfluencerSettingsPage = () => {
                 <span className="font-medium">Edit Digital Twin</span>
               </Link>
             </div>
-          </div>
-
-          {/* Subscription */}
-          <div className="bg-white rounded-3xl p-6 shadow-soft">
-            <div className="flex items-center gap-2 mb-4">
-              <CreditCard className="w-5 h-5 text-teal-500" />
-              <h2 className="font-outfit text-lg font-semibold">Subscription</h2>
-            </div>
-
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="font-semibold text-foreground">Pro Creator Plan</p>
-                <p className="text-sm text-muted-foreground">$120/month</p>
-              </div>
-              <span className="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm font-medium">
-                Active
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between py-4 border-t border-gray-100">
-              <span className="text-muted-foreground">Auto-renew</span>
-              <Switch
-                checked={autoRenew}
-                onCheckedChange={setAutoRenew}
-                data-testid="auto-renew-switch"
-              />
-            </div>
-
-            {/* Invoices */}
-            <div className="mt-4">
-              <h3 className="font-medium mb-3">Invoices</h3>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Invoice</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead className="text-right">PDF</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {invoices.map((invoice) => (
-                    <TableRow key={invoice.id}>
-                      <TableCell className="font-medium">{invoice.id}</TableCell>
-                      <TableCell>{invoice.date}</TableCell>
-                      <TableCell>{invoice.amount}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Download className="w-4 h-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-
-          {/* Payments */}
-          <div className="bg-white rounded-3xl p-6 shadow-soft">
-            <div className="flex items-center gap-2 mb-4">
-              <DollarSign className="w-5 h-5 text-green-500" />
-              <h2 className="font-outfit text-lg font-semibold">Payments</h2>
-            </div>
-
-            {/* Payment Stats */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="text-center p-4 bg-gradient-to-br from-green-50 to-teal-50 rounded-2xl">
-                <p className="text-2xl font-outfit font-bold text-green-600">$1,350.00</p>
-                <p className="text-sm text-muted-foreground">Total Earnings</p>
-              </div>
-              <div className="text-center p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl">
-                <p className="text-2xl font-outfit font-bold text-yellow-600">$300.00</p>
-                <p className="text-sm text-muted-foreground">Payments Due</p>
-              </div>
-              <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl">
-                <p className="text-2xl font-outfit font-bold text-blue-600">$1,050.00</p>
-                <p className="text-sm text-muted-foreground">Received</p>
-              </div>
-            </div>
-
-            {/* Payment History */}
-            <h3 className="font-medium mb-3">Payment History</h3>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">PDF</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {payments.map((payment) => (
-                  <TableRow key={payment.id}>
-                    <TableCell className="font-medium">{payment.id}</TableCell>
-                    <TableCell>{payment.date}</TableCell>
-                    <TableCell>{payment.amount}</TableCell>
-                    <TableCell>
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                          payment.status === "received"
-                            ? "bg-teal-100 text-teal-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}
-                      >
-                        {payment.status === "received" ? (
-                          <CheckCircle className="w-3 h-3" />
-                        ) : (
-                          <Clock className="w-3 h-3" />
-                        )}
-                        {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Download className="w-4 h-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
           </div>
 
           {/* Account Actions */}
