@@ -146,7 +146,7 @@ const BusinessPlanPage = () => {
     }
   };
 
-  // Load existing plan on mount
+  // Load existing plan on mount — auto-generate if none exists
   useEffect(() => {
     const loadPlan = async () => {
       if (!campaignId) { setLoading(false); return; }
@@ -154,8 +154,29 @@ const BusinessPlanPage = () => {
         const res = await campaignsApi.getPlan(campaignId);
         if (res.success && res.data) {
           populateFromPlan(res.data);
+          setLoading(false);
+          return;
         }
       } catch { /* no plan yet */ }
+
+      // No plan exists — try to auto-generate
+      setGenerating(true);
+      try {
+        const genRes = await campaignsApi.generatePlan(campaignId);
+        if (genRes.success && genRes.data) {
+          populateFromPlan(genRes.data);
+        } else {
+          // Try fetching after generate (might be async)
+          await new Promise(r => setTimeout(r, 2000));
+          const retryRes = await campaignsApi.getPlan(campaignId);
+          if (retryRes.success && retryRes.data) {
+            populateFromPlan(retryRes.data);
+          }
+        }
+      } catch {
+        // Generate service unavailable — user can fill manually
+      }
+      setGenerating(false);
       setLoading(false);
     };
     loadPlan();
